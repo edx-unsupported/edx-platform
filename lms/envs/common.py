@@ -1618,6 +1618,9 @@ INSTALLED_APPS = (
     'survey',
 
     'lms.djangoapps.lms_xblock',
+    
+    # EDX API application
+    'api_manager',    
 )
 
 ######################### MARKETING SITE ###############################
