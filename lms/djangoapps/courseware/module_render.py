@@ -1,3 +1,4 @@
+import hashlib
 import json
 import logging
 import mimetypes
@@ -5,6 +6,7 @@ import mimetypes
 import static_replace
 import xblock.reference.plugins
 
+from collections import OrderedDict
 from functools import partial
 from requests.auth import HTTPBasicAuth
 import dogstats_wrapper as dog_stats_api
@@ -13,6 +15,8 @@ from opaque_keys import InvalidKeyError
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
+from django.core.context_processors import csrf
+from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -33,7 +37,7 @@ from student.models import anonymous_id_for_user, user_by_anonymous_id
 from xblock.core import XBlock
 from xblock.fields import Scope
 from xblock.runtime import KvsFieldData, KeyValueStore
-from xblock.exceptions import NoSuchHandlerError
+from xblock.exceptions import NoSuchHandlerError, NoSuchViewError
 from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
@@ -915,6 +919,87 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, user):
         raise
 
     return webob_to_django_response(resp)
+
+
+def _get_module_by_usage_id(request, course_id, usage_id):
+    """
+    Gets a module instance based on its `usage_id` in a course, for a given request/user
+
+    Returns (location, descriptor, instance)
+    """
+    user = request.user
+
+    try:
+        course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+        usage_key = course_id.make_usage_key_from_deprecated_string(unquote_slashes(usage_id))
+    except InvalidKeyError:
+        raise Http404("Invalid location")
+
+    try:
+        descriptor = modulestore().get_item(usage_key)
+    except ItemNotFoundError:
+        log.warn(
+            "Invalid location for course id {course_id}: {usage_key}".format(
+                course_id=usage_key.course_key,
+                usage_key=usage_key
+            )
+        )
+        raise Http404
+
+    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+        course_id,
+        user,
+        descriptor
+    )
+    instance = get_module(user, request, usage_key, field_data_cache, grade_bucket_type='ajax')
+    if instance is None:
+        # Either permissions just changed, or someone is trying to be clever
+        # and load something they shouldn't have access to.
+        log.debug("No module %s for user %s -- access denied?", usage_key, user)
+        raise Http404
+
+    return instance
+
+
+def hash_resource(resource):
+    """
+    Hash a :class:`xblock.fragment.FragmentResource
+    """
+    md5 = hashlib.md5()
+    for data in resource:
+        md5.update(data)
+    return md5.hexdigest()
+
+
+def xblock_view(request, course_id, usage_id, view_name):
+    """
+    Returns the rendered view of a given XBlock, with related resources
+
+    Returns a json object containing two keys:
+        html: The rendered html of the view
+        resources: A list of tuples where the first element is the resource hash, and
+            the second is the resource description
+    """
+    if not request.user.is_authenticated():
+        raise PermissionDenied
+
+    instance = _get_module_by_usage_id(request, course_id, usage_id)
+
+    try:
+        fragment = instance.render(view_name)
+    except NoSuchViewError:
+        log.exception("Attempt to render missing view on %s: %s", instance, view_name)
+        raise Http404
+
+    hashed_resources = OrderedDict()
+    for resource in fragment.resources:
+        hashed_resources[hash_resource(resource)] = resource
+
+    return JsonResponse({
+        'html': fragment.content,
+        'resources': hashed_resources.items(),
+        'csrf_token': str(csrf(request)['csrf_token']),
+    })
 
 
 def get_score_bucket(grade, max_grade):
