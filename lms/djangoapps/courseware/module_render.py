@@ -1,3 +1,4 @@
+import hashlib
 import json
 import logging
 import mimetypes
@@ -5,6 +6,7 @@ import mimetypes
 import static_replace
 import xblock.reference.plugins
 
+from collections import OrderedDict
 from functools import partial
 from requests.auth import HTTPBasicAuth
 from dogapi import dog_stats_api
@@ -815,6 +817,16 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, user):
     return webob_to_django_response(resp)
 
 
+def hash_resource(resource):
+    """
+    Hash a :class:`xblock.fragment.FragmentResource
+    """
+    md5 = hashlib.md5()
+    for data in resource:
+        md5.update(data)
+    return md5.hexdigest()
+
+
 def xblock_view(request, course_id, usage_id, view_name):
     """
     Returns the rendered view of a given XBlock, with related resources
@@ -832,9 +844,13 @@ def xblock_view(request, course_id, usage_id, view_name):
         log.exception("Attempt to render missing view on %s: %s", instance, view_name)
         raise Http404
 
+    hashed_resources = OrderedDict()
+    for resource in fragment.resources:
+        hashed_resources[hash_resource(resource)] = resource
+
     return JsonResponse({
         'html': fragment.content,
-        'resources': fragment.resources,
+        'resources': hashed_resources.items(),
         'csrf_token': str(csrf(request)['csrf_token']),
     })
 
