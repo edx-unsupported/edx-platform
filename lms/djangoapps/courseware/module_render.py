@@ -781,13 +781,14 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix):
         suffix (str): The suffix to pass to the handler when invoked
         user (User): The currently logged in user
     """
-    location, descriptor, instance = _get_module_by_usage_id(request, course_id, usage_id)
 
     # Check submitted files
     files = request.FILES or {}
     error_msg = _check_files_limits(files)
     if error_msg:
         return HttpResponse(json.dumps({'success': error_msg}))
+
+    location, descriptor, instance = _get_module_by_usage_id(request, course_id, usage_id)
 
     tracking_context_name = 'module_callback_handler'
     tracking_context = {
