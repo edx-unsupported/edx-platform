@@ -325,6 +325,7 @@ class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
             self.assertIn(section, content)
         self.assertIn('<div class="xblock xblock-student_view xmodule_display', content['html'])
 
+
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestTOC(TestCase):
     """Check the Table of Contents for a course"""
