@@ -1,5 +1,8 @@
 """ API implementation for course-oriented interactions. """
 
+from lxml import etree
+from StringIO import StringIO
+
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -8,6 +11,7 @@ from api_manager.permissions import ApiKeyHeaderPermission
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location, InvalidLocationError
 
+from courseware.courses import get_course_about_section
 
 def _get_module_submodules(module, submodule_type=None):
     """
@@ -196,3 +200,70 @@ def courses_detail(request, course_id):
     else:
         status_code = status.HTTP_404_NOT_FOUND
     return Response(response_data, status=status_code)
+
+
+def _parse_about_html(html):
+    """
+    Helper method to break up the course about HTML into components
+    """
+    result = {}
+
+    parser = etree.HTMLParser()
+    tree = etree.parse(StringIO(html), parser)
+
+    sections = tree.findall('/body/section')
+
+    result = []
+    for section in sections:
+        section_class = section.get('class')
+        if section_class:
+            section_data = {}
+            section_data['name'] = section_class
+
+            section_data['articles'] = []
+            articles = section.findall('article')
+            if articles:
+                for article in articles:
+                    article_class = article.get('class')
+                    if article_class:
+                        article_data = {}
+                        article_data['name'] = article_class
+                        article_data['body'] = etree.tostring(article)
+                        section_data['articles'].append(article_data)
+            else:
+                section_data['body'] = etree.tostring(section)
+
+            result.append(section_data)
+
+    return result
+
+
+@api_view(['GET'])
+@permission_classes((ApiKeyHeaderPermission,))
+def course_about(request, course_id):
+    """
+    GET retrieves the course overview module, which - in MongoDB - is stored with the following
+    naming convention {"_id.org":"i4x", "_id.course":<course_num>, "_id.category":"about", "_id.name":"overview"}
+    """
+    store = modulestore()
+    response_data = {}
+
+    try:
+        course_module = store.get_course(course_id)
+        if not course_module:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+
+        overview = get_course_about_section(course_module, 'overview')
+        short_description = get_course_about_section(course_module, 'short_description')
+
+        response_data['sections'] = _parse_about_html(overview)
+
+        response_data['overview_html'] = overview
+        response_data['short_description'] = short_description
+
+    except InvalidLocationError:
+        return Response({}, status=status.HTTP_404_NOT_FOUND)
+
+
+
+    return Response(response_data)
