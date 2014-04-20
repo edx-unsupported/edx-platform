@@ -11,5 +11,7 @@ urlpatterns = patterns('api_manager.courses_views',
                        url(r'^(?P<course_id>[a-zA-Z0-9/_:]+)/modules/*$', 'modules_list'),
                        url(r'^(?P<course_id>[a-zA-Z0-9/_:]+)/overview$', 'course_overview'),
                        url(r'^(?P<course_id>[a-zA-Z0-9/_:]+)/updates$', 'course_updates'),
-                       url(r'^(?P<course_id>[a-zA-Z0-9/_:]+)$', 'courses_detail'),
+                       url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/static_tabs/(?P<tab_id>[a-zA-Z0-9/_:]+)$', 'static_tab_detail'),
+                       url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/static_tabs$', 'static_tabs_list'),
+                       url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)$', 'courses_detail'),
                        )
