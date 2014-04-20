@@ -10,5 +10,6 @@ urlpatterns = patterns('api_manager.courses_views',
                        url(r'^(?P<course_id>[a-zA-Z0-9/_:]+)/modules/(?P<module_id>[a-zA-Z0-9/_:]+)$', 'modules_detail'),
                        url(r'^(?P<course_id>[a-zA-Z0-9/_:]+)/modules/*$', 'modules_list'),
                        url(r'^(?P<course_id>[a-zA-Z0-9/_:]+)/overview$', 'course_overview'),
+                       url(r'^(?P<course_id>[a-zA-Z0-9/_:]+)/updates$', 'course_updates'),
                        url(r'^(?P<course_id>[a-zA-Z0-9/_:]+)$', 'courses_detail'),
                        )
