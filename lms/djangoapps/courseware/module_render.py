@@ -766,7 +766,7 @@ def _get_module_by_usage_id(request, course_id, usage_id):
         log.debug("No module %s for user %s -- access denied?", usage_key, user)
         raise Http404
 
-    return (location, descriptor, instance)
+    return instance
 
 
 def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix):
@@ -788,12 +788,12 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix):
     if error_msg:
         return HttpResponse(json.dumps({'success': error_msg}))
 
-    location, descriptor, instance = _get_module_by_usage_id(request, course_id, usage_id)
+    instance = _get_module_by_usage_id(request, course_id, usage_id)
 
     tracking_context_name = 'module_callback_handler'
     tracking_context = {
         'module': {
-            'display_name': descriptor.display_name_with_default,
+            'display_name': instance.display_name_with_default,
         }
     }
 
@@ -834,7 +834,7 @@ def xblock_view(request, course_id, usage_id, view_name):
         resources: A list of tuples where the first element is the resource hash, and
             the second is the resource description
     """
-    location, descriptor, instance = _get_module_by_usage_id(request, course_id, usage_id)
+    instance = _get_module_by_usage_id(request, course_id, usage_id)
 
     try:
         fragment = instance.render(view_name)
