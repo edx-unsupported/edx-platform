@@ -8,7 +8,7 @@ from django.db import IntegrityError
 from django.core.validators import validate_email, validate_slug, ValidationError
 from django.conf import settings
 from django.utils.translation import get_language, ugettext_lazy as _
-
+from django.contrib.auth import authenticate
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
