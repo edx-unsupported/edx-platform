@@ -27,6 +27,7 @@ from util.password_policy_validators import (
     validate_password_length, validate_password_complexity,
     validate_password_dictionary
 )
+from util.bad_request_rate_limiter import BadRequestRateLimiter
 
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
@@ -45,7 +46,6 @@ def _generate_base_uri(request):
     )
     return resource_uri
 
-
 def _serialize_user(response_data, user):
     """
     Loads the object data into the response dict
@@ -57,7 +57,6 @@ def _serialize_user(response_data, user):
     response_data['last_name'] = user.last_name
     response_data['id'] = user.id
     return response_data
-
 
 def _save_module_position(request, user, course_id, course_descriptor, position):
     """
@@ -263,6 +262,7 @@ class UsersGroupsList(APIView):
             response_data['groups'].append(group_data)
         response_status = status.HTTP_200_OK
         return Response(response_data, status=response_status)
+
 
 
 

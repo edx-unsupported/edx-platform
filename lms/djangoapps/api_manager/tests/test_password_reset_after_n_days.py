@@ -9,7 +9,10 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils import timezone
 from django.utils.translation import ugettext as _
-
+from django.core.cache import cache
+from datetime import datetime, timedelta
+from freezegun import freeze_time
+from pytz import UTC
 TEST_API_KEY = str(uuid.uuid4())
 
 @override_settings(EDX_API_KEY=TEST_API_KEY)
@@ -26,6 +29,7 @@ class UserPasswordResetTest(TestCase):
         """
         self.session_url = '/api/sessions'
         self.user_url = '/api/users'
+        cache.clear()
 
     @override_settings(ADVANCED_SECURITY_CONFIG={'MIN_DAYS_FOR_STUDENT_ACCOUNTS_PASSWORD_RESETS': 5})
     def test_user_must_reset_password_after_n_days(self):
@@ -83,12 +87,13 @@ class UserPasswordResetTest(TestCase):
         )
         self._assert_response(response, status=400)
 
-    @override_settings(ADVANCED_SECURITY_CONFIG={'MIN_DIFFERENT_STUDENT_PASSWORDS_BEFORE_REUSE': 1,
+    @override_settings(ADVANCED_SECURITY_CONFIG={'MIN_DIFFERENT_STUDENT_PASSWORDS_BEFORE_REUSE': 4,
                                                  'MIN_TIME_IN_DAYS_BETWEEN_ALLOWED_RESETS': 0})
     def test_password_reset_not_allowable_reuse(self):
         """
-        Try (and fail) user password reset
-        with same password as the old password
+        Try resetting user password  < 4 and > 4 times and
+        then use one of the passwords that you have used
+        before
         """
         response = self._do_post_request(
             self.user_url, 'test2', 'Test.Me64!', email='test@edx.org',
@@ -100,31 +105,46 @@ class UserPasswordResetTest(TestCase):
         pass_reset_url = "%s/%s" % (self.user_url, str(user_id))
         response = self._do_post_pass_reset_request(
             pass_reset_url, old_password='Test.Me64!',
+            new_password='Test.Me64#', secure=True
+        )
+        message = 'Password Reset Successful'
+        self._assert_response(response, status=201, message=message)
+
+        response = self._do_post_pass_reset_request(
+            pass_reset_url, old_password='Test.Me64#',
+            new_password='Test.Me64@', secure=True
+        )
+        message = 'Password Reset Successful'
+        self._assert_response(response, status=201, message=message)
+
+        response = self._do_post_pass_reset_request(
+            pass_reset_url, old_password='Test.Me64@',
+            new_password='Test.Me64^', secure=True
+        )
+        message = 'Password Reset Successful'
+        self._assert_response(response, status=201, message=message)
+
+        #now use previously used password
+        response = self._do_post_pass_reset_request(
+            pass_reset_url, old_password='Test.Me64^',
             new_password='Test.Me64!', secure=True
         )
         message = _(
             "You are re-using a password that you have used recently. You must "
-            "have 1 distinct password(s) before reusing a previous password."
+            "have 4 distinct password(s) before reusing a previous password."
         )
         self._assert_response(response, status=403, message=message)
 
-    @override_settings(ADVANCED_SECURITY_CONFIG={'MIN_DIFFERENT_STUDENT_PASSWORDS_BEFORE_REUSE': 0,
-                                                 'MIN_TIME_IN_DAYS_BETWEEN_ALLOWED_RESETS': 0})
-    def test_password_reset_valid_allowable_reuse(self):
-        """
-        Try (and pass) user password reset
-        with same password as the old password
-        """
-        response = self._do_post_request(
-            self.user_url, 'test2', 'Test.Me64!', email='test@edx.org',
-            first_name='John', last_name='Doe', secure=True
-        )
-        self._assert_response(response, status=201)
-        user_id = response.data['id']
-
-        pass_reset_url = "%s/%s" % (self.user_url, str(user_id))
         response = self._do_post_pass_reset_request(
-            pass_reset_url, old_password='Test.Me64!',
+            pass_reset_url, old_password='Test.Me64^',
+            new_password='Test.Me64&', secure=True
+        )
+        message = 'Password Reset Successful'
+        self._assert_response(response, status=201, message=message)
+
+        #now use previously used password
+        response = self._do_post_pass_reset_request(
+            pass_reset_url, old_password='Test.Me64&',
             new_password='Test.Me64!', secure=True
         )
         message = 'Password Reset Successful'
@@ -162,6 +182,66 @@ class UserPasswordResetTest(TestCase):
             )
             message = 'Password Reset Successful'
             self._assert_response(response, status=201, message=message)
+
+    @override_settings(ADVANCED_SECURITY_CONFIG={'MIN_TIME_IN_DAYS_BETWEEN_ALLOWED_RESETS': 0})
+    def test_password_reset_rate_limiting_protection(self):
+        """ Try (and fail) login user 30 times on invalid password """
+        response = self._do_post_request(
+            self.user_url, 'test2', 'Test.Me64!', email='test@edx.org',
+            first_name='John', last_name='Doe', secure=True
+        )
+        self._assert_response(response, status=201)
+        user_id = response.data['id']
+
+        pass_reset_url = "%s/%s" % (self.user_url, str(user_id))
+
+        for i in xrange(30):
+            password = u'test_password{0}'.format(i)
+            response = self._do_post_pass_reset_request(
+                pass_reset_url, old_password='Test.Me64!', new_password=password, secure=True
+            )
+            self.assertEqual(response.status_code, 400)
+
+        # then the rate limiter should kick in and give a HttpForbidden response
+        response = self._do_post_pass_reset_request(pass_reset_url, old_password='Test.Me64!', new_password='Test.Me64@', secure=True)
+        message = 'Rate limit exceeded in password_reset.'
+        self._assert_response(response, status=403, message=message)
+
+    @override_settings(ADVANCED_SECURITY_CONFIG={'MIN_TIME_IN_DAYS_BETWEEN_ALLOWED_RESETS': 0})
+    def test_password_reset_rate_limiting_unblock(self):
+        """
+        Try (and fail) login user 30 times on invalid password
+        and then unblock it after 5 minutes
+         """
+        response = self._do_post_request(
+            self.user_url, 'test2', 'Test.Me64!', email='test@edx.org',
+            first_name='John', last_name='Doe', secure=True
+        )
+        self._assert_response(response, status=201)
+        user_id = response.data['id']
+
+        pass_reset_url = "%s/%s" % (self.user_url, str(user_id))
+
+        for i in xrange(30):
+                password = u'test_password{0}'.format(i)
+                response = self._do_post_pass_reset_request(
+                    pass_reset_url, old_password='Test.Me64!', new_password=password, secure=True
+                )
+                self.assertEqual(response.status_code, 400)
+
+        response = self._do_post_pass_reset_request(
+            pass_reset_url, old_password='Test.Me64!', new_password='Test.Me64@', secure=True
+        )
+        message = 'Rate limit exceeded in password_reset.'
+        self._assert_response(response, status=403, message=message)
+
+        # now reset the time to 5 mins from now in future in order to unblock
+        reset_time = datetime.now(UTC) + timedelta(seconds=300)
+        with freeze_time(reset_time):
+            response = self._do_post_pass_reset_request(
+                pass_reset_url, old_password='Test.Me64!', new_password='Test.Me64@', secure=True
+            )
+            self._assert_response(response, status=201)
 
     def _do_post_request(self, url, username, password, **kwargs):
         """
