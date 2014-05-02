@@ -4,7 +4,6 @@ Tests for session api with advance security features
 import json
 import uuid
 from mock import patch
-from datetime import timedelta
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils import timezone
@@ -18,6 +17,8 @@ TEST_API_KEY = str(uuid.uuid4())
 @override_settings(EDX_API_KEY=TEST_API_KEY)
 @patch.dict("django.conf.settings.FEATURES", {'ENFORCE_PASSWORD_POLICY': True})
 @patch.dict("django.conf.settings.FEATURES", {'ADVANCED_SECURITY': True})
+@override_settings(PASSWORD_MIN_LENGTH=4, PASSWORD_MAX_LENGTH=12,
+                   PASSWORD_COMPLEXITY={'UPPER': 2, 'LOWER': 2, 'PUNCTUATION': 2, 'DIGITS': 2})
 class UserPasswordResetTest(TestCase):
     """
     Test api_manager.session.session_list view
@@ -51,7 +52,7 @@ class UserPasswordResetTest(TestCase):
         reset_time = timezone.now() + timedelta(days=5)
         with patch.object(timezone, 'now', return_value=reset_time):
             response = self._do_post_request(self.session_url, 'test2', 'Test.Me64!', secure=True)
-            message = _(
+            message =_(
                 'Your password has expired due to password policy on this account. '
                 'You must reset your password before you can log in again. Please click the '
                 'Forgot Password" link on this page to reset your password before logging in again.'
@@ -61,31 +62,13 @@ class UserPasswordResetTest(TestCase):
             #reset the password and then try login
             pass_reset_url = "%s/%s" % (self.user_url, str(user_id))
             response = self._do_post_pass_reset_request(
-                pass_reset_url, old_password='Test.Me64!', new_password='Test!Me64@', secure=True
+                pass_reset_url, password='Test.Me64@', secure=True
             )
             self.assertEqual(response.status_code,  201)
 
             #login successful after reset password
-            response = self._do_post_request(self.session_url, 'test2', 'Test!Me64@', secure=True)
+            response = self._do_post_request(self.session_url, 'test2', 'Test.Me64@', secure=True)
             self.assertEqual(response.status_code, 201)
-
-    def test_password_reset_with_invalid_old_password(self):
-        """
-        Try (and fail) user password reset with  Invalid old_password
-        """
-        response = self._do_post_request(
-            self.user_url, 'test2', 'Test.Me64!', email='test@edx.org',
-            first_name='John', last_name='Doe', secure=True
-        )
-        self._assert_response(response, status=201)
-        user_id = response.data['id']
-
-        pass_reset_url = "%s/%s" % (self.user_url, str(user_id))
-        response = self._do_post_pass_reset_request(
-            pass_reset_url, old_password='Tes2st.Me64!',
-            new_password='Test!Me64@', secure=True
-        )
-        self._assert_response(response, status=400)
 
     @override_settings(ADVANCED_SECURITY_CONFIG={'MIN_DIFFERENT_STUDENT_PASSWORDS_BEFORE_REUSE': 4,
                                                  'MIN_TIME_IN_DAYS_BETWEEN_ALLOWED_RESETS': 0})
@@ -104,30 +87,26 @@ class UserPasswordResetTest(TestCase):
 
         pass_reset_url = "%s/%s" % (self.user_url, str(user_id))
         response = self._do_post_pass_reset_request(
-            pass_reset_url, old_password='Test.Me64!',
-            new_password='Test.Me64#', secure=True
+            pass_reset_url, password='Test.Me64#', secure=True
         )
         message = 'Password Reset Successful'
         self._assert_response(response, status=201, message=message)
 
         response = self._do_post_pass_reset_request(
-            pass_reset_url, old_password='Test.Me64#',
-            new_password='Test.Me64@', secure=True
+            pass_reset_url, password='Test.Me64@', secure=True
         )
         message = 'Password Reset Successful'
         self._assert_response(response, status=201, message=message)
 
         response = self._do_post_pass_reset_request(
-            pass_reset_url, old_password='Test.Me64@',
-            new_password='Test.Me64^', secure=True
+            pass_reset_url, password='Test.Me64^', secure=True
         )
         message = 'Password Reset Successful'
         self._assert_response(response, status=201, message=message)
 
         #now use previously used password
         response = self._do_post_pass_reset_request(
-            pass_reset_url, old_password='Test.Me64^',
-            new_password='Test.Me64!', secure=True
+            pass_reset_url, password='Test.Me64!', secure=True
         )
         message = _(
             "You are re-using a password that you have used recently. You must "
@@ -136,16 +115,14 @@ class UserPasswordResetTest(TestCase):
         self._assert_response(response, status=403, message=message)
 
         response = self._do_post_pass_reset_request(
-            pass_reset_url, old_password='Test.Me64^',
-            new_password='Test.Me64&', secure=True
+            pass_reset_url, password='Test.Me64&', secure=True
         )
         message = 'Password Reset Successful'
         self._assert_response(response, status=201, message=message)
 
         #now use previously used password
         response = self._do_post_pass_reset_request(
-            pass_reset_url, old_password='Test.Me64&',
-            new_password='Test.Me64!', secure=True
+            pass_reset_url, password='Test.Me64!', secure=True
         )
         message = 'Password Reset Successful'
         self._assert_response(response, status=201, message=message)
@@ -165,8 +142,7 @@ class UserPasswordResetTest(TestCase):
 
         pass_reset_url = "%s/%s" % (self.user_url, str(user_id))
         response = self._do_post_pass_reset_request(
-            pass_reset_url, old_password='Test.Me64!',
-            new_password='NewP@ses34!', secure=True
+            pass_reset_url, password='NewP@ses34!', secure=True
         )
         message = _(
             "You are resetting passwords too frequently. Due to security policies, "
@@ -177,35 +153,10 @@ class UserPasswordResetTest(TestCase):
         reset_time = timezone.now() + timedelta(days=1)
         with patch.object(timezone, 'now', return_value=reset_time):
             response = self._do_post_pass_reset_request(
-                pass_reset_url, old_password='Test.Me64!',
-                new_password='NewP@ses34!', secure=True
+                pass_reset_url, password='NewP@ses34!', secure=True
             )
             message = 'Password Reset Successful'
             self._assert_response(response, status=201, message=message)
-
-    @override_settings(ADVANCED_SECURITY_CONFIG={'MIN_TIME_IN_DAYS_BETWEEN_ALLOWED_RESETS': 0})
-    def test_password_reset_rate_limiting_protection(self):
-        """ Try (and fail) login user 30 times on invalid password """
-        response = self._do_post_request(
-            self.user_url, 'test2', 'Test.Me64!', email='test@edx.org',
-            first_name='John', last_name='Doe', secure=True
-        )
-        self._assert_response(response, status=201)
-        user_id = response.data['id']
-
-        pass_reset_url = "%s/%s" % (self.user_url, str(user_id))
-
-        for i in xrange(30):
-            password = u'test_password{0}'.format(i)
-            response = self._do_post_pass_reset_request(
-                pass_reset_url, old_password='Test.Me64!', new_password=password, secure=True
-            )
-            self.assertEqual(response.status_code, 400)
-
-        # then the rate limiter should kick in and give a HttpForbidden response
-        response = self._do_post_pass_reset_request(pass_reset_url, old_password='Test.Me64!', new_password='Test.Me64@', secure=True)
-        message = 'Rate limit exceeded in password_reset.'
-        self._assert_response(response, status=403, message=message)
 
     @override_settings(ADVANCED_SECURITY_CONFIG={'MIN_TIME_IN_DAYS_BETWEEN_ALLOWED_RESETS': 0})
     def test_password_reset_rate_limiting_unblock(self):
@@ -220,26 +171,26 @@ class UserPasswordResetTest(TestCase):
         self._assert_response(response, status=201)
         user_id = response.data['id']
 
-        pass_reset_url = "%s/%s" % (self.user_url, str(user_id))
+        pass_reset_url = '{}/{}'.format(self.user_url, user_id)
 
         for i in xrange(30):
                 password = u'test_password{0}'.format(i)
                 response = self._do_post_pass_reset_request(
-                    pass_reset_url, old_password='Test.Me64!', new_password=password, secure=True
+                    '{}/{}'.format(self.user_url, i+200), password=password, secure=True
                 )
-                self.assertEqual(response.status_code, 400)
+                self._assert_response(response, status=404)
 
         response = self._do_post_pass_reset_request(
-            pass_reset_url, old_password='Test.Me64!', new_password='Test.Me64@', secure=True
+            '{}/{}'.format(self.user_url, '31'), password='Test.Me64@', secure=True
         )
-        message = 'Rate limit exceeded in password_reset.'
+        message = _('Rate limit exceeded in password_reset.')
         self._assert_response(response, status=403, message=message)
 
         # now reset the time to 5 mins from now in future in order to unblock
         reset_time = datetime.now(UTC) + timedelta(seconds=300)
         with freeze_time(reset_time):
             response = self._do_post_pass_reset_request(
-                pass_reset_url, old_password='Test.Me64!', new_password='Test.Me64@', secure=True
+                pass_reset_url, password='Test.Me64@', secure=True
             )
             self._assert_response(response, status=201)
 
@@ -260,11 +211,11 @@ class UserPasswordResetTest(TestCase):
             extra['wsgi.url_scheme'] = 'https'
         return self.client.post(url, post_params, headers=headers, **extra)
 
-    def _do_post_pass_reset_request(self, url, old_password, new_password, **kwargs):
+    def _do_post_pass_reset_request(self, url, password, **kwargs):
         """
         Post the Password Reset info
         """
-        post_params, extra = {'old_password': old_password, 'new_password': new_password}, {}
+        post_params, extra = {'password': password}, {}
 
         headers = {'X-Edx-Api-Key': TEST_API_KEY, 'Content-Type': 'application/json'}
         if kwargs.get('secure', False):
@@ -283,15 +234,7 @@ class UserPasswordResetTest(TestCase):
         value for 'message' in the JSON dict.
         """
         self.assertEqual(response.status_code, status)
-
-        try:
-            response_dict = json.loads(response.content)
-        except ValueError:
-            self.fail("Could not parse response content as JSON: %s"
-                      % str(response.content))
-
-        if success is not None:
-            self.assertEqual(response_dict['success'], success)
+        response_dict = json.loads(response.content)
 
         if message is not None:
             msg = ("'%s' did not contain '%s'" %
