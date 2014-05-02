@@ -12,7 +12,6 @@ from django.utils.importlib import import_module
 from django.utils.translation import ugettext as _
 
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -75,8 +74,7 @@ class SessionsList(APIView):
             response_status = status.HTTP_403_FORBIDDEN
             response_data['message'] = _(
                 'Your password has expired due to password policy on this account. '
-                'You must reset your password before you can log in again. Please click the '
-                'Forgot Password" link on this page to reset your password before logging in again.'
+                'You must reset your password before you can log in again.'
             )
             return Response(response_data, status=response_status)
 

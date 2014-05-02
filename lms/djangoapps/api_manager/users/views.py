@@ -8,9 +8,7 @@ from django.db import IntegrityError
 from django.core.validators import validate_email, validate_slug, ValidationError
 from django.conf import settings
 from django.utils.translation import get_language, ugettext_lazy as _
-from django.contrib.auth import authenticate
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -91,6 +89,7 @@ def _save_module_position(request, user, course_id, course_descriptor, position)
     saved_module = get_current_child(parent_module)
     return saved_module.id
 
+
 class UsersList(APIView):
     permission_classes = (ApiKeyHeaderPermission,)
 
@@ -168,6 +167,7 @@ class UsersList(APIView):
             response_data['field_conflict'] = "username"
 
         return Response(response_data, status=status_code)
+
 
 class UsersDetail(APIView):
     permission_classes = (ApiKeyHeaderPermission,)
@@ -283,6 +283,7 @@ class UsersDetail(APIView):
             return Response(response_data, status=status.HTTP_404_NOT_FOUND)
         return Response(response_data, status=status_code)
 
+
 class UsersGroupsList(APIView):
     permission_classes = (ApiKeyHeaderPermission,)
 
@@ -338,8 +339,6 @@ class UsersGroupsList(APIView):
             response_data['groups'].append(group_data)
         response_status = status.HTTP_200_OK
         return Response(response_data, status=response_status)
-
-
 
 
 class UsersGroupsDetail(APIView):

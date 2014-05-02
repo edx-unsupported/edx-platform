@@ -54,8 +54,7 @@ class UserPasswordResetTest(TestCase):
             response = self._do_post_request(self.session_url, 'test2', 'Test.Me64!', secure=True)
             message =_(
                 'Your password has expired due to password policy on this account. '
-                'You must reset your password before you can log in again. Please click the '
-                'Forgot Password" link on this page to reset your password before logging in again.'
+                'You must reset your password before you can log in again.'
             )
             self._assert_response(response, status=403, message=message)
 
