@@ -262,21 +262,63 @@ def _parse_updates_html(html):
 
 class CourseContentList(SecureAPIView):
     """
-    ### The CourseContentList view allows clients to retrieve the list of children for a given CourseContent entity
-    - URI: ```/api/courses/{course_id}/content/```
-    - URI: ```/api/courses/{course_id}/content/{content_id}/children```
-    - GET: Returns a JSON representation (array) of the set of CourseContent entities
-        * type: Set filtering parameter
-    ### Use Cases/Notes:
-    * Handling two very-different looking URIs with this one method seems odd, but we don't know where in the
-      CourseContent hierarchy we are -- we could even be at the top (ie, the Course entity itself)
-    * The 'type' parameter filters content children by their 'category' field ('chapter', 'video', etc.)
-    * Note that the type/child filter currently does not traverse deeper than the immediate child level
+    **Use Case** 
+
+        CourseContentList retrieves a list of children for a given CourseContent
+        entity as a JSON array. You can use the **uri** value in the response to
+        get details for that content entity.
+
+        CourseContentList has an optional type parameter that allows you to
+        filter the response by content type. The value of the type parameter
+        matches the category value in the response. Valid values for the type
+        parameter are:
+
+        * chapter
+        * sequential
+        * vertical
+        * html
+        * problem
+        * discussion
+        * video
+        * [CONFIRM]
+
+    **Example requests**:
+
+          GET /api/courses/{course_id}/content
+
+          GET /api/courses/{course_id}/content?type=video
+
+          GET /api/courses/{course_id}/content/{content_id}/children
+
+    **Example response**:
+
+        HTTP 200 OK
+        Vary: Accept
+        Content-Type: text/html; charset=utf-8
+        Allow: GET, HEAD, OPTIONS
+
+        [
+            {
+                "category": "chapter", 
+                "due": null, 
+                "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/i4x://un/cs101/chapter/introduction", 
+                "id": "i4x://un/cs101/chapter/introduction", 
+                "name": "Introduction"
+            }, 
+            {
+                "category": "chapter", 
+                "due": null, 
+                "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/i4x://un/cs101/chapter/getting_started", 
+                "id": "i4x://un/cs101/chapter/getting_started", 
+                "name": "Getting Started"
+            }
+        ]
     """
 
     def get(self, request, course_id, content_id=None):
         """
         GET /api/courses/{course_id}/content
+
         GET /api/courses/{course_id}/content/{content_id}/children
         """
         if content_id is None:
@@ -371,9 +413,10 @@ class CourseContentDetail(SecureAPIView):
 
 class CoursesList(SecureAPIView):
     """
-    
-    Retrieves a list of courses in the edX Platform as a JSON representation
-    (array) of the set of Course entities.
+    **Use Case** 
+
+        CoursesList retrieves a list of all courses in the edX Platform as a
+        JSON array. You can use the **uri** value in the response to get details
 
     **Example request**:
 
@@ -389,12 +432,12 @@ class CoursesList(SecureAPIView):
           [
             {
                 "category": "course",   
-                "name": "edX Demonstration Course",   
-                "uri": "http://localhost:8000/api/courses/edX/Open_DemoX/edx_demo_course",   
-                "number": "Open_DemoX",   
+                "name": "Computer Science 101",   
+                "uri": "http://edx-lms-server/api/courses/un/CS/cs101",   
+                "number": "CS101",   
                 "due": null,   
-                "org": "edX",   
-                "id": "edX/Open_DemoX/edx_demo_course"  
+                "org": "University N",   
+                "id": "un/CS/cs101"  
             }
           ]
     """
@@ -415,19 +458,133 @@ class CoursesList(SecureAPIView):
 
 class CoursesDetail(SecureAPIView):
     """
-    ### The CoursesDetail view allows clients to interact with a specific Course entity
-    - URI: ```/api/courses/{course_id}```
-    - GET: Returns a JSON representation of the specified Course entity
-        * depth: Tree prefetching/scoping parameter
-    ### Use Cases/Notes:
-    * Direct access to course information, irrespective of request/user context
-    * If 'depth' is provided, the response will include children to the specified tree level
-    * A GET response will additionally include a list of URIs to available sub-resources:
-        ** Related Users    /api/courses/{course_id}/users/
-        ** Related Groups   /api/courses/{course_id}/groups/
-        ** Course Overview  /api/courses/{course_id}/overview/
-        ** Course Updates   /api/courses/{course_id}/updates/
-        ** Static Tabs List /api/courses/{course_id}/static_tabs/
+    **Use Case** 
+
+        CoursesDetail retrieves details for a course. You can use the URI
+        values in the response to drill into more course information for:
+
+        * Users (/api/courses/{course_id}/users/)
+        * Groups (/api/courses/{course_id}/groups/)
+        * Course Overview (/api/courses/{course_id}/overview/)
+        * Course Updates (/api/courses/{course_id}/updates/)
+        * Course Pages (/api/courses/{course_id}/static_tabs/)
+
+        CoursesDetail has an optional **depth** parameter that allows you to
+        retrieve children to the specified tree level.
+
+    **Example requests**:
+
+        GET /api/courses/{course_id}
+
+        GET /api/courses/{course_id}?depth=2
+
+    
+    **Example response with no depth parameter**:
+
+        HTTP 200 OK  
+        Vary: Accept   
+        Content-Type: text/html; charset=utf-8   
+        Allow: GET, HEAD, OPTIONS 
+
+        {
+            "category": "course", 
+            "name": "Computer Science 101",   
+            "uri": "http://edx-lms-server/api/courses/un/CS/cs101",   
+            "number": "CS101",   
+            "due": null,   
+            "org": "University N",   
+            "id": "un/CS/cs101"  
+            "resources": [
+                {
+                    "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/"
+                }, 
+                {
+                    "uri": "http://edx-lms-server/api/courses/un/CS/cs101/groups/"
+                }, 
+                {
+                    "uri": "http://edx-lms-server/api/courses/un/CS/cs101/overview"
+                }, 
+                {
+                    "uri": "http://edx-lms-server/api/courses/un/CS/cs101/updates/"
+                }, 
+                {
+                    "uri": "http://edx-lms-server/api/courses/un/CS/cs101/static_tabs/"
+                }, 
+                {
+                    "uri": "http://edx-lms-server/api/courses/un/CS/cs101/users/"
+                }
+            ]
+        }
+
+    **Example response with depth=2**:
+
+        HTTP 200 OK  
+        Vary: Accept   
+        Content-Type: text/html; charset=utf-8   
+        Allow: GET, HEAD, OPTIONS 
+
+        {
+            "category": "course", 
+            "name": "Computer Science 101",   
+            "uri": "http://edx-lms-server/api/courses/un/CS/cs101",   
+            "number": "CS101",
+            "content": [
+                {
+                    "category": "chapter", 
+                    "name": "Introduction", 
+                    "due": null, 
+                    "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/i4x://un/cs101/chapter/introduction", 
+                    "id": "i4x://un/cs101/chapter/introduction", 
+                    "children": [
+                        {
+                            "category": "sequential", 
+                            "due": null, 
+                            "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/i4x://edX/Open_DemoX/sequential/cs_setup", 
+                            "id": "i4x://un/cs101/sequential/cs_setup", 
+                            "name": "Course Setup"
+                        }
+                    ]
+                }, 
+                {
+                    "category": "chapter", 
+                    "name": "Getting Started", 
+                    "due": null, 
+                    "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/i4x://un/cs101/chapter/getting_started", 
+                    "id": "i4x://un/cs101/chapter/getting_started", 
+                    "children": [
+                        {
+                            "category": "sequential", 
+                            "due": null, 
+                            "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/i4x://edX/Open_DemoX/sequential/sample_problem", 
+                            "id": "i4x://un/cs101/sequential/sample_problem", 
+                            "name": "Sample Problem"
+                        }
+                    ]
+                }, 
+            "due": null,   
+            "org": "University N",   
+            "id": "un/CS/cs101",   
+            "resources": [
+                {
+                    "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/"
+                }, 
+                {
+                    "uri": "http://edx-lms-server/api/courses/un/CS/cs101/groups/"
+                }, 
+                {
+                    "uri": "http://edx-lms-server/api/courses/un/CS/cs101/overview"
+                }, 
+                {
+                    "uri": "http://edx-lms-server/api/courses/un/CS/cs101/updates/"
+                }, 
+                {
+                    "uri": "http://edx-lms-server/api/courses/un/CS/cs101/static_tabs/"
+                }, 
+                {
+                    "uri": "http://edx-lms-server/api/courses/un/CS/cs101/users/"
+                }
+            ]
+        }
     """
 
     def get(self, request, course_id):

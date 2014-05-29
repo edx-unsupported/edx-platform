@@ -13,5 +13,10 @@ Courses
    * - Resource
      - Purpose
    * - GET /api/courses
-     - :ref:`View a List of Courses`
+     - :ref:`Retrieve a List of all Courses`
+   * - GET /api/courses/{course_id}/content?type=content_type
+     - :ref:`View Course Content`
+   * - GET /api/courses/{course_id}?depth=n
+     - :ref:`View Course Details`
+
    
