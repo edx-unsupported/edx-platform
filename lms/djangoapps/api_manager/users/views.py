@@ -53,6 +53,7 @@ def _generate_base_uri(request):
 
 def _serialize_user_profile(response_data, user_profile):
     """This function serialize user profile """
+    response_data['title'] = user_profile.title
     response_data['full_name'] = user_profile.name
     response_data['city'] = user_profile.city
     response_data['country'] = user_profile.country.code
@@ -119,6 +120,7 @@ class UsersList(SecureAPIView):
         * email: __required__, The unique email address for the User being created
         * username: __required__, The unique username for the User being created
         * password: __required__, String which matches enabled formatting constraints
+        * title
         * first_name
         * last_name
         * is_active, Boolean flag controlling the User's account activation status
@@ -134,6 +136,7 @@ class UsersList(SecureAPIView):
                 "email" : "honor@edx.org",
                 "username" : "honor",
                 "password" : "edx!@#",
+                "title" : "Software Engineer",
                 "first_name" : "Honor",
                 "last_name" : "Student",
                 "is_active" : False,
@@ -169,6 +172,7 @@ class UsersList(SecureAPIView):
         level_of_education = request.DATA.get('level_of_education', '')
         year_of_birth = request.DATA.get('year_of_birth', '')
         gender = request.DATA.get('gender', '')
+        title = request.DATA.get('title', '')
         # enforce password complexity as an optional feature
         if settings.FEATURES.get('ENFORCE_PASSWORD_POLICY', False):
             try:
@@ -213,6 +217,7 @@ class UsersList(SecureAPIView):
         profile.country = country
         profile.level_of_education = level_of_education
         profile.gender = gender
+        profile.title = title
 
         try:
             profile.year_of_birth = int(year_of_birth)
@@ -250,6 +255,7 @@ class UsersDetail(SecureAPIView):
         * email: __required__, The unique email address for the User being created
         * username: __required__, The unique username for the User being created
         * password: __required__, String which matches enabled formatting constraints
+        * title
         * first_name
         * last_name
         * is_active, Boolean flag controlling the User's account activation status
@@ -265,6 +271,7 @@ class UsersDetail(SecureAPIView):
                 "email" : "honor@edx.org",
                 "username" : "honor",
                 "password" : "edx!@#",
+                "title" : "Software Engineer",
                 "first_name" : "Honor",
                 "last_name" : "Student",
                 "is_active" : False,
@@ -442,6 +449,9 @@ class UsersDetail(SecureAPIView):
             gender = request.DATA.get('gender')
             if gender:
                 existing_user_profile.gender = gender
+            title = request.DATA.get('title')
+            if title:
+                existing_user_profile.title = title
             existing_user_profile.save()
         return Response(response_data, status=status.HTTP_200_OK)
 
@@ -603,13 +613,19 @@ class UsersCoursesList(SecureAPIView):
         response_data = []
         for enrollment in enrollments:
             descriptor = store.get_course(enrollment.course_id)
-            course_data = {
-                "id": enrollment.course_id,
-                "uri": '{}/{}'.format(base_uri, enrollment.course_id),
-                "is_active": enrollment.is_active,
-                "name": descriptor.display_name
-            }
-            response_data.append(course_data)
+            # NOTE: It is possible that a course has been hard deleted from the courseware
+            # database, but the enrollment row in the SQL database still exists
+            if descriptor:
+                course_data = {
+                    "id": enrollment.course_id,
+                    "uri": '{}/{}'.format(base_uri, enrollment.course_id),
+                    "is_active": enrollment.is_active,
+                    "name": descriptor.display_name
+                }
+                response_data.append(course_data)
+            else:
+                log.warning("User {0} enrolled in course_id {1}, but course could not be found.".format(user_id, enrollment.course_id))
+
         return Response(response_data, status=status.HTTP_200_OK)
 
 
