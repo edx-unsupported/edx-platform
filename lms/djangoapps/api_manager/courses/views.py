@@ -264,9 +264,9 @@ class CourseContentList(SecureAPIView):
     """
     **Use Case** 
 
-        CourseContentList retrieves a list of children for a given CourseContent
-        entity as a JSON array. You can use the **uri** value in the response to
-        get details for that content entity.
+        CourseContentList gets a collection of children for a given
+        course. You can use the **uri** value in
+        the response to get details for that content entity.
 
         CourseContentList has an optional type parameter that allows you to
         filter the response by content type. The value of the type parameter
@@ -284,43 +284,26 @@ class CourseContentList(SecureAPIView):
 
     **Example requests**:
 
-          GET /api/courses/{course_id}/content
+        GET /api/courses/{course_id}/content
 
-          GET /api/courses/{course_id}/content?type=video
+        GET /api/courses/{course_id}/content?type=video
 
-          GET /api/courses/{course_id}/content/{content_id}/children
+        GET /api/courses/{course_id}/content/{content_id}/children
 
-    **Example response**:
+    **Response Values**
 
-        HTTP 200 OK
-        Vary: Accept
-        Content-Type: text/html; charset=utf-8
-        Allow: GET, HEAD, OPTIONS
+        * category: The type of content. 
 
-        [
-            {
-                "category": "chapter", 
-                "due": null, 
-                "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/i4x://un/cs101/chapter/introduction", 
-                "id": "i4x://un/cs101/chapter/introduction", 
-                "name": "Introduction"
-            }, 
-            {
-                "category": "chapter", 
-                "due": null, 
-                "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/i4x://un/cs101/chapter/getting_started", 
-                "id": "i4x://un/cs101/chapter/getting_started", 
-                "name": "Getting Started"
-            }
-        ]
+        * due: The due date.
+
+        * uri: The URI to use to get details of the content entity.
+
+        * id: The unique identifier for the content entity.
+
+        * name: The name of the course.
     """
 
     def get(self, request, course_id, content_id=None):
-        """
-        GET /api/courses/{course_id}/content
-
-        GET /api/courses/{course_id}/content/{content_id}/children
-        """
         if content_id is None:
             content_id = course_id
         response_data = []
@@ -415,31 +398,28 @@ class CoursesList(SecureAPIView):
     """
     **Use Case** 
 
-        CoursesList retrieves a list of all courses in the edX Platform as a
-        JSON array. You can use the **uri** value in the response to get details
+        CoursesList returns a collection of courses in the edX Platform. You can
+        use the uri value in the response to get details of the course.
 
-    **Example request**:
+    **Example Request**
 
           GET /api/courses
 
-    **Example response**:
+    **Response Values**
 
-          HTTP 200 OK  
-          Vary: Accept   
-          Content-Type: text/html; charset=utf-8   
-          Allow: GET, HEAD, OPTIONS 
+        * category: The type of content. In this case, the value is always "course".
 
-          [
-            {
-                "category": "course",   
-                "name": "Computer Science 101",   
-                "uri": "http://edx-lms-server/api/courses/un/CS/cs101",   
-                "number": "CS101",   
-                "due": null,   
-                "org": "University N",   
-                "id": "un/CS/cs101"  
-            }
-          ]
+        * name: The name of the course.
+
+        * uri: The URI to use to get details of the course.
+
+        * number: The course number.
+
+        * due:  The due date. For courses, the value is always null.
+
+        * org: The organization specified for the course.
+
+        * id: The unique identifier for the course.
     """
 
     def get(self, request):
@@ -460,8 +440,9 @@ class CoursesDetail(SecureAPIView):
     """
     **Use Case** 
 
-        CoursesDetail retrieves details for a course. You can use the URI
-        values in the response to drill into more course information for:
+        CoursesDetail returns details for a course. You can use the URI values
+        in the resources collection in the response to get more course
+        information for:
 
         * Users (/api/courses/{course_id}/users/)
         * Groups (/api/courses/{course_id}/groups/)
@@ -470,7 +451,7 @@ class CoursesDetail(SecureAPIView):
         * Course Pages (/api/courses/{course_id}/static_tabs/)
 
         CoursesDetail has an optional **depth** parameter that allows you to
-        retrieve children to the specified tree level.
+        get course content children to the specified tree level.
 
     **Example requests**:
 
@@ -478,119 +459,31 @@ class CoursesDetail(SecureAPIView):
 
         GET /api/courses/{course_id}?depth=2
 
-    
-    **Example response with no depth parameter**:
+    **Response Values**
 
-        HTTP 200 OK  
-        Vary: Accept   
-        Content-Type: text/html; charset=utf-8   
-        Allow: GET, HEAD, OPTIONS 
+        * category: The type of content.
 
-        {
-            "category": "course", 
-            "name": "Computer Science 101",   
-            "uri": "http://edx-lms-server/api/courses/un/CS/cs101",   
-            "number": "CS101",   
-            "due": null,   
-            "org": "University N",   
-            "id": "un/CS/cs101"  
-            "resources": [
-                {
-                    "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/"
-                }, 
-                {
-                    "uri": "http://edx-lms-server/api/courses/un/CS/cs101/groups/"
-                }, 
-                {
-                    "uri": "http://edx-lms-server/api/courses/un/CS/cs101/overview"
-                }, 
-                {
-                    "uri": "http://edx-lms-server/api/courses/un/CS/cs101/updates/"
-                }, 
-                {
-                    "uri": "http://edx-lms-server/api/courses/un/CS/cs101/static_tabs/"
-                }, 
-                {
-                    "uri": "http://edx-lms-server/api/courses/un/CS/cs101/users/"
-                }
-            ]
-        }
+        * name: The name of the course.
 
-    **Example response with depth=2**:
+        * uri: The URI to use to get details of the course.
 
-        HTTP 200 OK  
-        Vary: Accept   
-        Content-Type: text/html; charset=utf-8   
-        Allow: GET, HEAD, OPTIONS 
+        * number: The course number.
 
-        {
-            "category": "course", 
-            "name": "Computer Science 101",   
-            "uri": "http://edx-lms-server/api/courses/un/CS/cs101",   
-            "number": "CS101",
-            "content": [
-                {
-                    "category": "chapter", 
-                    "name": "Introduction", 
-                    "due": null, 
-                    "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/i4x://un/cs101/chapter/introduction", 
-                    "id": "i4x://un/cs101/chapter/introduction", 
-                    "children": [
-                        {
-                            "category": "sequential", 
-                            "due": null, 
-                            "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/i4x://edX/Open_DemoX/sequential/cs_setup", 
-                            "id": "i4x://un/cs101/sequential/cs_setup", 
-                            "name": "Course Setup"
-                        }
-                    ]
-                }, 
-                {
-                    "category": "chapter", 
-                    "name": "Getting Started", 
-                    "due": null, 
-                    "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/i4x://un/cs101/chapter/getting_started", 
-                    "id": "i4x://un/cs101/chapter/getting_started", 
-                    "children": [
-                        {
-                            "category": "sequential", 
-                            "due": null, 
-                            "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/i4x://edX/Open_DemoX/sequential/sample_problem", 
-                            "id": "i4x://un/cs101/sequential/sample_problem", 
-                            "name": "Sample Problem"
-                        }
-                    ]
-                }, 
-            "due": null,   
-            "org": "University N",   
-            "id": "un/CS/cs101",   
-            "resources": [
-                {
-                    "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/"
-                }, 
-                {
-                    "uri": "http://edx-lms-server/api/courses/un/CS/cs101/groups/"
-                }, 
-                {
-                    "uri": "http://edx-lms-server/api/courses/un/CS/cs101/overview"
-                }, 
-                {
-                    "uri": "http://edx-lms-server/api/courses/un/CS/cs101/updates/"
-                }, 
-                {
-                    "uri": "http://edx-lms-server/api/courses/un/CS/cs101/static_tabs/"
-                }, 
-                {
-                    "uri": "http://edx-lms-server/api/courses/un/CS/cs101/users/"
-                }
-            ]
-        }
+        * content: When the depth parameter is used, a collection of child
+          course content entities, such as chapters, sequentials, and
+          components.
+
+        * due:  The due date. For courses, the value is always null.
+
+        * org: The organization specified for the course.
+
+        * id: The unique identifier for the course.
+
+        * resources: A collection of URIs to use to get more information about
+          the course.  
     """
 
     def get(self, request, course_id):
-        """
-        GET /api/courses/{course_id}?depth=3
-        """
         depth = request.QUERY_PARAMS.get('depth', 0)
         depth_int = int(depth)
         # get_course_by_id raises an Http404 if the requested course is invalid
