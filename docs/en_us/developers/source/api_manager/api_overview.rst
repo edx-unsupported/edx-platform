@@ -12,9 +12,11 @@ Courses
 
    * - Goal
      - Resource
-   * - :ref:`View a List of Courses`
+   * - :ref:`Get a List of Courses`
      - GET /api/courses
-   * - :ref:`View Course Content`
+   * - :ref:`Get Course Content`
      - GET /api/courses/{course_id}/content?type=content_type
-   * - :ref:`View Course Details`
+   * - :ref:`Get Course Details`
      - GET /api/courses/{course_id}?depth=n
+   * - :ref:`Get Content Details`
+     - GET /api/courses/{course_id}/content/{content_id}?type=content_type

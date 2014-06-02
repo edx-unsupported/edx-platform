@@ -4,17 +4,18 @@ Courses API Module
 
 .. module:: api_manager
 
-The page contains docstrings for:
+The page contains docstrings and example responses for:
 
-* `View a List of Courses`_
-* `View Course Details`_
-* `View Course Content`_
+* `Get a List of Courses`_
+* `Get Course Details`_
+* `Get Course Content`_
+* `Get Content Details`_
 
 
-.. _View a List of Courses:
+.. _Get a List of Courses:
 
 **************************
-View a List of Courses
+Get a List of Courses
 **************************
 
 .. autoclass:: courses.views.CoursesList
@@ -44,10 +45,10 @@ View a List of Courses
 
 
 
-.. _View Course Details:
+.. _Get Course Details:
 
 **************************
-View Course Details
+Get Course Details
 **************************
 
 .. autoclass:: courses.views.CoursesDetail
@@ -166,10 +167,10 @@ View Course Details
     }
 
 
-.. _View Course Content:
+.. _Get Course Content:
 
 **************************
-View Course Content
+Get Course Content
 **************************
 
 .. autoclass:: courses.views.CourseContentList
@@ -200,3 +201,54 @@ View Course Content
             "name": "Getting Started"
         }
     ]
+
+
+.. _Get Content Details:
+
+**************************
+Get Content Details
+**************************
+
+.. autoclass:: courses.views.CourseContentDetail
+    :members:
+
+**Example response**:
+
+.. code-block:: json
+
+    HTTP 200 OK
+    Vary: Accept
+    Content-Type: text/html; charset=utf-8
+    Allow: GET, HEAD, OPTIONS
+
+    {
+        "category": "chapter", 
+        "due": null, 
+        "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/i4x://un/cs101/chapter/introduction", 
+        "id": "i4x://un/cs101/chapter/introduction", 
+        "name": "Introduction"
+        "children": [
+            {
+                "category": "sequential", 
+                "due": null, 
+                "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/i4x://un/cs101/chapter/introduction/sequential/19a30717eff543078a5d94ae9d6c18a5", 
+                "id": "i4x://un/cs101/chapter/introduction/sequential/19a30717eff543078a5d94ae9d6c18a5", 
+                "name": "Lesson 1 - Getting Started"
+            }, 
+            {
+                "category": "sequential", 
+                "due": null, 
+                "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/i4x://un/cs101/chapter/introduction/sequential/basic_questions", 
+                "id": "i4x://un/cs101/chapter/introduction/sequential/basic_questions", 
+                "name": "Homework - Basic Questions"
+            }
+        ], 
+        "resources": [
+            {
+                "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/i4x://un/cs101/chapter/introduction/users"
+            }, 
+            {
+                "uri": "http://edx-lms-server/api/courses/un/CS/cs101/content/i4x://un/cs101/chapter/introduction/groups"
+            }
+        ]
+    }

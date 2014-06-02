@@ -264,7 +264,7 @@ class CourseContentList(SecureAPIView):
     """
     **Use Case** 
 
-        CourseContentList gets a collection of children for a given
+        CourseContentList gets a collection of content for a given
         course. You can use the **uri** value in
         the response to get details for that content entity.
 
@@ -331,24 +331,52 @@ class CourseContentList(SecureAPIView):
 
 class CourseContentDetail(SecureAPIView):
     """
-    ### The CourseContentDetail view allows clients to interact with a specific CourseContent entity
-    - URI: ```/api/courses/{course_id}/content/{content_id}```
-    - GET: Returns a JSON representation of the specified CourseContent entity
-        * type: Set filtering parameter
-    ### Use Cases/Notes:
-    * If the specified CourseContent is actually the Course, then we return a Course representation
-    * The Course representation includes a top-level CourseContent element named 'content'
-    * CourseContent representations include child CourseContent elements as 'children'
-    * Including 'type' will filter the set of children to those having a category matching 'type' (eg, 'video')
-    * A GET response will additionally include a list of URIs to available sub-resources:
-        ** Related Users  /api/courses/{course_id}/content/{content_id}/users
-        ** Related Groups /api/courses/{course_id}/content/{content_id}/groups
+    **Use Case** 
+
+        CourseContentDetail returns a JSON collection for a specified
+        CourseContent entity. If the specified CourseContent is the Course, the
+        course representation is returned. You can use the uri values in the
+        children collection in the JSON response to get details for that content
+        entity.
+
+        CourseContentDetail has an optional type parameter that allows you to
+        filter the response by content type. The value of the type parameter
+        matches the category value in the response. Valid values for the type
+        parameter are:
+
+        * chapter
+        * sequential
+        * vertical
+        * html
+        * problem
+        * discussion
+        * video
+        * [CONFIRM]
+
+    **Example Request**
+
+          GET /api/courses/{course_id}/content/{content_id}
+
+    **Response Values**
+
+        * category: The type of content.
+
+        * name: The name of the content entity.
+
+        * due:  The due date.
+
+        * uri: The URI of the content entity.
+
+        * id: The unique identifier for the course.
+
+        * children: Content entities that this conent entity contains.
+
+        * resources: A list of URIs to available users and groups:
+          * Related Users  /api/courses/{course_id}/content/{content_id}/users
+          * Related Groups /api/courses/{course_id}/content/{content_id}/groups
     """
 
     def get(self, request, course_id, content_id):
-        """
-        GET /api/courses/{course_id}/content/{content_id}?type=video
-        """
         store = modulestore()
         response_data = {}
         base_uri = _generate_base_uri(request)
@@ -440,7 +468,7 @@ class CoursesDetail(SecureAPIView):
     """
     **Use Case** 
 
-        CoursesDetail returns details for a course. You can use the URI values
+        CoursesDetail returns details for a course. You can use the uri values
         in the resources collection in the response to get more course
         information for:
 
@@ -651,14 +679,23 @@ class CoursesGroupsDetail(SecureAPIView):
 
 class CoursesOverview(SecureAPIView):
     """
-    ### The CoursesOverview view allows clients to interact with a specific piece of Course content
-    - URI: ```/api/courses/{course_id}/overview```
-    - GET: Returns a JSON representation of the specified CourseContent entity
-        * parse: Set filtering parameter
-    ### Use Cases/Notes:
-    * Use this operation to obtain the 'overview' content for a course
-    * If 'parse' is provided (and true), the system will attempt to break the content into "sections"
-    * If 'parse' is not provided (or is false), the system will return the content in its current HTML format
+    **Use Case** 
+
+        CoursesOverview returns a an HTML representation of the overview for the
+        specified course. CoursesOverview has an optional parse parameter that
+        when true breaks the response into a collection named sections. By
+        default, parse is false.
+
+    **Example Request**
+
+          GET /api/courses/{course_id}/overview
+
+          GET /api/courses/{course_id}/overview?parse=true
+
+    **Response Values**
+
+        * overview: The HTML representation of the course overview.
+
     """
 
     def get(self, request, course_id):
