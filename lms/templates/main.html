@@ -66,6 +66,7 @@
   <%static:css group='style-app'/>
   <%static:css group='style-app-extend1'/>
   <%static:css group='style-app-extend2'/>
+  <%static:css group='style-discussion-app'/>
 
   % if disable_courseware_js:
     <%static:js group='base_vendor'/>
@@ -139,7 +140,8 @@
   <div class="window-wrap" dir="${dir_rtl}">
     <a class="nav-skip" href="<%block name="nav_skip">#content</%block>">${_("Skip to this view's content")}</a>
 
-    <%include file="mathjax_accessible.html" />
+  <%include file="mathjax_include.html" />
+  <%include file="mathjax_accessible.html" />
 
     <%include file="${header_file}" />
 
