@@ -694,7 +694,11 @@ class CoursesOverview(SecureAPIView):
 
     **Response Values**
 
-        * overview: The HTML representation of the course overview.
+        * overview_html: The HTML representation of the course overview.
+          Sections of the overview are indicated by an HTML section element.
+
+        * sections: When parse=true, a collection of JSON objects representing
+          parts of the course overview.
 
     """
 

@@ -20,3 +20,5 @@ Courses
      - GET /api/courses/{course_id}?depth=n
    * - :ref:`Get Content Details`
      - GET /api/courses/{course_id}/content/{content_id}?type=content_type
+   * - :ref:`Get a Course Overview`
+     - GET /api/courses/{course_id}/overview?parse=true
