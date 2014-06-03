@@ -44,11 +44,11 @@ class CorsCSRFMiddleware(CsrfViewMiddleware):
         return True
 
     def process_view(self, request, callback, callback_args, callback_kwargs):
-        log.warn('oooooo')
         if not self.is_enabled(request):
             return
 
         is_secure_default = request.is_secure
+
         def is_secure_patched():
             return False
         request.is_secure = is_secure_patched
