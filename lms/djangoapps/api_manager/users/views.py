@@ -15,6 +15,7 @@ from django.db.models import Q
 
 from api_manager.permissions import SecureAPIView
 from api_manager.models import GroupProfile
+from .serializers import UserSerializer
 
 from courseware import module_render
 from courseware.model_data import FieldDataCache
@@ -60,6 +61,7 @@ def _serialize_user_profile(response_data, user_profile):
     response_data['level_of_education'] = user_profile.level_of_education
     response_data['year_of_birth'] = user_profile.year_of_birth
     response_data['gender'] = user_profile.gender
+    response_data['avatar_url'] = user_profile.avatar_url
 
     return response_data
 
@@ -116,6 +118,19 @@ class UsersList(SecureAPIView):
     """
     ### The UsersList view allows clients to retrieve/append a list of User entities
     - URI: ```/api/users/```
+    - GET: Provides paginated list of users, it supports email, username and id filters
+        Possible use cases
+        GET /api/users?ids=23
+        GET /api/users?ids=11,12,13&page=2
+        GET /api/users?email={john@example.com}
+        GET /api/users?username={john}
+            * email: string, filters user set by email address
+            * username: string, filters user set by username
+
+        Example JSON output {'count': '25', 'next': 'https://testserver/api/users?page=2', num_pages='3',
+        'previous': None, 'results':[]}
+        'next' and 'previous' keys would have value of None if there are not next or previous page after current page.
+
     - POST: Provides the ability to append to the User entity set
         * email: __required__, The unique email address for the User being created
         * username: __required__, The unique username for the User being created
@@ -130,6 +145,7 @@ class UsersList(SecureAPIView):
         * level_of_education
         * year_of_birth, Four-digit integer value
         * gender, Single-character value (M/F)
+        * avatar_url, pointer to the avatar/image resource
     - POST Example:
 
             {
@@ -146,13 +162,28 @@ class UsersList(SecureAPIView):
                 "level_of_education" : "hs",
                 "year_of_birth" : "1996",
                 "gender" : "F",
+                "avatar_url" : "http://example.com/avatar.png"
             }
     ### Use Cases/Notes:
-    * GET requests for _all_ users are not currently allowed via the API
     * Password formatting policies can be enabled through the "ENFORCE_PASSWORD_POLICY" feature flag
     * The first_name and last_name fields are additionally concatenated and stored in the 'name' field of UserProfile
     * Values for level_of_education can be found in the LEVEL_OF_EDUCATION_CHOICES enum, located in common/student/models.py
     """
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    filter_fields = ('email', 'username', )
+
+    def get(self, request, *args, **kwargs):
+        """
+        GET /api/users?ids=11,12,13.....&page=2
+        """
+        email = request.QUERY_PARAMS.get('email', None)
+        username = request.QUERY_PARAMS.get('username', None)
+        ids = request.QUERY_PARAMS.get('ids', None)
+        if email or username or ids:
+            return self.list(request, *args, **kwargs)
+        else:
+            return Response({'message': _('Unfiltered request is not allowed.')}, status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request):
         """
@@ -173,6 +204,7 @@ class UsersList(SecureAPIView):
         year_of_birth = request.DATA.get('year_of_birth', '')
         gender = request.DATA.get('gender', '')
         title = request.DATA.get('title', '')
+        avatar_url = request.DATA.get('avatar_url', None)
         # enforce password complexity as an optional feature
         if settings.FEATURES.get('ENFORCE_PASSWORD_POLICY', False):
             try:
@@ -218,6 +250,7 @@ class UsersList(SecureAPIView):
         profile.level_of_education = level_of_education
         profile.gender = gender
         profile.title = title
+        profile.avatar_url = avatar_url
 
         try:
             profile.year_of_birth = int(year_of_birth)
@@ -265,6 +298,7 @@ class UsersDetail(SecureAPIView):
         * level_of_education
         * year_of_birth, Four-digit integer value
         * gender, Single-character value (M/F)
+        * avatar_url, pointer to the avatar/image resource
     - POST Example:
 
             {
@@ -281,6 +315,7 @@ class UsersDetail(SecureAPIView):
                 "level_of_education" : "hs",
                 "year_of_birth" : "1996",
                 "gender" : "F",
+                "avatar_url" : "http://example.com/avatar.png"
             }
     ### Use Cases/Notes:
     * Use the UsersDetail view to obtain the current state for a specific User
@@ -452,6 +487,10 @@ class UsersDetail(SecureAPIView):
             title = request.DATA.get('title')
             if title:
                 existing_user_profile.title = title
+            avatar_url = request.DATA.get('avatar_url')
+            if avatar_url:
+                existing_user_profile.avatar_url = avatar_url
+
             existing_user_profile.save()
         return Response(response_data, status=status.HTTP_200_OK)
 

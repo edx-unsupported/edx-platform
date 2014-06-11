@@ -10,8 +10,6 @@ import unittest
 import uuid
 from mock import patch
 from django.utils.translation import ugettext as _
-from django.conf import settings
-from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.test import TestCase, Client
 from django.test.utils import override_settings
@@ -90,6 +88,54 @@ class UsersApiTests(TestCase):
         response = self.do_post(test_uri, data)
         user_id = response.data['id']
         return user_id
+
+    @override_settings(API_PAGE_SIZE=10)
+    def test_user_list_get(self):
+        test_uri = '/api/users'
+
+        # create a 25 new users
+        for i in xrange(1, 26):
+            data = {
+                'email': 'test{}@example.com'.format(i),
+                'username': 'test_user{}'.format(i),
+                'password': 'test_pass',
+                'first_name': 'John{}'.format(i),
+                'last_name': 'Doe{}'.format(i)
+            }
+
+            response = self.do_post(test_uri, data)
+            self.assertEqual(response.status_code, 201)
+        # fetch data without any filters applied
+        response = self.do_get('{}?page=1'.format(test_uri))
+        self.assertEqual(response.status_code, 400)
+        # fetch users data with page outside range
+        response = self.do_get('{}?ids={}&page=5'.format(test_uri, '2,3,7,11,6,21,34'))
+        self.assertEqual(response.status_code, 404)
+        # fetch user data by single id
+        response = self.do_get('{}?ids={}'.format(test_uri, '3'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 1)
+        # fetch user data by multiple ids
+        response = self.do_get('{}?page_size=5&ids={}'.format(test_uri, '2,3,7,11,6,21,34'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 6)
+        self.assertEqual(len(response.data['results']), 5)
+        self.assertEqual(response.data['num_pages'], 2)
+        self.assertIn('page=2', response.data['next'])
+        self.assertEqual(response.data['previous'], None)
+        # fetch user data by username
+        response = self.do_get('{}?username={}'.format(test_uri, 'test_user1'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 1)
+        # fetch user data by email
+        response = self.do_get('{}?email={}'.format(test_uri, 'test2@example.com'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 1)
+        self.assertIsNotNone(response.data['results'][0]['id'])
+        # fetch by username with a non existing user
+        response = self.do_get('{}?email={}'.format(test_uri, 'john@example.com'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 0)
 
     def test_user_list_post(self):
         test_uri = '/api/users'
@@ -232,7 +278,8 @@ class UsersApiTests(TestCase):
         local_username = self.test_username + str(randint(11, 99))
         data = {
             'email': self.test_email, 'username': local_username, 'password': self.test_password, 'first_name': self.test_first_name,
-            'last_name': self.test_last_name, 'city': self.test_city, 'country': 'PK', 'level_of_education': 'b', 'year_of_birth': '2000', "gender": 'male', "title": 'Software Engineer'}
+            'last_name': self.test_last_name, 'city': self.test_city, 'country': 'PK', 'level_of_education': 'b', 'year_of_birth': '2000',
+            'gender': 'male', 'title': 'Software Engineer', 'avatar_url': 'http://example.com/avatar.png'}
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 201)
         test_uri = test_uri + '/' + str(response.data['id'])
@@ -253,12 +300,14 @@ class UsersApiTests(TestCase):
         """
         Create a user, then add the user profile with invalid year of birth
         Profile Must be added with year_of_birth will be none
+        and avatar_url None
         """
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
         data = {
             'email': self.test_email, 'username': local_username, 'password': self.test_password, 'first_name': self.test_first_name,
-            'last_name': self.test_last_name, 'city': self.test_city, 'country': 'PK', 'level_of_education': 'b', 'year_of_birth': 'abcd', "gender": 'male', "title": 'Software Engineer'}
+            'last_name': self.test_last_name, 'city': self.test_city, 'country': 'PK', 'level_of_education': 'b', 'year_of_birth': 'abcd',
+            'gender': 'male', 'title': 'Software Engineer', 'avatar_url': None}
         response = self.do_post(test_uri, data)
         self.assertEqual(response.status_code, 201)
         test_uri_1 = test_uri + '/' + str(response.data['id'])
@@ -871,6 +920,7 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.data['country'], data["country"])
         self.assertEqual(response.data['gender'], data["gender"])
         self.assertEqual(response.data['title'], data["title"])
+        self.assertEqual(response.data['avatar_url'], data["avatar_url"])
         self.assertEqual(
             response.data['level_of_education'], data["level_of_education"])
         self.assertEqual(
