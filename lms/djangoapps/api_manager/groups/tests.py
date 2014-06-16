@@ -358,14 +358,13 @@ class GroupsApiTests(TestCase):
         is_active = True
 
         for num in range(0, 5):
-            local_username = self.test_username + str(randint(11, 99))
 
             if num == 3:
                 is_active = False
 
             data = {
-                'email': self.test_email,
-                'username': local_username,
+                'email': '{}{}'.format(num, self.test_email),
+                'username': '{}{}'.format(num, self.test_username),
                 'password': self.test_password,
                 'first_name': self.test_first_name,
                 'last_name': self.test_last_name,
@@ -374,6 +373,7 @@ class GroupsApiTests(TestCase):
 
             # associating a user with a group
             response = self.do_post(self.base_users_uri, data)
+            self.assertEqual(response.status_code, 201)
             user_id = response.data['id']
             test_uri = self.base_groups_uri + '/' + str(group_id) + '/users'
             response = self.do_post(test_uri, data={'user_id': user_id})

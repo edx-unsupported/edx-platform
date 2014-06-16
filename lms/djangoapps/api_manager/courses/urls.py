@@ -26,6 +26,7 @@ urlpatterns = patterns(
     url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/static_tabs/*$', courses_views.CoursesStaticTabsList.as_view()),
     url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/users/(?P<user_id>[0-9]+)$', courses_views.CoursesUsersDetail.as_view()),
     url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/users/*$', courses_views.CoursesUsersList.as_view()),
+    url(r'^(?P<course_id>[^/]+/[^/]+/[^/]+)/completions/*$', courses_views.CourseModuleCompletionList.as_view(), name='completion-list'),
 )
 
 urlpatterns = format_suffix_patterns(urlpatterns)

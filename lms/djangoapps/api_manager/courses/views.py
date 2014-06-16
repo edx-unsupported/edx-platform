@@ -8,11 +8,15 @@ from StringIO import StringIO
 
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
+from django.http import Http404
 
 from rest_framework import status
 from rest_framework.response import Response
 
-from api_manager.models import CourseGroupRelationship, CourseContentGroupRelationship, GroupProfile
+from api_manager.models import CourseGroupRelationship, CourseContentGroupRelationship, GroupProfile, \
+    CourseModuleCompletion
 from api_manager.users.serializers import UserSerializer
 from courseware import module_render
 from courseware.courses import get_course, get_course_about_section, get_course_info_section
@@ -21,26 +25,12 @@ from courseware.views import get_static_tab_contents
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location, InvalidLocationError
-from api_manager.permissions import SecureAPIView
+from api_manager.permissions import SecureAPIView, SecureListAPIView
+from api_manager.utils import generate_base_uri
+from .serializers import CourseModuleCompletionSerializer
 
 
 log = logging.getLogger(__name__)
-
-
-def _generate_base_uri(request):
-    """
-    Constructs the protocol:host:path component of the resource uri
-    """
-    protocol = 'http'
-    if request.is_secure():
-        protocol = protocol + 's'
-    resource_uri = '{}://{}{}'.format(
-        protocol,
-        request.get_host(),
-        request.get_full_path()
-    )
-    return resource_uri
-
 
 def _get_content_children(content, content_type=None):
     """
@@ -329,7 +319,7 @@ class CourseContentDetail(SecureAPIView):
         """
         store = modulestore()
         response_data = {}
-        base_uri = _generate_base_uri(request)
+        base_uri = generate_base_uri(request)
         content_type = request.QUERY_PARAMS.get('type', None)
         response_data['uri'] = base_uri
         if course_id != content_id:
@@ -361,10 +351,11 @@ class CourseContentDetail(SecureAPIView):
                 course_id,
                 children
             )
+            base_uri_without_qs = generate_base_uri(request, True)
             response_data['resources'] = []
-            resource_uri = '{}/users'.format(base_uri)
+            resource_uri = '{}/users'.format(base_uri_without_qs)
             response_data['resources'].append({'uri': resource_uri})
-            resource_uri = '{}/groups'.format(base_uri)
+            resource_uri = '{}/groups'.format(base_uri_without_qs)
             response_data['resources'].append({'uri': resource_uri})
             status_code = status.HTTP_200_OK
         else:
@@ -445,20 +436,21 @@ class CoursesDetail(SecureAPIView):
                 course_descriptor.id,
                 course_descriptor
             )
-        base_uri = _generate_base_uri(request)
+        base_uri = generate_base_uri(request)
         response_data['uri'] = base_uri
+        base_uri_without_qs = generate_base_uri(request, True)
         response_data['resources'] = []
-        resource_uri = '{}/content/'.format(base_uri)
+        resource_uri = '{}/content/'.format(base_uri_without_qs)
         response_data['resources'].append({'uri': resource_uri})
-        resource_uri = '{}/groups/'.format(base_uri)
+        resource_uri = '{}/groups/'.format(base_uri_without_qs)
         response_data['resources'].append({'uri': resource_uri})
-        resource_uri = '{}/overview/'.format(base_uri)
+        resource_uri = '{}/overview/'.format(base_uri_without_qs)
         response_data['resources'].append({'uri': resource_uri})
-        resource_uri = '{}/updates/'.format(base_uri)
+        resource_uri = '{}/updates/'.format(base_uri_without_qs)
         response_data['resources'].append({'uri': resource_uri})
-        resource_uri = '{}/static_tabs/'.format(base_uri)
+        resource_uri = '{}/static_tabs/'.format(base_uri_without_qs)
         response_data['resources'].append({'uri': resource_uri})
-        resource_uri = '{}/users/'.format(base_uri)
+        resource_uri = '{}/users/'.format(base_uri_without_qs)
         response_data['resources'].append({'uri': resource_uri})
         return Response(response_data, status=status.HTTP_200_OK)
 
@@ -487,7 +479,7 @@ class CoursesGroupsList(SecureAPIView):
         """
         response_data = {}
         group_id = request.DATA['group_id']
-        base_uri = _generate_base_uri(request)
+        base_uri = generate_base_uri(request)
         try:
             existing_course = get_course(course_id)
         except ValueError:
@@ -564,7 +556,7 @@ class CoursesGroupsDetail(SecureAPIView):
         except ObjectDoesNotExist:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         response_data = {}
-        base_uri = _generate_base_uri(request)
+        base_uri = generate_base_uri(request)
         response_data['uri'] = base_uri
         response_data['course_id'] = course_id
         response_data['group_id'] = group_id
@@ -580,7 +572,7 @@ class CoursesGroupsDetail(SecureAPIView):
         except ObjectDoesNotExist:
             pass
         response_data = {}
-        response_data['uri'] = _generate_base_uri(request)
+        response_data['uri'] = generate_base_uri(request)
         return Response(response_data, status=status.HTTP_204_NO_CONTENT)
 
 
@@ -790,7 +782,7 @@ class CoursesUsersList(SecureAPIView):
         GET /api/courses/{course_id/users}
         """
         response_data = OrderedDict()
-        base_uri = _generate_base_uri(request)
+        base_uri = generate_base_uri(request)
         response_data['uri'] = base_uri
         try:
             existing_course = get_course(course_id)
@@ -835,7 +827,7 @@ class CoursesUsersDetail(SecureAPIView):
         """
         GET /api/courses/{course_id}/users/{user_id}
         """
-        base_uri = _generate_base_uri(request)
+        base_uri = generate_base_uri(request)
         response_data = {
             'course_id': course_id,
             'user_id': user_id,
@@ -882,7 +874,7 @@ class CoursesUsersDetail(SecureAPIView):
         if user:
             CourseEnrollment.unenroll(user, course_id)
         response_data = {}
-        base_uri = _generate_base_uri(request)
+        base_uri = generate_base_uri(request)
         response_data['uri'] = base_uri
         return Response(response_data, status=status.HTTP_204_NO_CONTENT)
 
@@ -927,7 +919,7 @@ class CourseContentGroupsList(SecureAPIView):
         except ObjectDoesNotExist:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         response_data = {}
-        base_uri = _generate_base_uri(request)
+        base_uri = generate_base_uri(request)
         response_data['uri'] = '{}/{}'.format(base_uri, existing_profile.group_id)
         response_data['course_id'] = course_descriptor.id
         response_data['content_id'] = existing_content.id
@@ -1055,3 +1047,83 @@ class CourseContentUsersList(SecureAPIView):
 
         serializer = UserSerializer(queryset, many=True)
         return Response(serializer.data)  # pylint: disable=E1101
+
+
+class CourseModuleCompletionList(SecureListAPIView):
+    """
+    ### The CourseModuleCompletionList allows clients to view user's course module completion entities
+    to monitor a user's progression throughout the duration of a course,
+    - URI: ```/api/courses/{course_id}/completions```
+    - GET: Returns a JSON representation of the course, content and user and timestamps
+    - GET Example:
+        {
+            "count":"1",
+            "num_pages": "1",
+            "previous": null
+            "next": null
+            "results": [
+                {
+                    "id": 2,
+                    "user_id": "3",
+                    "course_id": "32fgdf",
+                    "content_id": "324dfgd",
+                    "created": "2014-06-10T13:14:49.878Z",
+                    "modified": "2014-06-10T13:14:49.914Z"
+                }
+            ]
+        }
+
+    Filters can also be applied
+    ```/api/courses/{course_id}/completions/?user_id={user_id}```
+    ```/api/courses/{course_id}/completions/?content_id={content_id}```
+    ```/api/courses/{course_id}/completions/?user_id={user_id}&content_id={content_id}```
+    - POST: Creates a Course-Module completion entity
+    - POST Example:
+        {
+            "content_id":"i4x://the/content/location",
+            "user_id":4
+        }
+    ### Use Cases/Notes:
+    * Use GET operation to retrieve list of course completions by user
+    * Use GET operation to verify user has completed specific course module
+    """
+    serializer_class = CourseModuleCompletionSerializer
+
+    def get_queryset(self):
+        """
+        GET /api/courses/{course_id}/completions/
+        """
+        user_ids = self.request.QUERY_PARAMS.get('user_id', None)
+        content_id = self.request.QUERY_PARAMS.get('content_id', None)
+        course_id = self.kwargs['course_id']
+        queryset = CourseModuleCompletion.objects.filter(course_id=course_id)
+        upper_bound = getattr(settings, 'API_LOOKUP_UPPER_BOUND', 100)
+        if user_ids:
+            if ',' in user_ids:
+                user_ids = user_ids.split(",")[:upper_bound]
+            queryset = queryset.filter(user__in=user_ids)
+
+        if content_id:
+            queryset = queryset.filter(content_id=content_id)
+
+        return queryset
+
+    def post(self, request, course_id):
+        """
+        POST /api/courses/{course_id}/completions/
+        """
+        content_id = request.DATA.get('content_id', None)
+        user_id = request.DATA.get('user_id', None)
+        if not content_id:
+            return Response({'message': _('content_id is missing')}, status.HTTP_400_BAD_REQUEST)
+        if not user_id:
+            return Response({'message': _('user_id is missing')}, status.HTTP_400_BAD_REQUEST)
+
+        completion, created = CourseModuleCompletion.objects.get_or_create(user_id=user_id,
+                                                                           course_id=course_id,
+                                                                           content_id=content_id)
+        serializer = CourseModuleCompletionSerializer(completion)
+        if created:
+            return Response(serializer.data, status=status.HTTP_201_CREATED)  # pylint: disable=E1101
+        else:
+            return Response({'message': _('Resource already exists')}, status=status.HTTP_409_CONFLICT)

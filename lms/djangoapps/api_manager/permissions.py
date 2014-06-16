@@ -5,6 +5,7 @@ from django.conf import settings
 
 from api_manager.utils import get_client_ip_address, address_exists_in_network
 from rest_framework import permissions, generics, filters, pagination, serializers
+from rest_framework.views import APIView
 
 
 log = logging.getLogger(__name__)
@@ -87,10 +88,11 @@ class IdsInFilterBackend(filters.BaseFilterBackend):
         Parse querystring to get ids and the filter the queryset
         Max of 100 values are allowed for performance reasons
         """
+        upper_bound = getattr(settings, 'API_LOOKUP_UPPER_BOUND', 100)
         ids = request.QUERY_PARAMS.get('ids')
         if ids:
             if ',' in ids:
-                ids = ids.split(",")[:100]
+                ids = ids.split(",")[:upper_bound]
             return queryset.filter(id__in=ids)
         return queryset
 
@@ -102,13 +104,39 @@ class CustomPaginationSerializer(pagination.PaginationSerializer):
     num_pages = serializers.Field(source='paginator.num_pages')
 
 
-class SecureAPIView(generics.ListAPIView):
+class SecureAPIView(APIView):
+    permission_classes = (ApiKeyHeaderPermission, )
+
+
+class PermissionMixin(object):
     """
-        Inherited from ListAPIView
+    Mixin to set custom permission_classes
     """
     permission_classes = (ApiKeyHeaderPermission, IPAddressRestrictedPermission)
+
+
+class FilterBackendMixin(object):
+    """
+    Mixin to set custom filter_backends
+    """
     filter_backends = (filters.DjangoFilterBackend, IdsInFilterBackend,)
+
+
+class PaginationMixin(object):
+    """
+    Mixin to set custom pagination support
+    """
     pagination_serializer_class = CustomPaginationSerializer
     paginate_by = getattr(settings, 'API_PAGE_SIZE', 20)
     paginate_by_param = 'page_size'
     max_paginate_by = 100
+
+
+class SecureListAPIView(PermissionMixin,
+                        FilterBackendMixin,
+                        PaginationMixin,
+                        generics.ListAPIView):
+    """
+        Inherited from ListAPIView
+    """
+    pass
