@@ -40,6 +40,11 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('id', 'url', 'name')
 
 
+class GradeSerializer(serializers.Serializer):
+    """ Serializer for model interactions """
+    grade = serializers.Field()
+
+
 class ProjectSerializer(serializers.HyperlinkedModelSerializer):
     """ Serializer for model interactions """
     workgroups = serializers.PrimaryKeyRelatedField(many=True, required=False)
@@ -63,7 +68,8 @@ class WorkgroupSubmissionSerializer(serializers.HyperlinkedModelSerializer):
         """ Meta class for defining additional serializer characteristics """
         model = WorkgroupSubmission
         fields = (
-            'id', 'url', 'created', 'modified', 'document_id', 'document_url', 'document_mime_type',
+            'id', 'url', 'created', 'modified', 'document_id', 'document_url',
+            'document_mime_type', 'document_filename',
             'user', 'workgroup', 'reviews'
         )
 
