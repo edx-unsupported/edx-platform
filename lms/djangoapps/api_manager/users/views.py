@@ -2,7 +2,7 @@
 
 import logging
 
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from django.core.validators import validate_email, validate_slug, ValidationError
@@ -15,7 +15,7 @@ from rest_framework.response import Response
 from django.db.models import Q
 
 from api_manager.permissions import SecureAPIView, SecureListAPIView
-from api_manager.models import GroupProfile
+from api_manager.models import GroupProfile, APIUser as User
 from api_manager.organizations.serializers import OrganizationSerializer
 from api_manager.utils import generate_base_uri
 from projects.serializers import BasicWorkgroupSerializer
@@ -36,6 +36,9 @@ from util.bad_request_rate_limiter import BadRequestRateLimiter
 
 from courseware import grades
 from courseware.courses import get_course
+
+from lms.lib.comment_client.user import User as CommentUser
+from lms.lib.comment_client.utils import CommentClientRequestError
 
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
@@ -522,7 +525,7 @@ class UsersGroupsList(SecureAPIView):
             return Response(response_data, status=status.HTTP_409_CONFLICT)
         except ObjectDoesNotExist:
             existing_user.groups.add(existing_group.id)
-            response_data['uri'] = '{}/{}'.format(base_uri, existing_user.id)
+            response_data['uri'] = '{}/{}'.format(base_uri, existing_group.id)
             response_data['group_id'] = str(existing_group.id)
             response_data['user_id'] = str(existing_user.id)
             return Response(response_data, status=status.HTTP_201_CREATED)
@@ -782,10 +785,12 @@ class UsersCoursesGradesDetail(SecureAPIView):
 
         courseware_summary = grades.progress_summary(student, request, course)
         grade_summary = grades.grade(student, request, course)
+        grading_policy = course.grading_policy
 
         response_data = {
             'courseware_summary': courseware_summary,
-            'grade_summary': grade_summary
+            'grade_summary': grade_summary,
+            'grading_policy': grading_policy
         }
 
         return Response(response_data)
@@ -808,7 +813,7 @@ class UsersPreferences(SecureAPIView):
     * POSTing a duplicate preference will cause the existing preference to be overwritten (effectively a PUT operation)
     """
 
-    def get(self, request, user_id): # pylint: disable=W0613
+    def get(self, request, user_id):  # pylint: disable=W0613
         """
         GET returns the preferences for the specified user
         """
@@ -911,3 +916,33 @@ class UsersWorkgroupsList(SecureListAPIView):
         if course_id:
             queryset = queryset.filter(project__course_id=course_id)
         return queryset
+
+
+class UsersSocialMetrics(SecureListAPIView):
+    """
+    ### The UsersSocialMetrics view allows clients to query about the activity of a user in the
+    forums
+    - URI: ```/api/users/{user_id}/courses/{course_id}/metrics/social/```
+    - GET: Returns a list of social metrics for that user in the specified course
+    """
+
+    def get(self, request, user_id, course_id): # pylint: disable=W0613
+
+        try:
+            user = User.objects.get(id=user_id)
+        except ObjectDoesNotExist:
+            return Response({}, status.HTTP_404_NOT_FOUND)
+
+        comment_user = CommentUser.from_django_user(user)
+        comment_user.course_id = course_id
+
+        try:
+            data = comment_user.social_stats()
+            http_status = status.HTTP_200_OK
+        except CommentClientRequestError, e:
+            data = {
+                "err_msg": str(e)
+            }
+            http_status = status.HTTP_500_INTERNAL_SERVER_ERROR
+
+        return Response(data, http_status)

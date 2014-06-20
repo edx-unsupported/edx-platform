@@ -13,6 +13,8 @@ from django.utils.translation import ugettext as _
 from django.core.cache import cache
 from django.test import TestCase, Client
 from django.test.utils import override_settings
+from student.tests.factories import UserFactory
+from student.models import anonymous_id_for_user
 from projects.models import Project
 
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
@@ -68,6 +70,7 @@ class UsersApiTests(TestCase):
             content_id=self.course_content.id + 'b2'
         )
 
+        self.user = UserFactory()
         self.client = SecureClient()
         cache.clear()
 
@@ -913,9 +916,6 @@ class UsersApiTests(TestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
 
-        print 'data type == ' + response.data.__class__.__name__
-        print 'data = {}'.format(response.data)
-
         courseware_summary = response.data['courseware_summary']
         self.assertEqual(len(courseware_summary), 2)
         self.assertEqual(courseware_summary[0]['course'], 'Robot Super Course')
@@ -930,6 +930,12 @@ class UsersApiTests(TestCase):
         self.assertEqual(len(sections), 1)
         self.assertEqual(sections[0]['display_name'], 'Sequence 2')
         self.assertEqual(sections[0]['graded'], False)
+
+        grade_summary = response.data['grade_summary']
+        self.assertGreater(len(grade_summary['section_breakdown']), 0)
+        grading_policy = response.data['grading_policy']
+        self.assertGreater(len(grading_policy['GRADER']), 0)
+        self.assertIsNotNone(grading_policy['GRADE_CUTOFFS'])
 
     def is_user_profile_created_updated(self, response, data):
         """This function compare response with user profile data """
@@ -947,7 +953,8 @@ class UsersApiTests(TestCase):
             str(response.data['year_of_birth']), data["year_of_birth"])
 
     def test_user_organizations_list(self):
-        user_id = self._create_test_user()
+        user_id = self.user.id
+        anonymous_id = anonymous_id_for_user(self.user, self.course.id)
         for i in xrange(1, 7):
             data = {
                 'name': 'Org ' + str(i),
@@ -963,13 +970,20 @@ class UsersApiTests(TestCase):
         self.assertEqual(len(response.data['results']), 6)
         self.assertEqual(response.data['num_pages'], 1)
 
+        # test with anonymous user id
+        test_uri = '/api/users/{}/organizations/'.format(anonymous_id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.data['count'], 6)
+
         # test with invalid user
         response = self.do_get('/api/users/4356340/organizations/')
         self.assertEqual(response.status_code, 404)
 
     def test_user_workgroups_list(self):
         test_workgroups_uri = '/api/workgroups/'
-        user_id = self._create_test_user()
+        user_id = self.user.id
+        # create anonymous user
+        anonymous_id = anonymous_id_for_user(self.user, self.course.id)
         for i in xrange(1, 12):
             project_id = self.test_project.id
             if i > 7:  # set to other project
@@ -986,13 +1000,14 @@ class UsersApiTests(TestCase):
             response = self.do_post(users_uri, data)
             self.assertEqual(response.status_code, 201)
 
-        test_uri = '/api/users/{}/workgroups/?page_size=10'.format(user_id)
+        # test with anonymous user id
+        test_uri = '/api/users/{}/workgroups/?page_size=10'.format(anonymous_id)
         response = self.do_get(test_uri)
         self.assertEqual(response.data['count'], 11)
         self.assertEqual(len(response.data['results']), 10)
         self.assertEqual(response.data['num_pages'], 2)
 
-        # test with course_id filter
+        # test with course_id filter and integer user id
         response = self.do_get('/api/users/{}/workgroups/?course_id={}'.format(user_id, self.course.id))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 7)
