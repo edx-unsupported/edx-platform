@@ -50,6 +50,7 @@ class UsersApiTests(TestCase):
         self.test_first_name = str(uuid.uuid4())
         self.test_last_name = str(uuid.uuid4())
         self.test_city = str(uuid.uuid4())
+        self.org_base_uri = '/api/organizations/'
 
         self.test_course_data = '<html>{}</html>'.format(str(uuid.uuid4()))
         self.course = CourseFactory.create()
@@ -115,7 +116,7 @@ class UsersApiTests(TestCase):
 
     def test_user_list_get(self):
         test_uri = '/api/users'
-
+        users = []
         # create a 25 new users
         for i in xrange(1, 26):
             data = {
@@ -128,6 +129,19 @@ class UsersApiTests(TestCase):
 
             response = self.do_post(test_uri, data)
             self.assertEqual(response.status_code, 201)
+            users.append(response.data['id'])
+
+        # create organizations and add users to them
+        total_orgs = 30
+        for i in xrange(0, total_orgs):
+            data = {
+                'name': '{} {}'.format('Org', i),
+                'display_name': '{} {}'.format('Org display name', i),
+                'users': users
+            }
+            response = self.do_post(self.org_base_uri, data)
+            self.assertEqual(response.status_code, 201)
+
         # fetch data without any filters applied
         response = self.do_get('{}?page=1'.format(test_uri))
         self.assertEqual(response.status_code, 400)
@@ -138,6 +152,10 @@ class UsersApiTests(TestCase):
         response = self.do_get('{}?ids={}'.format(test_uri, '3'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(len(response.data['results'][0]['organizations']), total_orgs)
+        self.assertIsNotNone(response.data['results'][0]['organizations'][0]['name'])
+        self.assertIsNotNone(response.data['results'][0]['organizations'][0]['id'])
+        self.assertIsNotNone(response.data['results'][0]['organizations'][0]['url'])
         # fetch user data by multiple ids
         response = self.do_get('{}?page_size=5&ids={}'.format(test_uri, '2,3,7,11,6,21,34'))
         self.assertEqual(response.status_code, 200)
@@ -961,7 +979,7 @@ class UsersApiTests(TestCase):
                 'display_name': 'Org display name' + str(i),
                 'users': [user_id]
             }
-            response = self.do_post('/api/organizations/', data)
+            response = self.do_post(self.org_base_uri, data)
             self.assertEqual(response.status_code, 201)
 
         test_uri = '/api/users/{}/organizations/'.format(user_id)
@@ -1025,3 +1043,47 @@ class UsersApiTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 0)
         self.assertEqual(len(response.data['results']), 0)
+
+    def test_user_completions_list(self):
+        user_id = self.user.id
+        another_user_id = UserFactory().id
+        completion_uri = '/api/courses/{}/completions/'.format(self.course.id)
+
+        for i in xrange(1, 17):
+            if i > 7:
+                course_user_id = another_user_id
+            else:
+                course_user_id = user_id
+            completions_data = {'content_id': '{}_{}'.format(self.course_content.id, i), 'user_id': course_user_id}
+            response = self.do_post(completion_uri, completions_data)
+            self.assertEqual(response.status_code, 201)
+
+        # Get course module completion by user
+        completion_list_uri = '/api/users/{}/courses/{}/completions/?page_size=5'.format(user_id, self.course.id)
+        response = self.do_get(completion_list_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 7)
+        self.assertEqual(len(response.data['results']), 5)
+        self.assertEqual(response.data['results'][0]['user_id'], user_id)
+        self.assertEqual(response.data['results'][0]['course_id'], self.course.id)
+        self.assertEqual(response.data['num_pages'], 2)
+
+        # Get course module completion by other user
+        completion_list_uri = '/api/users/{}/courses/{}/completions/'.format(another_user_id, self.course.id)
+        response = self.do_get(completion_list_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 9)
+
+        # Get course module completion by other user and course module id
+        completion_list_uri = '/api/users/{}/courses/{}/completions/?content_id={}'.format(
+            another_user_id,
+            self.course.id,
+            '{}_{}'.format(self.course_content.id, 10))
+        response = self.do_get(completion_list_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 1)
+
+        # Get course module completion by bogus user
+        completion_list_uri = '/api/users/{}/courses/{}/completions/'.format('34323422', self.course.id)
+        response = self.do_get(completion_list_uri)
+        self.assertEqual(response.status_code, 404)
