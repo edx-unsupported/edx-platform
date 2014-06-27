@@ -9,7 +9,7 @@ from StringIO import StringIO
 from django.conf import settings
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Avg, Sum
+from django.db.models import Avg, Sum, Count
 from django.http import Http404
 from django.utils.translation import ugettext_lazy as _
 
@@ -1467,3 +1467,38 @@ class CoursesLeadersList(SecureListAPIView):
         queryset = queryset.values('student__id', 'student__username', 'student__profile__title',
                                    'student__profile__avatar_url').annotate(points_scored=Sum('grade')).order_by('-points_scored')[:count]
         return queryset
+
+
+class CourseCompletionsPositionMetrics(SecureAPIView):
+    """
+    ### The CourseCompletionsPositionMetrics view allows clients to retrieve a position of user
+    in terms of course module completions for the specified Course and course average completions
+    - URI: ```/api/courses/{course_id}/metrics/completions/position/{user_id}/```
+    - GET: Returns a JSON representation with `position`, `completions` and `course_avg` keys
+    """
+
+    def get(self, request, course_id, user_id):  # pylint: disable=W0613
+        """
+        GET /api/courses/{course_id}/metrics/completions/position/{user_id}/
+        """
+        try:
+            existing_course = get_course(course_id)
+        except ValueError:
+            existing_course = None
+        if not existing_course:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+        user_completions = CourseModuleCompletion.objects.filter(user__id=user_id).count()
+        completions_above_user = CourseModuleCompletion.objects.values('user__id')\
+            .annotate(completions=Count('content_id')).filter(completions__gt=user_completions).count()
+        total_completions = CourseModuleCompletion.objects.count()
+        users = CourseModuleCompletion.objects.aggregate(total=Count('user__id', distinct=True))
+        course_avg = 0
+        if users and users['total'] > 0:
+            course_avg = round(total_completions / float(users['total']), 1)
+
+        data = {
+            'position': completions_above_user + 1,
+            'completions': user_completions,
+            'course_avg': course_avg
+        }
+        return Response(data, status=status.HTTP_200_OK)

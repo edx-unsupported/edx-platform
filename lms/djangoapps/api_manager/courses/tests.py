@@ -1408,3 +1408,61 @@ class CoursesApiTests(TestCase):
         # test with bogus course
         response = self.do_get(course_metrics_uri.format(self.test_bogus_course_id))
         self.assertEqual(response.status_code, 404)
+
+    def test_coursemodulecompletions_position_metrics(self):
+        completion_uri = '{}/{}/completions/'.format(self.base_courses_uri, self.course.id)
+        users = []
+        for i in xrange(1, 6):
+            data = {
+                'email': 'test{}@example.com'.format(i),
+                'username': 'test_user{}'.format(i),
+                'password': 'test_pass',
+                'first_name': 'John{}'.format(i),
+                'last_name': 'Doe{}'.format(i)
+            }
+            response = self.do_post(self.base_users_uri, data)
+            self.assertEqual(response.status_code, 201)
+            users.append(response.data['id'])
+
+        for i in xrange(1, 26):
+            content_id = self.course_content.id + str(i)
+            if i < 5:
+                user_id = users[0]
+            elif i < 11:
+                user_id = users[1]
+            elif i < 18:
+                user_id = users[2]
+            else:
+                user_id = users[3]
+
+            completions_data = {'content_id': content_id, 'user_id': user_id}
+            response = self.do_post(completion_uri, completions_data)
+            self.assertEqual(response.status_code, 201)
+
+        # get user position in terms of completions
+        completion_metrics_uri = '{}/{}/metrics/completions/position/'.format(self.base_courses_uri, self.course.id)
+        response = self.do_get('{}{}/'.format(completion_metrics_uri, users[1]))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['position'], 3)
+        self.assertEqual(response.data['completions'], 6)
+        self.assertEqual(response.data['course_avg'], 6.3)
+        # get position of another user
+        response = self.do_get('{}{}/'.format(completion_metrics_uri, users[0]))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['position'], 4)
+        self.assertEqual(response.data['completions'], 4)
+        # add one more completion
+        completions_data = {'content_id': '{}_{}'.format(self.course_content.id, 26), 'user_id': users[4]}
+        response = self.do_post(completion_uri, completions_data)
+        self.assertEqual(response.status_code, 201)
+        # get position of another user. course_avg should be changed
+        response = self.do_get('{}{}/'.format(completion_metrics_uri, users[3]))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['position'], 1)
+        self.assertEqual(response.data['completions'], 8)
+        self.assertEqual(response.data['course_avg'], 5.2)
+        # test with bogus course
+        completion_metrics_uri = '{}/{}/metrics/completions/position/'.format(self.base_courses_uri,
+                                                                              self.test_bogus_course_id)
+        response = self.do_get('{}{}/'.format(completion_metrics_uri, users[3]))
+        self.assertEqual(response.status_code, 404)
