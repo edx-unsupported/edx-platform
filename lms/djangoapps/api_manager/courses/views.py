@@ -9,7 +9,7 @@ from StringIO import StringIO
 from django.conf import settings
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Avg, Sum
+from django.db.models import Avg, Sum, Count
 from django.http import Http404
 from django.utils.translation import ugettext_lazy as _
 
@@ -34,7 +34,7 @@ from projects.models import Project
 from projects.serializers import ProjectSerializer
 
 from .serializers import CourseModuleCompletionSerializer
-from .serializers import GradeSerializer
+from .serializers import GradeSerializer, CourseLeadersSerializer, CourseCompletionsLeadersSerializer
 
 log = logging.getLogger(__name__)
 
@@ -1398,3 +1398,145 @@ class CoursesProjectList(SecureListAPIView):
             raise Http404
 
         return Project.objects.filter(course_id=course_id)
+
+
+class CourseMetrics(SecureAPIView):
+    """
+    ### The CourseMetrics view allows clients to retrieve a list of Metrics for the specified Course
+    - URI: ```/api/courses/{course_id}/metrics/```
+    - GET: Returns a JSON representation (array) of the set of course metrics
+    ### Use Cases/Notes:
+    * Example: Display number of users enrolled in a given course
+    """
+
+    def get(self, request, course_id):  # pylint: disable=W0613
+        """
+        GET /api/courses/{course_id}/metrics/
+        """
+        try:
+            existing_course = get_course(course_id)
+        except ValueError:
+            existing_course = None
+        if not existing_course:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+        users_enrolled = CourseEnrollment.num_enrolled_in(course_id)
+        data = {
+            'users_enrolled': users_enrolled
+        }
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class CoursesLeadersList(SecureListAPIView):
+    """
+    ### The CoursesLeadersList view allows clients to retrieve top 3 users who are leading
+    in terms of points_scored and course average for the specified Course. If user_id parameter is given
+    it would return user's position
+    - URI: ```/api/courses/{course_id}/metrics/proficiency/leaders/?user_id={user_id}```
+    - GET: Returns a JSON representation (array) of the users with points scored
+    Filters can also be applied
+    ```/api/courses/{course_id}/metrics/proficiency/leaders/?content_id={content_id}```
+    To get more than 3 users use count parameter
+    ```/api/courses/{course_id}/metrics/proficiency/leaders/?count=3```
+    ### Use Cases/Notes:
+    * Example: Display proficiency leaderboard of a given course
+    * Example: Display position of a users in a course in terms of proficiency points and course avg
+    """
+
+    def get(self, request, course_id):  # pylint: disable=W0613
+        """
+        GET /api/courses/{course_id}/metrics/proficiency/leaders/
+        """
+        user_id = self.request.QUERY_PARAMS.get('user_id', None)
+        content_id = self.request.QUERY_PARAMS.get('content_id', None)
+        count = self.request.QUERY_PARAMS.get('count', 3)
+        data = {}
+        course_avg = 0
+        try:
+            get_course(course_id)
+        except ValueError:
+            raise Http404
+        queryset = StudentModule.objects.filter(
+            course_id__exact=course_id,
+            grade__isnull=False,
+            max_grade__isnull=False,
+            max_grade__gt=0,
+            student__is_active=True
+        )
+
+        if content_id:
+            queryset = queryset.filter(module_state_key=content_id)
+
+        if user_id:
+            user_points = StudentModule.objects.filter(course_id__exact=course_id,
+                                                       student__id=user_id).aggregate(points=Sum('grade'))
+            users_above = queryset.values('student__id').annotate(points=Sum('grade')).\
+                filter(points__gt=user_points['points']).count()
+            data['position'] = users_above + 1
+            data['points'] = user_points['points']
+
+        points = queryset.aggregate(total=Sum('grade'))
+        users = queryset.filter(student__is_active=True).aggregate(total=Count('student__id', distinct=True))
+        if users and users['total']:
+            course_avg = round(points['total'] / float(users['total']), 1)
+        data['course_avg'] = course_avg
+        queryset = queryset.filter(student__is_active=True).values('student__id', 'student__username',
+                                                                   'student__profile__title',
+                                                                   'student__profile__avatar_url')\
+            .annotate(points_scored=Sum('grade')).order_by('-points_scored')[:count]
+        serializer = CourseLeadersSerializer(queryset, many=True)
+
+        data['leaders'] = serializer.data  # pylint: disable=E1101
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class CoursesCompletionsLeadersList(SecureAPIView):
+    """
+    ### The CoursesCompletionsLeadersList view allows clients to retrieve top 3 users who are leading
+    in terms of course module completions and course average for the specified Course, if user_id parameter is given
+    position of user is returned
+    - URI: ```/api/courses/{course_id}/metrics/completions/leaders/```
+    - GET: Returns a JSON representation (array) of the users with points scored
+    Filters can also be applied
+    ```/api/courses/{course_id}/metrics/completions/leaders/?content_id={content_id}```
+    To get more than 3 users use count parameter
+    ```/api/courses/{course_id}/metrics/completions/leaders/?count=6```
+    ### Use Cases/Notes:
+    * Example: Display leaders in terms of completions in a given course
+    * Example: Display top 3 users leading in terms of completions in a given course
+    """
+
+    def get(self, request, course_id):  # pylint: disable=W0613
+        """
+        GET /api/courses/{course_id}/metrics/completions/leaders/
+        """
+        user_id = self.request.QUERY_PARAMS.get('user_id', None)
+        count = self.request.QUERY_PARAMS.get('count', 3)
+        data = {}
+        course_avg = 0
+        try:
+            get_course(course_id)
+        except ValueError:
+            raise Http404
+        queryset = CourseModuleCompletion.objects.filter(course_id=course_id)
+
+        if user_id:
+            user_completions = queryset.filter(user__id=user_id).count()
+            completions_above_user = queryset.filter(user__is_active=True).values('user__id')\
+                .annotate(completions=Count('content_id')).filter(completions__gt=user_completions).count()
+            data['position'] = completions_above_user + 1
+            data['completions'] = user_completions
+
+        total_completions = queryset.filter(user__is_active=True).count()
+        users = CourseModuleCompletion.objects.filter(user__is_active=True)\
+            .aggregate(total=Count('user__id', distinct=True))
+
+        if users and users['total'] > 0:
+            course_avg = round(total_completions / float(users['total']), 1)
+        data['course_avg'] = course_avg
+
+        queryset = queryset.filter(user__is_active=True).values('user__id', 'user__username', 'user__profile__title',
+                                                                'user__profile__avatar_url')\
+            .annotate(completions=Count('content_id')).order_by('-completions')[:count]
+        serializer = CourseCompletionsLeadersSerializer(queryset, many=True)
+        data['leaders'] = serializer.data  # pylint: disable=E1101
+        return Response(data, status=status.HTTP_200_OK)
