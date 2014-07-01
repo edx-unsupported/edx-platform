@@ -50,7 +50,10 @@ class SequenceModule(SequenceFields, XModule):
 
     def __init__(self, *args, **kwargs):
         super(SequenceModule, self).__init__(*args, **kwargs)
-
+        print "SELF.SYSTEM"
+        print self.system
+        print self.system.__dict__
+        print "END SELF.SYSTEM"
         # if position is specified in system, then use that instead
         if getattr(self.system, 'position', None) is not None:
             self.position = int(self.system.position)
