@@ -14,7 +14,7 @@ from django.core.cache import cache
 from django.test import TestCase, Client
 from django.test.utils import override_settings
 from student.tests.factories import UserFactory
-from student.models import anonymous_id_for_user
+from student.models import anonymous_id_for_user, CourseEnrollment
 from projects.models import Project
 
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
@@ -644,6 +644,18 @@ class UsersApiTests(TestCase):
             data=test_data,
             display_name="Chapter 3"
         )
+        sequential1 = ItemFactory.create(
+            category="sequential",
+            parent_location=chapter3.location,
+            data=test_data,
+            display_name="Sequential 1"
+        )
+        sequential2 = ItemFactory.create(
+            category="sequential",
+            parent_location=chapter3.location,
+            data=test_data,
+            display_name="Sequential 2"
+        )
         test_uri = '/api/users'
         local_username = self.test_username + str(randint(11, 99))
         data = {'email': self.test_email, 'username': local_username, 'password':
@@ -659,11 +671,21 @@ class UsersApiTests(TestCase):
             'position': {
                 'parent_content_id': str(course.id),
                 'child_content_id': str(chapter3.location)
-
             }
         }
         response = self.do_post(test_uri, data=position_data)
         self.assertEqual(response.data['position'], chapter3.id)
+        position_data = {
+            'position': {
+                'parent_content_id': str(chapter3.id),
+                'child_content_id': str(sequential2.location)
+            }
+        }
+        response = self.do_post(test_uri, data=position_data)
+        self.assertEqual(response.data['position'], sequential2.id)
+        response = self.do_get(response.data['uri'])
+        print response.data
+        assert 0
 
     def test_user_courses_detail_post_position_invalid_user(self):
         course = CourseFactory.create()

@@ -660,6 +660,7 @@ class UsersCoursesList(SecureAPIView):
                 log.warning("User {0} enrolled in course_id {1}, but course could not be found.".format(user_id, enrollment.course_id))
 
         return Response(response_data, status=status.HTTP_200_OK)
+from django.db import connection
 
 
 class UsersCoursesDetail(SecureAPIView):
@@ -692,6 +693,9 @@ class UsersCoursesDetail(SecureAPIView):
         """
         POST /api/users/{user_id}/courses/{course_id}
         """
+        print '******************************************'
+        print '******** POST USER-COURSES-DETAIL *********'
+        print '******************************************'
         store = modulestore()
         base_uri = generate_base_uri(request)
         response_data = {}
@@ -717,6 +721,9 @@ class UsersCoursesDetail(SecureAPIView):
         """
         GET /api/users/{user_id}/courses/{course_id}
         """
+        print '******************************************'
+        print '******** GET USER-COURSES-DETAIL *********'
+        print '******************************************'
         store = modulestore()
         response_data = {}
         base_uri = generate_base_uri(request)
@@ -731,13 +738,40 @@ class UsersCoursesDetail(SecureAPIView):
         response_data['course_id'] = course_id
         response_data['uri'] = base_uri
         field_data_cache = FieldDataCache([course_descriptor], course_id, user)
-        course_content = module_render.get_module(
+        course_module = module_render.get_module_for_descriptor(
             user,
             request,
-            course_descriptor.location,
+            course_descriptor,
             field_data_cache,
             course_id)
-        response_data['position'] = course_content.position
+
+        response_data['position'] = course_module.position
+        print "BEGIN DIRECT SQL QUERY"
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM courseware_studentmodule")
+        rows = cursor.fetchall()
+        print rows
+        print "END DIRECT SQL QUERY"
+        response_data['position_tree'] = {}
+        parent_module = course_module
+        while parent_module is not None:
+            print "VIEW GET CURRENT CHILD"
+            current_child_descriptor = get_current_child(parent_module)
+            if current_child_descriptor:
+                response_data['position_tree'][current_child_descriptor.category] = {}
+                response_data['position_tree'][current_child_descriptor.category]['id'] = current_child_descriptor.id
+                child_field_data_cache = FieldDataCache([parent_module], course_id, user)
+                print "VIEW GET NEW PARENT MODULE"
+                parent_module = module_render.get_module(
+                    user,
+                    request,
+                    current_child_descriptor.id,
+                    child_field_data_cache,
+                    course_id
+                )
+            else:
+                parent_module = None
+
         return Response(response_data, status=status.HTTP_200_OK)
 
     def delete(self, request, user_id, course_id):

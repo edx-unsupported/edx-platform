@@ -129,6 +129,7 @@ def get_current_child(xmodule):
         pos = xmodule.position - 1
 
     children = xmodule.get_display_items()
+    print "GCC: SELECTED CHILD"
     if 0 <= pos < len(children):
         child = children[pos]
     elif len(children) > 0:
@@ -136,6 +137,10 @@ def get_current_child(xmodule):
         child = children[0]
     else:
         child = None
+    print child
+    if child:
+        print child.__dict__
+    print "END GCC: SELECTED CHILD"
     return child
 
 
@@ -170,19 +175,33 @@ def redirect_to_course_position(course_module):
     urlargs['section'] = section.url_name
     return redirect(reverse('courseware_section', kwargs=urlargs))
 
+from django.db import connection
 
 def save_child_position(seq_module, child_name):
     """
     child_name: url_name of the child
     """
-    print child_name
     for position, c in enumerate(seq_module.get_display_items(), start=1):
         if c.url_name == child_name:
             # Only save if position changed
             if position != seq_module.position:
                 seq_module.position = position
-    # Save this new position to the underlying KeyValueStore
-    seq_module.save()
+                print "PRE-SAVE SEQ MODULE"
+                print seq_module
+                print seq_module.__dict__
+                print "END PRE-SAVE SEQ MODULE"
+                seq_module.save()
+                print "POST-SAVE SEQ MODULE"
+                print seq_module
+                print seq_module.__dict__
+                print "END POST-SAVE SEQ MODULE"
+                print "BEGIN DIRECT SQL QUERY"
+                cursor = connection.cursor()
+                cursor.execute("SELECT * FROM courseware_studentmodule")
+                rows = cursor.fetchall()
+                print rows
+                print "END DIRECT SQL QUERY"
+
 
 
 def chat_settings(course, user):
