@@ -33,7 +33,7 @@ from api_manager.utils import generate_base_uri
 from projects.models import Project
 from projects.serializers import ProjectSerializer
 
-from .serializers import CourseModuleCompletionSerializer
+from .serializers import CourseModuleCompletionSerializer, CourseSerializer
 from .serializers import GradeSerializer, CourseLeadersSerializer, CourseCompletionsLeadersSerializer
 
 log = logging.getLogger(__name__)
@@ -429,11 +429,11 @@ class CourseContentDetail(SecureAPIView):
         return Response(response_data, status=status_code)
 
 
-class CoursesList(SecureAPIView):
+class CoursesList(SecureListAPIView):
     """
     **Use Case**
 
-        CoursesList returns a collection of courses in the edX Platform. You can
+        CoursesList returns paginated list of courses in the edX Platform. You can
         use the uri value in the response to get details of the course.
 
     **Example Request**
@@ -456,19 +456,12 @@ class CoursesList(SecureAPIView):
 
         * id: The unique identifier for the course.
     """
+    serializer_class = CourseSerializer
 
-    def get(self, request):
-        response_data = []
+    def get_queryset(self):
         store = modulestore()
         course_descriptors = store.get_courses()
-        for course_descriptor in course_descriptors:
-            course_data = _serialize_content(
-                request,
-                course_descriptor.id,
-                course_descriptor
-            )
-            response_data.append(course_data)
-        return Response(response_data, status=status.HTTP_200_OK)
+        return course_descriptors
 
 
 class CoursesDetail(SecureAPIView):
