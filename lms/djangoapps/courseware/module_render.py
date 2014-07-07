@@ -47,6 +47,7 @@ from xmodule.x_module import XModuleDescriptor
 from util.json_request import JsonResponse
 from util.sandboxing import can_execute_unsafe_code
 
+from api_manager.models import CourseModuleCompletion
 
 log = logging.getLogger(__name__)
 
@@ -339,10 +340,31 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
 
         dog_stats_api.increment("lms.courseware.question_answered", tags=tags)
 
+        # we can treat a grading event as a indication that a user
+        # "completed" an xBlock
+        if settings.FEATURES.get('MARK_PROGRESS_ON_GRADING_EVENT', False):
+            handle_progress_event(block, event_type, event)
+
+    def handle_progress_event(block, event_type, event):
+        """
+        tie into the CourseCompletions datamodels that are exposed in the api_manager djangoapp
+        """
+        user_id = event.get('user_id', user.id)
+
+        CourseModuleCompletion.objects.get_or_create(
+            user_id=user_id,
+            course_id=course_id,
+            content_id=unicode(descriptor.location)
+        )
+
     def publish(block, event_type, event):
         """A function that allows XModules to publish events."""
         if event_type == 'grade':
             handle_grade_event(block, event_type, event)
+        elif event_type == 'progress':
+            # expose another special case event type which gets sent
+            # into the CourseCompletions models
+            handle_progress_event(block, event_type, event)
         else:
             track_function(event_type, event)
 
