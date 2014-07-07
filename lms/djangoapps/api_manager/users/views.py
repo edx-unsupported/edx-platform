@@ -24,6 +24,7 @@ from projects.serializers import BasicWorkgroupSerializer
 from .serializers import UserSerializer, UserCountByCitySerializer
 
 from courseware import module_render
+from courseware.courses import get_course
 from courseware.model_data import FieldDataCache
 from courseware.views import get_module_for_descriptor, save_child_position, get_current_child
 from lang_pref import LANGUAGE_KEY
@@ -717,12 +718,11 @@ class UsersCoursesDetail(SecureAPIView):
         """
         GET /api/users/{user_id}/courses/{course_id}
         """
-        store = modulestore()
         response_data = {}
         base_uri = generate_base_uri(request)
         try:
             user = User.objects.get(id=user_id, is_active=True)
-            course_descriptor = store.get_course(course_id)
+            course_descriptor = get_course(course_id, depth=2)
         except (ObjectDoesNotExist, ValueError):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         if not CourseEnrollment.is_enrolled(user, course_id):
@@ -730,14 +730,34 @@ class UsersCoursesDetail(SecureAPIView):
         response_data['user_id'] = user.id
         response_data['course_id'] = course_id
         response_data['uri'] = base_uri
-        field_data_cache = FieldDataCache([course_descriptor], course_id, user)
-        course_content = module_render.get_module(
+        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+            course_id,
+            user,
+            course_descriptor,
+            depth=2)  # depth=2 should load submodules down to the 'vertical' tier
+        course_module = module_render.get_module_for_descriptor(
             user,
             request,
-            course_descriptor.location,
+            course_descriptor,
             field_data_cache,
             course_id)
-        response_data['position'] = course_content.position
+        response_data['position'] = course_module.position
+        response_data['position_tree'] = {}
+        parent_module = course_module
+        while parent_module is not None:
+            current_child_descriptor = get_current_child(parent_module)
+            if current_child_descriptor:
+                response_data['position_tree'][current_child_descriptor.category] = {}
+                response_data['position_tree'][current_child_descriptor.category]['id'] = current_child_descriptor.id
+                parent_module = module_render.get_module(
+                    user,
+                    request,
+                    current_child_descriptor.id,
+                    field_data_cache,
+                    course_id
+                )
+            else:
+                parent_module = None
         return Response(response_data, status=status.HTTP_200_OK)
 
     def delete(self, request, user_id, course_id):

@@ -30,8 +30,8 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location, InvalidLocationError
 from api_manager.permissions import SecureAPIView, SecureListAPIView
 from api_manager.utils import generate_base_uri
-from projects.models import Project
-from projects.serializers import ProjectSerializer
+from projects.models import Project, Workgroup
+from projects.serializers import ProjectSerializer, BasicWorkgroupSerializer
 
 from .serializers import CourseModuleCompletionSerializer
 from .serializers import GradeSerializer, CourseLeadersSerializer, CourseCompletionsLeadersSerializer
@@ -1540,3 +1540,24 @@ class CoursesCompletionsLeadersList(SecureAPIView):
         serializer = CourseCompletionsLeadersSerializer(queryset, many=True)
         data['leaders'] = serializer.data  # pylint: disable=E1101
         return Response(data, status=status.HTTP_200_OK)
+
+
+class CoursesWorkgroupsList(SecureListAPIView):
+    """
+    ### The CoursesWorkgroupsList view allows clients to retrieve a list of workgroups
+    associated to a course
+    - URI: ```/api/courses/{course_id}/workgroups/```
+    - GET: Provides paginated list of workgroups associated to a course
+    """
+
+    serializer_class = BasicWorkgroupSerializer
+
+    def get_queryset(self):
+        course_id = self.kwargs['course_id']
+        try:
+            get_course(course_id)
+        except ValueError:
+            raise Http404
+
+        queryset = Workgroup.objects.filter(project__course_id=course_id)
+        return queryset
