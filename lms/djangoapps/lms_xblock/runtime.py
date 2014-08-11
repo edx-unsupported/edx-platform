@@ -14,6 +14,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.library_tools import LibraryToolsService
 from xmodule.x_module import ModuleSystem
 from xmodule.partitions.partitions_service import PartitionService
+from xmodule.settings_service import SettingsService
 
 
 def _quote_slashes(match):
@@ -196,6 +197,7 @@ class LmsModuleSystem(LmsHandlerUrls, ModuleSystem):  # pylint: disable=abstract
     """
     def __init__(self, **kwargs):
         services = kwargs.setdefault('services', {})
+        services['settings'] = SettingsService()
         services['user_tags'] = UserTagsService(self)
         services['partitions'] = LmsPartitionService(
             user=kwargs.get('user'),
