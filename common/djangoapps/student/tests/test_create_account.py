@@ -1,7 +1,6 @@
 "Tests for account creation"
 
 import ddt
-import unittest
 from django.contrib.auth.models import User
 from django.test.client import RequestFactory
 from django.conf import settings
@@ -14,6 +13,7 @@ import mock
 
 from openedx.core.djangoapps.user_api.models import UserPreference
 from lang_pref import LANGUAGE_KEY
+from notification_prefs import NOTIFICATION_PREF_KEY
 
 from edxmako.tests import mako_middleware_process_request
 from external_auth.models import ExternalAuthMap
@@ -53,6 +53,13 @@ class TestCreateAccount(TestCase):
         self.assertEqual(response.status_code, 200)
         user = User.objects.get(username=self.username)
         self.assertEqual(UserPreference.get_preference(user, LANGUAGE_KEY), lang)
+
+    @mock.patch.dict("student.models.settings.FEATURES", {"ENABLE_DISCUSSION_EMAIL_DIGEST": True})
+    def test_discussions_email_digest_pref(self):
+        response = self.client.post(self.url, self.params)
+        self.assertEqual(response.status_code, 200)
+        user = User.objects.get(username=self.username)
+        self.assertIsNotNone(UserPreference.get_preference(user, NOTIFICATION_PREF_KEY))
 
     def base_extauth_bypass_sending_activation_email(self, bypass_activation_email_for_extauth_setting):
         """

@@ -81,6 +81,7 @@ from bulk_email.models import Optout, CourseAuthorization
 import shoppingcart
 from openedx.core.djangoapps.user_api.models import UserPreference
 from lang_pref import LANGUAGE_KEY
+from notification_prefs.views import enable_notifications
 
 import track.views
 
@@ -1609,6 +1610,9 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
         return JsonResponse({'success': False, 'value': exc.message, 'field': exc.field}, status=400)
 
     (user, profile, registration) = ret
+
+    if settings.FEATURES.get('ENABLE_DISCUSSION_EMAIL_DIGEST'):
+        enable_notifications(user)
 
     dog_stats_api.increment("common.student.account_created")
 
