@@ -270,6 +270,9 @@ FEATURES = {
     # nonzero grade cutoff is met
     'SHOW_PROGRESS_SUCCESS_BUTTON': False,
 
+    # Grade only if score type is proficiency
+    'GRADING_ON_PROFICIENCY_SCORE': False,
+
     # Whether an xBlock publishing a 'grade' event should be considered a 'progress' event as well
     'MARK_PROGRESS_ON_GRADING_EVENT': False
 }
