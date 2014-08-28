@@ -836,6 +836,9 @@ def xblock_view(request, course_id, usage_id, view_name):
         resources: A list of tuples where the first element is the resource hash, and
             the second is the resource description
     """
+    if not request.user.is_authenticated():
+        raise PermissionDenied
+
     instance = _get_module_by_usage_id(request, course_id, usage_id)
 
     try:
