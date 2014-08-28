@@ -1,3 +1,7 @@
+"""
+Module rendering
+"""
+
 import hashlib
 import json
 import logging
@@ -16,6 +20,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.core.context_processors import csrf
+from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -846,6 +851,9 @@ def xblock_view(request, course_id, usage_id, view_name):
         resources: A list of tuples where the first element is the resource hash, and
             the second is the resource description
     """
+    if not request.user.is_authenticated():
+        raise PermissionDenied
+
     instance = _get_module_by_usage_id(request, course_id, usage_id)
 
     try:
