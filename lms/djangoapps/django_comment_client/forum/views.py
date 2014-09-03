@@ -20,7 +20,9 @@ from openedx.core.djangoapps.course_groups.cohorts import (
     is_course_cohorted,
     get_cohort_id,
     get_course_cohorts,
-    is_commentable_cohorted
+    is_commentable_cohorted,
+    get_cohorted_threads_privacy,
+    get_cohort_by_id
 )
 from courseware.access import has_access
 from xmodule.modulestore.django import modulestore
@@ -102,6 +104,24 @@ def get_threads(request, course_key, discussion_id=None, per_page=THREADS_PER_PA
     #there are 2 dimensions to consider when executing a search with respect to group id
     #is user a moderator
     #did the user request a group
+
+    #if the user requested a group explicitly, give them that group, othewrise, if mod, show all, else if student, use cohort
+
+    group_id = request.GET.get('group_id')
+
+    if group_id == "all":
+        group_id = None
+
+    if not group_id:
+        if not cached_has_permission(request.user, "see_all_cohorts", course_key):
+            group_id = get_cohort_id(request.user, course_key)
+            if not group_id and get_cohorted_threads_privacy(course_key) == 'cohort-only':
+                default_query_params['exclude_groups'] = True
+
+    if group_id:
+        default_query_params["group_id"] = group_id
+
+    #so by default, a moderator sees all items, and a student sees his cohort
 
     query_params = merge_dict(
         default_query_params,
