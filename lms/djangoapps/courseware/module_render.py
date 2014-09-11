@@ -372,7 +372,13 @@ def get_module_system_for_user(user, field_data_cache,
     def publish(block, event_type, event):
         """A function that allows XModules to publish events."""
         if event_type == 'grade':
-            handle_grade_event(block, event_type, event)
+            grade_on_proficiency = settings.FEATURES.get('GRADING_ON_PROFICIENCY_SCORE', False)
+            if grade_on_proficiency:
+                score_type = event.get('score_type')
+                if score_type == 'proficiency':
+                    handle_grade_event(block, event_type, event)
+            else:
+                handle_grade_event(block, event_type, event)
         elif event_type == 'progress':
             # expose another special case event type which gets sent
             # into the CourseCompletions models
