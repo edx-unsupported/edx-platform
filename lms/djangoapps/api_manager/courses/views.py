@@ -18,7 +18,7 @@ from django.db.models import Q
 from rest_framework import status
 from rest_framework.response import Response
 
-from courseware.courses import get_course_about_section, get_course_info_section
+from courseware.courses import get_course_about_section, get_course_info_section, course_image_url
 from courseware.models import StudentModule
 from courseware.views import get_static_tab_contents
 from django_comment_common.models import FORUM_ROLE_MODERATOR
@@ -29,7 +29,8 @@ from student.roles import CourseRole, CourseAccessRole, CourseInstructorRole, Co
 
 from xmodule.modulestore.django import modulestore
 
-from api_manager.courseware_access import get_course, get_course_child, get_course_leaf_nodes, get_course_key, course_exists, get_modulestore
+from api_manager.courseware_access import get_course, get_course_child, get_course_leaf_nodes, get_course_key, \
+    course_exists, get_modulestore
 from api_manager.models import CourseGroupRelationship, CourseContentGroupRelationship, GroupProfile, \
     CourseModuleCompletion
 from api_manager.permissions import SecureAPIView, SecureListAPIView
@@ -41,6 +42,7 @@ from .serializers import CourseModuleCompletionSerializer, CourseSerializer
 from .serializers import GradeSerializer, CourseLeadersSerializer, CourseCompletionsLeadersSerializer
 
 from lms.lib.comment_client.user import get_course_social_stats
+from lms.lib.comment_client.thread import get_course_thread_stats
 from lms.lib.comment_client.utils import CommentClientRequestError
 
 from opaque_keys.edx.keys import CourseKey
@@ -606,6 +608,7 @@ class CoursesDetail(SecureAPIView):
         base_uri = generate_base_uri(request)
         response_data['uri'] = base_uri
         base_uri_without_qs = generate_base_uri(request, True)
+        response_data['course_image_url'] = request.build_absolute_uri(course_image_url(course_descriptor))
         response_data['resources'] = []
         resource_uri = '{}/content/'.format(base_uri_without_qs)
         response_data['resources'].append({'uri': resource_uri})
@@ -1430,11 +1433,7 @@ class CoursesMetricsGradesList(SecureListAPIView):
         queryset_grade_min = queryset.aggregate(Min('grade'))
         queryset_grade_count = queryset.aggregate(Count('grade'))
 
-        course_queryset = StudentGradebook.objects.filter(course_id__exact=course_key).exclude(user__in=exclude_users)
-        course_queryset_grade_avg = course_queryset.aggregate(Avg('grade'))
-        course_queryset_grade_max = course_queryset.aggregate(Max('grade'))
-        course_queryset_grade_min = course_queryset.aggregate(Min('grade'))
-        course_queryset_grade_count = course_queryset.aggregate(Count('grade'))
+        course_metrics = StudentGradebook.generate_leaderboard(course_key, exclude_users=exclude_users)
 
         response_data = {}
         base_uri = generate_base_uri(request)
@@ -1445,10 +1444,10 @@ class CoursesMetricsGradesList(SecureListAPIView):
         response_data['grade_minimum'] = queryset_grade_min['grade__min']
         response_data['grade_count'] = queryset_grade_count['grade__count']
 
-        response_data['course_grade_average'] = course_queryset_grade_avg['grade__avg']
-        response_data['course_grade_maximum'] = course_queryset_grade_max['grade__max']
-        response_data['course_grade_minimum'] = course_queryset_grade_min['grade__min']
-        response_data['course_grade_count'] = course_queryset_grade_count['grade__count']
+        response_data['course_grade_average'] = course_metrics['course_avg']
+        response_data['course_grade_maximum'] = course_metrics['course_max']
+        response_data['course_grade_minimum'] = course_metrics['course_min']
+        response_data['course_grade_count'] = course_metrics['course_count']
 
         response_data['grades'] = []
         for row in queryset:
@@ -1475,8 +1474,9 @@ class CoursesProjectList(SecureListAPIView):
 class CoursesMetrics(SecureAPIView):
     """
     ### The CoursesMetrics view allows clients to retrieve a list of Metrics for the specified Course
-    - URI: ```/api/courses/{course_id}/metrics/```
+    - URI: ```/api/courses/{course_id}/metrics/?organization={organization_id}```
     - GET: Returns a JSON representation (array) of the set of course metrics
+    - metrics can be filtered by organization by adding organization parameter to GET request
     ### Use Cases/Notes:
     * Example: Display number of users enrolled in a given course
     """
@@ -1487,11 +1487,31 @@ class CoursesMetrics(SecureAPIView):
         """
         if not course_exists(request, request.user, course_id):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
-        course_key = get_course_key(course_id)
-        users_enrolled = CourseEnrollment.num_enrolled_in(course_key)
+        course_descriptor, course_key, course_content = get_course(request, request.user, course_id)
+        slash_course_id = get_course_key(course_id, slashseparated=True)
+        exclude_users = _get_aggregate_exclusion_user_ids(course_key)
+        users_enrolled_qs = CourseEnrollment.users_enrolled_in(course_key).exclude(id__in=exclude_users)
+        organization = request.QUERY_PARAMS.get('organization', None)
+        if organization:
+            users_enrolled_qs = users_enrolled_qs.filter(organizations=organization)
+
+        users_started_qs = CourseModuleCompletion.objects.filter(course_id=course_id).exclude(user_id__in=exclude_users)
+        if organization:
+            users_started_qs = users_started_qs.filter(user__organizations=organization)
         data = {
-            'users_enrolled': users_enrolled
+            'users_enrolled': users_enrolled_qs.count(),
+            'users_started': users_started_qs.values('user').distinct().count(),
+            'grade_cutoffs': course_descriptor.grading_policy['GRADE_CUTOFFS']
         }
+        thread_stats = {}
+        try:
+            thread_stats = get_course_thread_stats(slash_course_id)
+        except CommentClientRequestError, e:
+            data = {
+                "err_msg": str(e)
+            }
+            return Response(data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        data.update(thread_stats)
         return Response(data, status=status.HTTP_200_OK)
 
 
@@ -1632,18 +1652,10 @@ class CoursesMetricsSocial(SecureListAPIView):
     def get(self, request, course_id): # pylint: disable=W0613
 
         try:
-            # be robust to the try of course_id we get from caller
-            try:
-                # assume new style
-                course_key = CourseKey.from_string(course_id)
-                slash_course_id = course_key.to_deprecated_string()
-            except:
-                # assume course_id passed in is legacy format
-                slash_course_id = course_id
-
+            slash_course_id = get_course_key(course_id, slashseparated=True)
             # the forum service expects the legacy slash separated string format
             data = get_course_social_stats(slash_course_id)
-
+            course_key = get_course_key(course_id)
             # remove any excluded users from the aggregate
 
             exclude_users = _get_aggregate_exclusion_user_ids(course_key)
