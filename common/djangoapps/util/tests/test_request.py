@@ -47,7 +47,12 @@ class ResponseTestCase(unittest.TestCase):
 
         self.assertIsNone(course_id_from_url('/login'))
         self.assertIsNone(course_id_from_url('/course/edX/maths/2020'))
-        self.assertIsNone(course_id_from_url('/courses/edX/maths/'))
+        self.assertIsNone(course_id_from_url('/courses/edX/maths'))
+
+        course_id = course_id_from_url('/courses/edX/maths/')
+        self.assertEqual(course_id.org, 'edX')
+        self.assertEqual(course_id.course, 'maths')
+        self.assertEqual(course_id.run, '')
 
         course_id = course_id_from_url('/courses/edX/maths/2020')
         self.assertEqual(course_id.org, 'edX')
