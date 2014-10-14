@@ -1743,7 +1743,7 @@ class CoursesApiTests(TestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['leaders']), 4)
-        self.assertEqual(response.data['course_avg'], 14)
+        self.assertEqual(response.data['course_avg'], 13.889)
 
         # without count filter and user_id
         test_uri = '{}/{}/metrics/completions/leaders/?user_id={}'.format(self.base_courses_uri, self.test_course_id,
@@ -1752,7 +1752,7 @@ class CoursesApiTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['leaders']), 3)
         self.assertEqual(response.data['position'], 2)
-        self.assertEqual(response.data['completions'], 19)
+        self.assertEqual(response.data['completions'], 19.444)
 
         # with skipleaders filter
         test_uri = '{}/{}/metrics/completions/leaders/?user_id={}&skipleaders=true'.format(self.base_courses_uri,
@@ -1762,7 +1762,7 @@ class CoursesApiTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIsNone(response.data.get('leaders', None))
         self.assertIsNone(response.data.get('position', None))
-        self.assertEqual(response.data['completions'], 19)
+        self.assertEqual(response.data['completions'], 19.444)
 
         # test with bogus course
         test_uri = '{}/{}/metrics/completions/leaders/'.format(self.base_courses_uri, self.test_bogus_course_id)
