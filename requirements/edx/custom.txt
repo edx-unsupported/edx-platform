@@ -9,3 +9,4 @@
 -e git+https://github.com/edx-solutions/xblock-group-project.git@61ec5fde38393d403ea86e8e87937a37856d4958#egg=xblock-group-project
 -e git+https://github.com/edx-solutions/xblock-discussion.git@27ae014555fb190060932217e0a6f627fe8be05e#egg=xblock-discussion
 -e git+https://github.com/edx-solutions/xblock-adventure.git@30894de41ee7efe7d5b6400086463d12995893f7#egg=xblock-adventure
+-e git+https://github.com/edx-solutions/xblock-utils.git@7d7201fb2b0bfc8e5d13905d1cedf88335ab4a93#egg=xblock-utils
