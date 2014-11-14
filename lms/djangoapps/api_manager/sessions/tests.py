@@ -88,6 +88,18 @@ class SessionsApiTests(TestCase):
         self.assertEqual(str(response.data['user']['username']), local_username)
         self.assertEqual(response.data['user']['id'], user_id)
 
+    def test_session_list_post_already_logged_in(self):
+        local_username = self.test_username + str(randint(11, 99))
+        local_username = local_username[3:-1]  # username is a 32-character field
+        data = {'email': self.test_email, 'username': local_username, 'password': self.test_password}
+        response = self.do_post(self.base_users_uri, data)
+        user_id = response.data['id']
+        data = {'username': local_username, 'password': self.test_password}
+        response = self.do_post(self.base_sessions_uri, data)
+        self.assertEqual(response.status_code, 201)
+        response = self.do_post(self.base_sessions_uri, data)
+        self.assertEqual(response.status_code, 200)
+
     def test_session_list_post_invalid(self):
         local_username = self.test_username + str(randint(11, 99))
         local_username = local_username[3:-1]  # username is a 32-character field
