@@ -1,3 +1,6 @@
+"""
+Enables interactivity for CLI operations
+"""
 import sys
 
 
