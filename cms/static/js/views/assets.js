@@ -12,6 +12,10 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 "click .filterable-column .column-filter-link": "toggleFilterColumn"
             },
 
+            typeData: ['JPG', 'PNG', 'TXT'],
+
+            allLabel: 'ALL',
+
             initialize : function() {
                 PagingView.prototype.initialize.call(this);
                 var collection = this.collection;
@@ -44,7 +48,7 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                     ViewUtils.hideLoadingIndicator();
 
                     // Create the table
-                    this.$el.html(this.template());
+                    this.$el.html(this.template({typeData: this.typeData}));
                     tableBody = this.$('#asset-table-body');
                     this.tableBody = tableBody;
                     this.pagingHeader = new PagingHeader({view: this, el: $('#asset-paging-header')});
@@ -192,6 +196,15 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
             toggleFilterColumnState: function(menu, event){
                 var $subnav = menu.find('.wrapper-nav-sub');
                 var $title = menu.find('.title');
+                var titleText = $title.find('.type-filter');
+                var assetfilter = $(event.currentTarget).data('assetfilter');
+
+                if(assetfilter == this.allLabel){
+                    titleText.text(titleText.data('alllabel'));
+                }
+                else{
+                    titleText.text(assetfilter);
+                }
 
                 if ($subnav.hasClass('is-shown')) {
                     $subnav.removeClass('is-shown');
@@ -210,7 +223,12 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
             toggleFilterColumn: function(event) {
                 event.preventDefault();
                 var collection = this.collection;
-                collection.assetFilter = $(event.currentTarget).data('assetfilter');
+                if($(event.currentTarget).data('assetfilter') == this.allLabel){
+                   collection.assetFilter = '';
+                }
+                else{
+                    collection.assetFilter = $(event.currentTarget).data('assetfilter');
+                }
                 this.setPage(0);
                 this.closeFilterPopup(event);
             },

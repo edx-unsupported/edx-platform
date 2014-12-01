@@ -751,3 +751,6 @@ ADVANCED_PROBLEM_TYPES = [
         'boilerplate_name': None,
     }
 ]
+
+# Files and Uploads type filter values
+FILES_AND_UPLOAD_TYPE_FILTER = ['PNG', 'JPG', 'TXT']

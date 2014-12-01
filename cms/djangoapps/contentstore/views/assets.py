@@ -99,9 +99,16 @@ def _assets_json(request, course_key):
     requested_filter = request.REQUEST.get('asset_type', '')
     filter_params = None
     if requested_filter is not None and len(requested_filter) > 0:
-        filter_params = {
-            "$where": "this.displayname.split('.').reverse()[0].toUpperCase() == '{}'.toUpperCase()".format(requested_filter),
-        }
+        if requested_filter == 'OTHER':
+            all_filters = settings.FILES_AND_UPLOAD_TYPE_FILTER
+            where = ["this.displayname.split('.').reverse()[0].toUpperCase() != '{}'.toUpperCase()".format(all_filter) for all_filter in all_filters]
+            filter_params = {
+                "$where": ' && '.join(where),
+            }
+        else:
+            filter_params = {
+                "$where": "this.displayname.split('.').reverse()[0].toUpperCase() == '{}'.toUpperCase()".format(requested_filter),
+            }
 
     sort_direction = DESCENDING
     if request.REQUEST.get('direction', '').lower() == 'asc':
