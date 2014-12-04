@@ -793,7 +793,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix):
     files = request.FILES or {}
     error_msg = _check_files_limits(files)
     if error_msg:
-        return HttpResponse(json.dumps({'success': error_msg}))
+        return JsonResponse(object={'success': error_msg}, status=413)
 
     instance = _get_module_by_usage_id(request, course_id, usage_id)
 

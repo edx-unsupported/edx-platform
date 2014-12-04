@@ -312,7 +312,7 @@ class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
             json.dumps({
                 'success': 'Submission aborted! Maximum %d files may be submitted at once' %
                            settings.MAX_FILEUPLOADS_PER_INPUT
-            })
+            }, indent=2)
         )
 
     def test_too_large_file(self):
@@ -332,7 +332,7 @@ class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
             json.dumps({
                 'success': 'Submission aborted! Your file "%s" is too large (max size: %d MB)' %
                            (inputfile.name, settings.STUDENT_FILEUPLOAD_MAX_SIZE / (1000 ** 2))
-            })
+            }, indent=2)
         )
 
     def test_xmodule_dispatch(self):
