@@ -5,13 +5,15 @@ Run these tests @ Devstack:
 from datetime import datetime
 import uuid
 
+from django.conf import settings
 from django.contrib.auth.models import Group, User
 from django.test import TestCase
 from django.test.utils import override_settings
 
 from projects.management.commands import migrate_project_courseids
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
-from projects.models import Project, Workgroup, WorkgroupReview, WorkgroupSubmission, WorkgroupSubmissionReview
+if settings.FEATURES.get('PROJECTS_APP', False):
+    from projects.models import Project, Workgroup, WorkgroupReview, WorkgroupSubmission, WorkgroupSubmissionReview
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from django.db import connection
@@ -59,48 +61,46 @@ class MigrateCourseIdsTests(TestCase):
         self.new_style_course_id2 = unicode(self.course2.id)
         self.new_style_content_id2 = unicode(self.chapter2.location)
 
+    if settings.FEATURES.get('PROJECTS_APP', False):
+        def test_migrate_project_courseids(self):
+            """
+            Test the data migration
+            """
+            # Set up the data to be migrated
+            user = User.objects.create(email='testuser@edx.org', username='testuser', password='testpassword', is_active=True)
+            project = Project.objects.create(course_id=self.old_style_course_id, content_id=self.old_style_content_id)
+            workgroup = Workgroup.objects.create(name='Test Workgroup', project=project)
+            workgroup_review = WorkgroupReview.objects.create(workgroup=workgroup, content_id=self.old_style_content_id)
+            workgroup_submission = WorkgroupSubmission.objects.create(workgroup=workgroup, user=user)
+            workgroup_submission_review = WorkgroupSubmissionReview.objects.create(submission=workgroup_submission, content_id=self.old_style_content_id)
 
-    def test_migrate_project_courseids(self):
-        """
-        Test the data migration
-        """
-        # Set up the data to be migrated
-        user = User.objects.create(email='testuser@edx.org', username='testuser', password='testpassword', is_active=True)
-        project = Project.objects.create(course_id=self.old_style_course_id, content_id=self.old_style_content_id)
-        workgroup = Workgroup.objects.create(name='Test Workgroup', project=project)
-        workgroup_review = WorkgroupReview.objects.create(workgroup=workgroup, content_id=self.old_style_content_id)
-        workgroup_submission = WorkgroupSubmission.objects.create(workgroup=workgroup, user=user)
-        workgroup_submission_review = WorkgroupSubmissionReview.objects.create(submission=workgroup_submission, content_id=self.old_style_content_id)
+            user2 = User.objects.create(email='testuser2@edx.org', username='testuser2', password='testpassword2', is_active=True)
+            project2 = Project.objects.create(course_id=self.new_style_course_id2, content_id=self.new_style_content_id2)
+            workgroup2 = Workgroup.objects.create(name='Test Workgroup2', project=project2)
+            workgroup_review2 = WorkgroupReview.objects.create(workgroup=workgroup2, content_id=self.new_style_content_id2)
+            workgroup_submission2 = WorkgroupSubmission.objects.create(workgroup=workgroup2, user=user2)
+            workgroup_submission_review2 = WorkgroupSubmissionReview.objects.create(submission=workgroup_submission2, content_id=self.new_style_content_id2)
 
-        user2 = User.objects.create(email='testuser2@edx.org', username='testuser2', password='testpassword2', is_active=True)
-        project2 = Project.objects.create(course_id=self.new_style_course_id2, content_id=self.new_style_content_id2)
-        workgroup2 = Workgroup.objects.create(name='Test Workgroup2', project=project2)
-        workgroup_review2 = WorkgroupReview.objects.create(workgroup=workgroup2, content_id=self.new_style_content_id2)
-        workgroup_submission2 = WorkgroupSubmission.objects.create(workgroup=workgroup2, user=user2)
-        workgroup_submission_review2 = WorkgroupSubmissionReview.objects.create(submission=workgroup_submission2, content_id=self.new_style_content_id2)
+            # Run the data migration
+            migrate_project_courseids.Command().handle()
 
+            # Confirm that the data has been properly migrated
+            updated_project = Project.objects.get(id=project.id)
+            self.assertEqual(updated_project.course_id, self.new_style_course_id)
+            self.assertEqual(updated_project.content_id, self.new_style_content_id)
+            updated_project = Project.objects.get(id=project2.id)
+            self.assertEqual(updated_project.course_id, self.new_style_course_id2)
+            self.assertEqual(updated_project.content_id, self.new_style_content_id2)
+            print "Project Data Migration Passed"
 
-        # Run the data migration
-        migrate_project_courseids.Command().handle()
+            updated_workgroup_review = WorkgroupReview.objects.get(id=workgroup_review.id)
+            self.assertEqual(updated_workgroup_review.content_id, self.new_style_content_id)
+            updated_workgroup_review = WorkgroupReview.objects.get(id=workgroup_review2.id)
+            self.assertEqual(updated_workgroup_review.content_id, self.new_style_content_id2)
+            print "Workgroup Review Data Migration Passed"
 
-
-        # Confirm that the data has been properly migrated
-        updated_project = Project.objects.get(id=project.id)
-        self.assertEqual(updated_project.course_id, self.new_style_course_id)
-        self.assertEqual(updated_project.content_id, self.new_style_content_id)
-        updated_project = Project.objects.get(id=project2.id)
-        self.assertEqual(updated_project.course_id, self.new_style_course_id2)
-        self.assertEqual(updated_project.content_id, self.new_style_content_id2)
-        print "Project Data Migration Passed"
-
-        updated_workgroup_review = WorkgroupReview.objects.get(id=workgroup_review.id)
-        self.assertEqual(updated_workgroup_review.content_id, self.new_style_content_id)
-        updated_workgroup_review = WorkgroupReview.objects.get(id=workgroup_review2.id)
-        self.assertEqual(updated_workgroup_review.content_id, self.new_style_content_id2)
-        print "Workgroup Review Data Migration Passed"
-
-        updated_workgroup_submission_review = WorkgroupSubmissionReview.objects.get(id=workgroup_submission_review.id)
-        self.assertEqual(updated_workgroup_submission_review.content_id, self.new_style_content_id)
-        updated_workgroup_submission_review = WorkgroupSubmissionReview.objects.get(id=workgroup_submission_review2.id)
-        self.assertEqual(updated_workgroup_submission_review.content_id, self.new_style_content_id2)
-        print "Workgroup Submission Review Data Migration Passed"
+            updated_submission_review = WorkgroupSubmissionReview.objects.get(id=workgroup_submission_review.id)
+            self.assertEqual(updated_submission_review.content_id, self.new_style_content_id)
+            updated_submission_review = WorkgroupSubmissionReview.objects.get(id=workgroup_submission_review2.id)
+            self.assertEqual(updated_submission_review.content_id, self.new_style_content_id2)
+            print "Workgroup Submission Review Data Migration Passed"

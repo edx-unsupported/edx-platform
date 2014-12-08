@@ -29,7 +29,7 @@ class GenerateGradebookEntriesTests(TestCase):
     def setUp(self):
 
         # Turn off the signalling mechanism temporarily
-        settings._wrapped.default_settings.FEATURES['SIGNAL_ON_SCORE_CHANGED'] = False
+        settings._wrapped.default_settings.FEATURES['STUDENT_MODULE_EMIT_SIGNAL_ON_SCORE_CHANGED'] = False  # pylint: disable=W0212
 
         # Create a couple courses to work with
         self.course = CourseFactory.create(
@@ -159,7 +159,7 @@ class GenerateGradebookEntriesTests(TestCase):
         self.assertEqual(user0_entry.proforma_grade, 0.28575)
 
         # Enable the signalling mechanism
-        settings._wrapped.default_settings.FEATURES['SIGNAL_ON_SCORE_CHANGED'] = True
+        settings._wrapped.default_settings.FEATURES['STUDENT_MODULE_EMIT_SIGNAL_ON_SCORE_CHANGED'] = True  # pylint: disable=W0212
 
         # Change the score of the final exam for that user
         grade = 0.99

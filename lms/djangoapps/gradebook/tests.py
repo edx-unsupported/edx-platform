@@ -25,7 +25,7 @@ from gradebook.models import StudentGradebook, StudentGradebookHistory
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-@override_settings(STUDENT_GRADEBOOK=True)
+@override_settings(GRADEBOOK_APP=True)
 class GradebookTests(TestCase):
     """ Test suite for Student Gradebook """
 

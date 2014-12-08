@@ -99,7 +99,7 @@ def send_score_changed_signal(sender, instance, **kwargs):
     """
     Broadcast the recorded score to connected receivers
     """
-    if settings.FEATURES.get('SIGNAL_ON_SCORE_CHANGED', False) and instance.grade is not None:
+    if settings.FEATURES.get('STUDENT_MODULE_EMIT_SIGNAL_ON_SCORE_CHANGED', False) and instance.grade is not None:
         previous_entries = StudentModuleHistory.objects.filter(student_module=instance)\
             .exclude(grade=None)\
             .exclude(created=instance.modified, state=instance.state)\

@@ -6,18 +6,20 @@ from datetime import datetime
 import uuid
 import time
 
+from django.conf import settings
+from django.db.models.signals import post_save
 from django.test import TestCase
 from django.test.utils import override_settings
-from django.db.models.signals import post_save
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
-from progress.management.commands import generate_progress_entries
-from progress.models import StudentProgress, StudentProgressHistory, CourseModuleCompletion
-from progress.signals import handle_cmc_post_save_signal
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-import progress.signals
+
+if settings.FEATURES.get('PROGRESS_APP', False):
+    from progress.management.commands import generate_progress_entries
+    from progress.models import StudentProgress, StudentProgressHistory, CourseModuleCompletion
+    from progress.signals import handle_cmc_post_save_signal
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -83,95 +85,106 @@ class GenerateProgressEntriesTests(TestCase):
         self.users = [UserFactory.create(username="testuser" + str(__), profile='test') for __ in xrange(3)]
         for user in self.users:
             CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
-        # Turn off the signalling mechanism temporarily
-        post_save.disconnect(receiver=handle_cmc_post_save_signal,
-                             sender=CourseModuleCompletion, dispatch_uid='edxapp.api_manager.post_save_cms')
-        self._generate_course_completion_test_entries()
-        post_save.connect(receiver=handle_cmc_post_save_signal,
-                          sender=CourseModuleCompletion, dispatch_uid='edxapp.api_manager.post_save_cms')
 
-    def _generate_course_completion_test_entries(self):
-        """
-        Clears existing CourseModuleCompletion entries and creates 3 for each user
-        """
-        CourseModuleCompletion.objects.all().delete()
-        for user in self.users:
-            completion, created = CourseModuleCompletion.objects.get_or_create(user=user,
-                                                                               course_id=self.course.id,
-                                                                               content_id=unicode(self.problem.location),
-                                                                               stage=None)
+        if settings.FEATURES.get('PROGRESS_APP', False):
+            # Turn off the signalling mechanism temporarily
+            post_save.disconnect(receiver=handle_cmc_post_save_signal,
+                                 sender=CourseModuleCompletion, dispatch_uid='edxapp.api_manager.post_save_cms')
+            self._generate_course_completion_test_entries()
+            post_save.connect(receiver=handle_cmc_post_save_signal,
+                              sender=CourseModuleCompletion, dispatch_uid='edxapp.api_manager.post_save_cms')
 
-            completion, created = CourseModuleCompletion.objects.get_or_create(user=user,
-                                                                               course_id=self.course.id,
-                                                                               content_id=unicode(self.problem2.location),
-                                                                               stage=None)
+    if settings.FEATURES.get('PROGRESS_APP', False):
+        def _generate_course_completion_test_entries(self):
+            """
+            Clears existing CourseModuleCompletion entries and creates 3 for each user
+            """
+            CourseModuleCompletion.objects.all().delete()
+            for user in self.users:
+                CourseModuleCompletion.objects.get_or_create(
+                    user=user,
+                    course_id=self.course.id,
+                    content_id=unicode(self.problem.location),
+                    stage=None
+                )
 
-            completion, created = CourseModuleCompletion.objects.get_or_create(user=user,
-                                                                               course_id=self.course.id,
-                                                                               content_id=unicode(self.problem3.location),
-                                                                               stage=None)
+                CourseModuleCompletion.objects.get_or_create(
+                    user=user,
+                    course_id=self.course.id,
+                    content_id=unicode(self.problem2.location),
+                    stage=None
+                )
 
-    def test_generate_progress_entries_command(self):
-        """
-        Test the progress entry generator
-        """
-        # Set up the command context
-        course_ids = '{},bogus/course/id'.format(self.course.id)
-        user_ids = '{}'.format(self.users[0].id)
-        current_entries = StudentProgress.objects.all()
-        self.assertEqual(len(current_entries), 0)
-        current_entries = StudentProgressHistory.objects.all()
-        self.assertEqual(len(current_entries), 0)
+                CourseModuleCompletion.objects.get_or_create(
+                    user=user,
+                    course_id=self.course.id,
+                    content_id=unicode(self.problem3.location),
+                    stage=None
+                )
 
-        # Run the command just for one user
-        generate_progress_entries.Command().handle(user_ids=user_ids)
+        def test_generate_progress_entries_command(self):
+            """
+            Test the progress entry generator
+            """
+            # Set up the command context
+            course_ids = '{},bogus/course/id'.format(self.course.id)
+            user_ids = '{}'.format(self.users[0].id)
+            current_entries = StudentProgress.objects.all()
+            self.assertEqual(len(current_entries), 0)
+            current_entries = StudentProgressHistory.objects.all()
+            self.assertEqual(len(current_entries), 0)
 
-        # Confirm the progress has been properly updated
-        current_entries = StudentProgress.objects.all()
-        self.assertEqual(len(current_entries), 1)
-        current_entries = StudentProgressHistory.objects.all()
-        self.assertEqual(len(current_entries), 1)
-        user0_entry = StudentProgress.objects.get(user=self.users[0])
-        self.assertEqual(user0_entry.completions, 3)
+            # Run the command just for one user
+            generate_progress_entries.Command().handle(user_ids=user_ids)
 
-        # The first user will be skipped this next time around because they already have a progress record
-        # and their completions have not changed, and we need to test this valid use case ('skipped')
-        # We also need to test the 'updated' use case, so we'll add a new completion record for the
-        # second user which will alter their count on this next cycle and kick off the update flow
-        completion, created = CourseModuleCompletion.objects.get_or_create(user=self.users[1],
-                                                                           course_id=self.course.id,
-                                                                           content_id=unicode(self.problem4.location),
-                                                                           stage=None)
+            # Confirm the progress has been properly updated
+            current_entries = StudentProgress.objects.all()
+            self.assertEqual(len(current_entries), 1)
+            current_entries = StudentProgressHistory.objects.all()
+            self.assertEqual(len(current_entries), 1)
+            user0_entry = StudentProgress.objects.get(user=self.users[0])
+            self.assertEqual(user0_entry.completions, 3)
 
-        # Run the command across all users, but just for the specified course
-        generate_progress_entries.Command().handle(course_ids=course_ids)
+            # The first user will be skipped this next time around because they already have a progress record
+            # and their completions have not changed, and we need to test this valid use case ('skipped')
+            # We also need to test the 'updated' use case, so we'll add a new completion record for the
+            # second user which will alter their count on this next cycle and kick off the update flow
+            CourseModuleCompletion.objects.get_or_create(
+                user=self.users[1],
+                course_id=self.course.id,
+                content_id=unicode(self.problem4.location),
+                stage=None
+            )
 
-        # Confirm that the progress has been properly updated
-        current_entries = StudentProgress.objects.all()
-        self.assertEqual(len(current_entries), 3)
-        current_entries = StudentProgressHistory.objects.all()
-        self.assertEqual(len(current_entries), 4)
-        user0_entry = StudentProgress.objects.get(user=self.users[0])
-        self.assertEqual(user0_entry.completions, 3)
-        user1_entry = StudentProgress.objects.get(user=self.users[1])
-        self.assertEqual(user1_entry.completions, 4)
-        user2_entry = StudentProgress.objects.get(user=self.users[2])
-        self.assertEqual(user2_entry.completions, 3)
+            # Run the command across all users, but just for the specified course
+            generate_progress_entries.Command().handle(course_ids=course_ids)
 
-    def test_progress_history(self):
-        """
-        Test the progress, and history
-        """
-        # Clear enteries
-        StudentProgress.objects.all().delete()
-        StudentProgressHistory.objects.all().delete()
-        self._generate_course_completion_test_entries()
+            # Confirm that the progress has been properly updated
+            current_entries = StudentProgress.objects.all()
+            self.assertEqual(len(current_entries), 3)
+            current_entries = StudentProgressHistory.objects.all()
+            self.assertEqual(len(current_entries), 4)
+            user0_entry = StudentProgress.objects.get(user=self.users[0])
+            self.assertEqual(user0_entry.completions, 3)
+            user1_entry = StudentProgress.objects.get(user=self.users[1])
+            self.assertEqual(user1_entry.completions, 4)
+            user2_entry = StudentProgress.objects.get(user=self.users[2])
+            self.assertEqual(user2_entry.completions, 3)
 
-        #let single bindings to complete their work
-        time.sleep(2)
-        current_entries = StudentProgress.objects.all()
-        self.assertEqual(len(current_entries), 3)
-        current_entries = StudentProgressHistory.objects.all()
-        self.assertEqual(len(current_entries), 9)
-        user0_entry = StudentProgress.objects.get(user=self.users[0])
-        self.assertEqual(user0_entry.completions, 3)
+        def test_progress_history(self):
+            """
+            Test the progress, and history
+            """
+            # Clear enteries
+            StudentProgress.objects.all().delete()
+            StudentProgressHistory.objects.all().delete()
+            self._generate_course_completion_test_entries()
+
+            #let single bindings to complete their work
+            time.sleep(2)
+            current_entries = StudentProgress.objects.all()
+            self.assertEqual(len(current_entries), 3)
+            current_entries = StudentProgressHistory.objects.all()
+            self.assertEqual(len(current_entries), 9)
+            user0_entry = StudentProgress.objects.get(user=self.users[0])
+            self.assertEqual(user0_entry.completions, 3)

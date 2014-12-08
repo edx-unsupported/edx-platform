@@ -1,10 +1,12 @@
 """ Django REST Framework Serializers """
-
+from django.conf import settings
 from django.contrib.auth.models import User
 
 from rest_framework import serializers
 
-from api_manager.groups.serializers import GroupSerializer
+if settings.FEATURES.get('PROJECTS_APP', False):
+    from api_manager.groups.serializers import GroupSerializer
+
 from .models import Project, Workgroup, WorkgroupSubmission
 from .models import WorkgroupReview, WorkgroupSubmissionReview, WorkgroupPeerReview
 
@@ -17,7 +19,6 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         model = User
         fields = ('id', 'url', 'username', 'email')
 
-
 class GradeSerializer(serializers.Serializer):
     """ Serializer for model interactions """
     grade = serializers.Field()
@@ -26,15 +27,18 @@ class GradeSerializer(serializers.Serializer):
 class ProjectSerializer(serializers.HyperlinkedModelSerializer):
     """ Serializer for model interactions """
     workgroups = serializers.PrimaryKeyRelatedField(many=True, required=False)
-    organization = serializers.PrimaryKeyRelatedField(required=False)
+    if settings.FEATURES.get('ORGANIZATIONS_APP', False):
+        organization = serializers.PrimaryKeyRelatedField(required=False)
 
     class Meta:
         """ Meta class for defining additional serializer characteristics """
         model = Project
         fields = (
             'id', 'url', 'created', 'modified', 'course_id', 'content_id',
-            'organization', 'workgroups'
+            'workgroups'
         )
+        if settings.FEATURES.get('ORGANIZATIONS_APP', False):
+            fields += ('organization',)
 
 
 class WorkgroupSubmissionSerializer(serializers.HyperlinkedModelSerializer):
@@ -96,21 +100,23 @@ class WorkgroupPeerReviewSerializer(serializers.HyperlinkedModelSerializer):
 class WorkgroupSerializer(serializers.HyperlinkedModelSerializer):
     """ Serializer for model interactions """
     project = serializers.PrimaryKeyRelatedField(required=True)
-    groups = GroupSerializer(many=True, required=False)
-    users = UserSerializer(many=True, required=False)
     submissions = serializers.PrimaryKeyRelatedField(many=True, required=False)
     workgroup_reviews = serializers.PrimaryKeyRelatedField(many=True, required=False)
     peer_reviews = serializers.PrimaryKeyRelatedField(many=True, required=False)
+
+    if settings.FEATURES.get('PROJECTS_APP', False):
+        groups = GroupSerializer(many=True, required=False)
+        users = UserSerializer(many=True, required=False)
 
     class Meta:
         """ Meta class for defining additional serializer characteristics """
         model = Workgroup
         fields = (
-            'id', 'url', 'created', 'modified', 'name', 'project',
-            'groups', 'users', 'submissions',
-            'workgroup_reviews', 'peer_reviews'
+            'id', 'url', 'created', 'modified', 'name',
+            'project', 'submissions', 'workgroup_reviews', 'peer_reviews'
         )
-
+        if settings.FEATURES.get('PROJECTS_APP', False):
+            fields += ('users', 'groups')
 
 class BasicWorkgroupSerializer(serializers.HyperlinkedModelSerializer):
     """ Basic Workgroup Serializer to keep only basic fields """

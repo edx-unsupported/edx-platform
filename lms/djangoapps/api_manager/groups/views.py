@@ -1,7 +1,9 @@
 """ API implementation for group-oriented interactions. """
 import uuid
 import json
+import logging
 
+from django.conf import settings
 from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
@@ -13,10 +15,16 @@ from api_manager.courseware_access import get_course
 from api_manager.models import GroupRelationship, CourseGroupRelationship, GroupProfile, APIUser as User
 from api_manager.permissions import SecureAPIView, SecureListAPIView
 from api_manager.utils import str2bool, generate_base_uri
-from organizations import serializers
-from projects.serializers import BasicWorkgroupSerializer, GroupSerializer
 
+if settings.FEATURES.get('ORGANIZATIONS_APP', False):
+    from organizations import serializers
 
+if settings.FEATURES.get('PROJECTS_APP', False):
+    from projects.serializers import BasicWorkgroupSerializer
+
+from .serializers import GroupSerializer
+
+log = logging.getLogger(__name__)
 RELATIONSHIP_TYPES = {'hierarchical': 'h', 'graph': 'g'}
 
 
@@ -56,6 +64,7 @@ class GroupsList(SecureListAPIView):
     * Ultimately, both 'type' and 'data' are determined by the client/caller.  Open edX has no type or data specifications at the present time.
     """
     serializer_class = GroupSerializer
+    lookup_field = 'id'
 
     def post(self, request):
         """
@@ -641,6 +650,9 @@ class GroupsOrganizationsList(SecureAPIView):
         """
         GET /api/groups/{group_id}/organizations/
         """
+        if not settings.FEATURES.get('ORGANIZATIONS_APP', False):
+            log.error('GroupsOrganizationsList: ORGANIZATIONS_APP is required, but not installed/enabled')
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
         response_data = {}
         try:
             existing_group = Group.objects.get(id=group_id)
@@ -662,9 +674,14 @@ class GroupsWorkgroupsList(SecureListAPIView):
     GET ```/api/groups/{group_id}/workgroups/?course_id={course_id}```
     """
 
-    serializer_class = BasicWorkgroupSerializer
+    if settings.FEATURES.get('ORGANIZATIONS_APP', False) and settings.FEATURES.get('PROJECTS_APP', False):
+        serializer_class = BasicWorkgroupSerializer
 
     def get_queryset(self):
+        if not settings.FEATURES.get('ORGANIZATIONS_APP', False) or not settings.FEATURES.get('PROJECTS_APP', False):
+            log.error('GroupsWorkgroupsList: ORGANIZATIONS_APP and PROJECTS_APP are required, but are not installed/enabled')
+            raise Http404
+
         group_id = self.kwargs['group_id']
         course_id = self.request.QUERY_PARAMS.get('course_id', None)
         try:

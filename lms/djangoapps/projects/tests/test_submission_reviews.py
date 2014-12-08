@@ -8,13 +8,15 @@ import json
 import uuid
 from urllib import urlencode
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.test import TestCase, Client
 from django.test.utils import override_settings
 
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
-from projects.models import Project, Workgroup, WorkgroupSubmission
+if settings.FEATURES.get('PROJECTS_APP', False):
+    from projects.models import Project, Workgroup, WorkgroupSubmission
 from student.models import anonymous_id_for_user
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -68,25 +70,26 @@ class SubmissionReviewsApiTests(TestCase):
         )
         self.anonymous_user_id = anonymous_id_for_user(self.test_user, self.course.id)
 
-        self.test_project = Project.objects.create(
-            course_id=self.test_course_id,
-            content_id=self.test_course_content_id,
-        )
+        if settings.FEATURES.get('PROJECTS_APP', False):
+            self.test_project = Project.objects.create(
+                course_id=self.test_course_id,
+                content_id=self.test_course_content_id,
+            )
 
-        self.test_workgroup = Workgroup.objects.create(
-            name="Test Workgroup",
-            project=self.test_project,
-        )
-        self.test_workgroup.add_user(self.test_user)
-        self.test_workgroup.save()
+            self.test_workgroup = Workgroup.objects.create(
+                name="Test Workgroup",
+                project=self.test_project,
+            )
+            self.test_workgroup.add_user(self.test_user)
+            self.test_workgroup.save()
 
-        self.test_submission = WorkgroupSubmission.objects.create(
-            user=self.test_user,
-            workgroup=self.test_workgroup,
-            document_id="Document12345.pdf",
-            document_url="http://test-s3.amazonaws.com/bucketname",
-            document_mime_type="application/pdf"
-        )
+            self.test_submission = WorkgroupSubmission.objects.create(
+                user=self.test_user,
+                workgroup=self.test_workgroup,
+                document_id="Document12345.pdf",
+                document_url="http://test-s3.amazonaws.com/bucketname",
+                document_mime_type="application/pdf"
+            )
 
         self.client = SecureClient()
         cache.clear()
@@ -120,103 +123,104 @@ class SubmissionReviewsApiTests(TestCase):
         response = self.client.delete(uri, headers=headers)
         return response
 
-    def test_submission_reviews_list_post(self):
-        data = {
-            'submission': self.test_submission.id,
-            'reviewer': self.anonymous_user_id,
-            'question': self.test_question,
-            'answer': self.test_answer,
-            'content_id': self.test_course_content_id,
-        }
-        response = self.do_post(self.test_submission_reviews_uri, data)
-        self.assertEqual(response.status_code, 201)
-        self.assertGreater(response.data['id'], 0)
-        confirm_uri = '{}{}{}/'.format(
-            self.test_server_prefix,
-            self.test_submission_reviews_uri,
-            str(response.data['id'])
-        )
-        self.assertEqual(response.data['url'], confirm_uri)
-        self.assertGreater(response.data['id'], 0)
-        self.assertEqual(response.data['reviewer'], self.anonymous_user_id)
-        self.assertEqual(response.data['submission'], self.test_submission.id)
-        self.assertEqual(response.data['question'], self.test_question)
-        self.assertEqual(response.data['answer'], self.test_answer)
-        self.assertEqual(response.data['content_id'], self.test_course_content_id)
-        self.assertIsNotNone(response.data['created'])
-        self.assertIsNotNone(response.data['modified'])
+    if settings.FEATURES.get('PROJECTS_APP', False):
+        def test_submission_reviews_list_post(self):
+            data = {
+                'submission': self.test_submission.id,
+                'reviewer': self.anonymous_user_id,
+                'question': self.test_question,
+                'answer': self.test_answer,
+                'content_id': self.test_course_content_id,
+            }
+            response = self.do_post(self.test_submission_reviews_uri, data)
+            self.assertEqual(response.status_code, 201)
+            self.assertGreater(response.data['id'], 0)
+            confirm_uri = '{}{}{}/'.format(
+                self.test_server_prefix,
+                self.test_submission_reviews_uri,
+                str(response.data['id'])
+            )
+            self.assertEqual(response.data['url'], confirm_uri)
+            self.assertGreater(response.data['id'], 0)
+            self.assertEqual(response.data['reviewer'], self.anonymous_user_id)
+            self.assertEqual(response.data['submission'], self.test_submission.id)
+            self.assertEqual(response.data['question'], self.test_question)
+            self.assertEqual(response.data['answer'], self.test_answer)
+            self.assertEqual(response.data['content_id'], self.test_course_content_id)
+            self.assertIsNotNone(response.data['created'])
+            self.assertIsNotNone(response.data['modified'])
 
-    def test_submission_reviews_list_get(self):
-        data = {
-            'submission': self.test_submission.id,
-            'reviewer': self.anonymous_user_id,
-            'question': self.test_question,
-            'answer': self.test_answer,
-            'content_id': self.test_course_content_id,
-        }
-        response = self.do_post(self.test_submission_reviews_uri, data)
-        self.assertEqual(response.status_code, 201)
-        data = {
-            'submission': self.test_submission.id,
-            'reviewer': self.anonymous_user_id,
-            'question': self.test_question,
-            'answer': self.test_answer,
-            'content_id': self.test_course_content_id,
-        }
-        response = self.do_post(self.test_submission_reviews_uri, data)
-        self.assertEqual(response.status_code, 201)
+        def test_submission_reviews_list_get(self):
+            data = {
+                'submission': self.test_submission.id,
+                'reviewer': self.anonymous_user_id,
+                'question': self.test_question,
+                'answer': self.test_answer,
+                'content_id': self.test_course_content_id,
+            }
+            response = self.do_post(self.test_submission_reviews_uri, data)
+            self.assertEqual(response.status_code, 201)
+            data = {
+                'submission': self.test_submission.id,
+                'reviewer': self.anonymous_user_id,
+                'question': self.test_question,
+                'answer': self.test_answer,
+                'content_id': self.test_course_content_id,
+            }
+            response = self.do_post(self.test_submission_reviews_uri, data)
+            self.assertEqual(response.status_code, 201)
 
-        response = self.do_get(self.test_submission_reviews_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 2)
+            response = self.do_get(self.test_submission_reviews_uri)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.data), 2)
 
-    def test_submission_reviews_detail_get(self):
-        data = {
-            'submission': self.test_submission.id,
-            'reviewer': self.anonymous_user_id,
-            'question': self.test_question,
-            'answer': self.test_answer,
-            'content_id': self.test_course_content_id,
-        }
-        response = self.do_post(self.test_submission_reviews_uri, data)
-        self.assertEqual(response.status_code, 201)
-        test_uri = '{}{}/'.format(self.test_submission_reviews_uri, str(response.data['id']))
-        response = self.do_get(test_uri)
-        self.assertEqual(response.status_code, 200)
-        confirm_uri = '{}{}{}/'.format(
-            self.test_server_prefix,
-            self.test_submission_reviews_uri,
-            str(response.data['id'])
-        )
-        self.assertEqual(response.data['url'], confirm_uri)
-        self.assertGreater(response.data['id'], 0)
-        self.assertEqual(response.data['reviewer'], self.anonymous_user_id)
-        self.assertEqual(response.data['submission'], self.test_submission.id)
-        self.assertEqual(response.data['question'], self.test_question)
-        self.assertEqual(response.data['answer'], self.test_answer)
-        self.assertEqual(response.data['content_id'], self.test_course_content_id)
-        self.assertIsNotNone(response.data['created'])
-        self.assertIsNotNone(response.data['modified'])
+        def test_submission_reviews_detail_get(self):
+            data = {
+                'submission': self.test_submission.id,
+                'reviewer': self.anonymous_user_id,
+                'question': self.test_question,
+                'answer': self.test_answer,
+                'content_id': self.test_course_content_id,
+            }
+            response = self.do_post(self.test_submission_reviews_uri, data)
+            self.assertEqual(response.status_code, 201)
+            test_uri = '{}{}/'.format(self.test_submission_reviews_uri, str(response.data['id']))
+            response = self.do_get(test_uri)
+            self.assertEqual(response.status_code, 200)
+            confirm_uri = '{}{}{}/'.format(
+                self.test_server_prefix,
+                self.test_submission_reviews_uri,
+                str(response.data['id'])
+            )
+            self.assertEqual(response.data['url'], confirm_uri)
+            self.assertGreater(response.data['id'], 0)
+            self.assertEqual(response.data['reviewer'], self.anonymous_user_id)
+            self.assertEqual(response.data['submission'], self.test_submission.id)
+            self.assertEqual(response.data['question'], self.test_question)
+            self.assertEqual(response.data['answer'], self.test_answer)
+            self.assertEqual(response.data['content_id'], self.test_course_content_id)
+            self.assertIsNotNone(response.data['created'])
+            self.assertIsNotNone(response.data['modified'])
 
-    def test_submission_reviews_detail_get_undefined(self):
-        test_uri = '{}123456789/'.format(self.test_submission_reviews_uri)
-        response = self.do_get(test_uri)
-        self.assertEqual(response.status_code, 404)
+        def test_submission_reviews_detail_get_undefined(self):
+            test_uri = '{}123456789/'.format(self.test_submission_reviews_uri)
+            response = self.do_get(test_uri)
+            self.assertEqual(response.status_code, 404)
 
-    def test_submission_reviews_detail_delete(self):
-        data = {
-            'submission': self.test_submission.id,
-            'reviewer': self.anonymous_user_id,
-            'question': self.test_question,
-            'answer': self.test_answer,
-        }
-        response = self.do_post(self.test_submission_reviews_uri, data)
-        print response.data
-        self.assertEqual(response.status_code, 201)
-        test_uri = '{}{}/'.format(self.test_submission_reviews_uri, str(response.data['id']))
-        response = self.do_get(test_uri)
-        self.assertEqual(response.status_code, 200)
-        response = self.do_delete(test_uri)
-        self.assertEqual(response.status_code, 204)
-        response = self.do_get(test_uri)
-        self.assertEqual(response.status_code, 404)
+        def test_submission_reviews_detail_delete(self):
+            data = {
+                'submission': self.test_submission.id,
+                'reviewer': self.anonymous_user_id,
+                'question': self.test_question,
+                'answer': self.test_answer,
+            }
+            response = self.do_post(self.test_submission_reviews_uri, data)
+            print response.data
+            self.assertEqual(response.status_code, 201)
+            test_uri = '{}{}/'.format(self.test_submission_reviews_uri, str(response.data['id']))
+            response = self.do_get(test_uri)
+            self.assertEqual(response.status_code, 200)
+            response = self.do_delete(test_uri)
+            self.assertEqual(response.status_code, 204)
+            response = self.do_get(test_uri)
+            self.assertEqual(response.status_code, 404)

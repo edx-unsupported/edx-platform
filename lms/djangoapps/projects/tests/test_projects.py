@@ -7,12 +7,14 @@ Run these tests @ Devstack:
 import json
 import uuid
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.test import TestCase, Client
 from django.test.utils import override_settings
 
-from projects.models import Project, Workgroup
+if settings.FEATURES.get('PROJECTS_APP', False):
+    from projects.models import Project, Workgroup
 
 TEST_API_KEY = str(uuid.uuid4())
 
@@ -49,17 +51,18 @@ class ProjectsApiTests(TestCase):
             is_active=True
         )
 
-        self.test_project = Project.objects.create(
-            course_id=self.test_course_id,
-            content_id=self.test_course_content_id,
-        )
+        if settings.FEATURES.get('PROJECTS_APP', False):
+            self.test_project = Project.objects.create(
+                course_id=self.test_course_id,
+                content_id=self.test_course_content_id,
+            )
 
-        self.test_workgroup = Workgroup.objects.create(
-            name="Test Workgroup",
-            project=self.test_project,
-        )
-        self.test_workgroup.add_user(self.test_user)
-        self.test_workgroup.save()
+            self.test_workgroup = Workgroup.objects.create(
+                name="Test Workgroup",
+                project=self.test_project,
+            )
+            self.test_workgroup.add_user(self.test_user)
+            self.test_workgroup.save()
 
         self.client = SecureClient()
         cache.clear()
@@ -93,90 +96,92 @@ class ProjectsApiTests(TestCase):
         response = self.client.delete(uri, headers=headers)
         return response
 
-    def test_projects_list_post(self):
-        data = {
-            'name': 'Test Organization'
-        }
-        response = self.do_post(self.test_organizations_uri, data)
-        self.assertEqual(response.status_code, 201)
-        test_org_id = response.data['id']
+    if settings.FEATURES.get('PROJECTS_APP', False):
+        if settings.FEATURES.get('ORGANIZATIONS_APP', False):
+            def test_projects_list_post(self):
+                data = {
+                    'name': 'Test Organization'
+                }
+                response = self.do_post(self.test_organizations_uri, data)
+                self.assertEqual(response.status_code, 201)
+                test_org_id = response.data['id']
 
-        test_course_content_id = "i4x://blahblah1234"
-        data = {
-            'name': self.test_project_name,
-            'course_id': self.test_course_id,
-            'content_id': test_course_content_id,
-            'organization': test_org_id
-        }
-        response = self.do_post(self.test_projects_uri, data)
-        self.assertEqual(response.status_code, 201)
-        self.assertGreater(response.data['id'], 0)
-        confirm_uri = '{}{}{}/'.format(
-            self.test_server_prefix,
-            self.test_projects_uri,
-            str(response.data['id'])
-        )
-        self.assertEqual(response.data['url'], confirm_uri)
-        self.assertEqual(response.data['organization'], test_org_id)
-        self.assertEqual(response.data['course_id'], self.test_course_id)
-        self.assertEqual(response.data['content_id'], test_course_content_id)
-        self.assertIsNotNone(response.data['workgroups'])
-        self.assertIsNotNone(response.data['created'])
-        self.assertIsNotNone(response.data['modified'])
+                test_course_content_id = "i4x://blahblah1234"
+                data = {
+                    'name': self.test_project_name,
+                    'course_id': self.test_course_id,
+                    'content_id': test_course_content_id,
+                    'organization': test_org_id
+                }
+                response = self.do_post(self.test_projects_uri, data)
+                self.assertEqual(response.status_code, 201)
+                self.assertGreater(response.data['id'], 0)
+                confirm_uri = '{}{}{}/'.format(
+                    self.test_server_prefix,
+                    self.test_projects_uri,
+                    str(response.data['id'])
+                )
+                self.assertEqual(response.data['url'], confirm_uri)
+                self.assertEqual(response.data['organization'], test_org_id)
+                self.assertEqual(response.data['course_id'], self.test_course_id)
+                self.assertEqual(response.data['content_id'], test_course_content_id)
+                self.assertIsNotNone(response.data['workgroups'])
+                self.assertIsNotNone(response.data['created'])
+                self.assertIsNotNone(response.data['modified'])
 
-    def test_projects_list_post_without_org(self):
-        test_course_content_id = "i4x://blahblah1234"
-        data = {
-            'name': self.test_project_name,
-            'course_id': self.test_course_id,
-            'content_id': test_course_content_id,
-            'organization': None
-        }
-        response = self.do_post(self.test_projects_uri, data)
-        self.assertEqual(response.status_code, 201)
-        self.assertGreater(response.data['id'], 0)
-        self.assertEqual(response.data['organization'], None)
+            def test_projects_list_post_without_org(self):
+                test_course_content_id = "i4x://blahblah1234"
+                data = {
+                    'name': self.test_project_name,
+                    'course_id': self.test_course_id,
+                    'content_id': test_course_content_id,
+                    'organization': None
+                }
+                response = self.do_post(self.test_projects_uri, data)
+                self.assertEqual(response.status_code, 201)
+                self.assertGreater(response.data['id'], 0)
+                self.assertEqual(response.data['organization'], None)
 
-    def test_projects_detail_get(self):
-        test_uri = '{}{}/'.format(self.test_projects_uri, self.test_project.id)
-        response = self.do_get(test_uri)
-        self.assertEqual(response.status_code, 200)
-        confirm_uri = self.test_server_prefix + test_uri
-        self.assertEqual(response.data['url'], confirm_uri)
-        self.assertGreater(response.data['id'], 0)
-        self.assertEqual(response.data['course_id'], self.test_course_id)
-        self.assertEqual(response.data['content_id'], self.test_course_content_id)
-        self.assertIsNotNone(response.data['workgroups'])
-        self.assertIsNotNone(response.data['created'])
-        self.assertIsNotNone(response.data['modified'])
+        def test_projects_detail_get(self):
+            test_uri = '{}{}/'.format(self.test_projects_uri, self.test_project.id)
+            response = self.do_get(test_uri)
+            self.assertEqual(response.status_code, 200)
+            confirm_uri = self.test_server_prefix + test_uri
+            self.assertEqual(response.data['url'], confirm_uri)
+            self.assertGreater(response.data['id'], 0)
+            self.assertEqual(response.data['course_id'], self.test_course_id)
+            self.assertEqual(response.data['content_id'], self.test_course_content_id)
+            self.assertIsNotNone(response.data['workgroups'])
+            self.assertIsNotNone(response.data['created'])
+            self.assertIsNotNone(response.data['modified'])
 
-    def test_projects_workgroups_post(self):
-        test_uri = '{}{}/workgroups/'.format(self.test_projects_uri, self.test_project.id)
-        data = {"id": self.test_workgroup.id}
-        response = self.do_post(test_uri, data)
-        self.assertEqual(response.status_code, 201)
-        response = self.do_get(test_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data[0]['id'], self.test_workgroup.id)
+        def test_projects_workgroups_post(self):
+            test_uri = '{}{}/workgroups/'.format(self.test_projects_uri, self.test_project.id)
+            data = {"id": self.test_workgroup.id}
+            response = self.do_post(test_uri, data)
+            self.assertEqual(response.status_code, 201)
+            response = self.do_get(test_uri)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.data[0]['id'], self.test_workgroup.id)
 
-    def test_projects_workgroups_post_invalid_workgroup(self):
-        test_uri = '{}{}/workgroups/'.format(self.test_projects_uri, self.test_project.id)
-        data = {
-            'id': 123456,
-        }
-        response = self.do_post(test_uri, data)
-        self.assertEqual(response.status_code, 400)
+        def test_projects_workgroups_post_invalid_workgroup(self):
+            test_uri = '{}{}/workgroups/'.format(self.test_projects_uri, self.test_project.id)
+            data = {
+                'id': 123456,
+            }
+            response = self.do_post(test_uri, data)
+            self.assertEqual(response.status_code, 400)
 
-    def test_projects_detail_get_undefined(self):
-        test_uri = '{}/123456789/'.format(self.test_projects_uri)
-        response = self.do_get(test_uri)
-        self.assertEqual(response.status_code, 404)
+        def test_projects_detail_get_undefined(self):
+            test_uri = '{}/123456789/'.format(self.test_projects_uri)
+            response = self.do_get(test_uri)
+            self.assertEqual(response.status_code, 404)
 
-    def test_projects_detail_delete(self):
-        test_uri = '{}{}/'.format(self.test_projects_uri, self.test_project.id)
-        response = self.do_get(test_uri)
-        self.assertEqual(response.status_code, 200)
-        response = self.do_delete(test_uri)
-        self.assertEqual(response.status_code, 204)
-        response = self.do_get(test_uri)
-        self.assertEqual(response.status_code, 404)
+        def test_projects_detail_delete(self):
+            test_uri = '{}{}/'.format(self.test_projects_uri, self.test_project.id)
+            response = self.do_get(test_uri)
+            self.assertEqual(response.status_code, 200)
+            response = self.do_delete(test_uri)
+            self.assertEqual(response.status_code, 204)
+            response = self.do_get(test_uri)
+            self.assertEqual(response.status_code, 404)

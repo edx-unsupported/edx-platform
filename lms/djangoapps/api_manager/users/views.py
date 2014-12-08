@@ -3,6 +3,7 @@
 import logging
 from requests.exceptions import ConnectionError
 
+from django.conf import settings
 from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
@@ -26,7 +27,6 @@ from course_groups.cohorts import (
     remove_user_from_cohort
 )
 from django_comment_common.models import Role, FORUM_ROLE_MODERATOR
-from gradebook.models import StudentGradebook
 from instructor.access import revoke_access, update_forum_role
 from lang_pref import LANGUAGE_KEY
 from notification_prefs.views import enable_notifications
@@ -47,16 +47,23 @@ from util.password_policy_validators import (
 from xmodule.modulestore import InvalidLocationError
 from xmodule.modulestore.django import modulestore
 
-from progress.serializers import CourseModuleCompletionSerializer
+if settings.FEATURES.get('GRADEBOOK_APP', False):
+    from gradebook.models import StudentGradebook
+
+if settings.FEATURES.get('ORGANIZATIONS_APP', False):
+    from organizations.serializers import OrganizationSerializer
+
+if settings.FEATURES.get('PROGRESS_APP', False):
+    from progress.serializers import CourseModuleCompletionSerializer
+
+if settings.FEATURES.get('PROJECTS_APP', False):
+    from projects.serializers import BasicWorkgroupSerializer
+
 from api_manager.courseware_access import get_course, get_course_child, get_course_key, course_exists
 from api_manager.permissions import SecureAPIView, SecureListAPIView, IdsInFilterBackend, HasOrgsFilterBackend
 from api_manager.models import GroupProfile, APIUser as User
-from organizations.serializers import OrganizationSerializer
 from api_manager.utils import generate_base_uri, dict_has_items, extract_data_params
-from projects.serializers import BasicWorkgroupSerializer
 from .serializers import UserSerializer, UserCountByCitySerializer, UserRolesSerializer
-
-
 
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
@@ -862,6 +869,8 @@ class UsersCoursesDetail(SecureAPIView):
             course_descriptor, course_key, course_content = get_course(request, user, course_id)
         except (ObjectDoesNotExist, ValueError):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
+        print user.__dict__
+        print course_key
         if not CourseEnrollment.is_enrolled(user, course_key):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         response_data['user_id'] = user.id
@@ -929,6 +938,12 @@ class UsersCoursesGradesDetail(SecureAPIView):
         """
         GET /api/users/{user_id}/courses/{course_id}/grades
         """
+        if not settings.FEATURES.get('GRADEBOOK_APP', False):
+            # Would prefer to return 501 Not Implemented here
+            # but unsure how to 'raise' one inside of get_queryset()
+            # Logging an error allows it to be picked up by monitoring
+            log.error('UsersOrganizationsList: ORGANIZATIONS_APP is required, but not installed/enabled')
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
 
         # The pre-fetching of groups is done to make auth checks not require an
         # additional DB lookup (this kills the Progress page in particular).
@@ -1090,10 +1105,17 @@ class UsersOrganizationsList(SecureListAPIView):
     - URI: ```/api/users/{user_id}/organizations/```
     - GET: Provides paginated list of organizations for a user
     """
-
-    serializer_class = OrganizationSerializer
+    if settings.FEATURES.get('ORGANIZATIONS_APP', False):
+        serializer_class = OrganizationSerializer
 
     def get_queryset(self):
+        if not settings.FEATURES.get('ORGANIZATIONS_APP', False):
+            # Would prefer to return 501 Not Implemented here
+            # but unsure how to 'raise' one inside of get_queryset()
+            # Logging an error allows it to be picked up by monitoring
+            log.error('UsersOrganizationsList: ORGANIZATIONS_APP is required, but not installed/enabled')
+            raise Http404
+
         user_id = self.kwargs['user_id']
         try:
             user = User.objects.get(id=user_id)
@@ -1112,10 +1134,17 @@ class UsersWorkgroupsList(SecureListAPIView):
     To filter the user's workgroup set by course
     GET ```/api/users/{user_id}/workgroups/?course_id={course_id}```
     """
-
-    serializer_class = BasicWorkgroupSerializer
+    if settings.FEATURES.get('PROJECTS_APP', False):
+        serializer_class = BasicWorkgroupSerializer
 
     def get_queryset(self):
+        if not settings.FEATURES.get('PROJECTS_APP', False):
+            # Would prefer to return 501 Not Implemented here
+            # but unsure how to 'raise' one inside of get_queryset()
+            # Logging an error allows it to be picked up by monitoring
+            log.error('UsersWorkgroupsList: PROJECTS_APP is required, but not installed/enabled')
+            raise Http404
+
         user_id = self.kwargs['user_id']
         course_id = self.request.QUERY_PARAMS.get('course_id', None)
         try:
@@ -1139,10 +1168,17 @@ class UsersCoursesCompletionsList(SecureListAPIView):
     To filter the user's course completions by course content
     GET ```/api/users/{user_id}/courses/{course_id}/completions/?content_id={content_id}```
     """
-
-    serializer_class = CourseModuleCompletionSerializer
+    if settings.FEATURES.get('PROGRESS_APP', False):
+        serializer_class = CourseModuleCompletionSerializer
 
     def get_queryset(self):
+        if not settings.FEATURES.get('PROGRESS_APP', False):
+            # Would prefer to return 501 Not Implemented here
+            # but unsure how to 'raise' one inside of get_queryset()
+            # Logging an error allows it to be picked up by monitoring
+            log.error('UsersCoursesCompletionsList: PROGRESS_APP is required, but not installed/enabled')
+            raise Http404
+
         user_id = self.kwargs['user_id']
         course_id = self.kwargs.get('course_id', None)
         content_id = self.request.QUERY_PARAMS.get('content_id', None)

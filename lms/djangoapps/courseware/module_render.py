@@ -56,11 +56,11 @@ from xmodule_modifiers import (
 )
 from xmodule.lti_module import LTIModule
 from xmodule.x_module import XModuleDescriptor
-from progress.models import CourseModuleCompletion
-
 from util.json_request import JsonResponse
 from util.sandboxing import can_execute_unsafe_code
 
+if settings.FEATURES.get('PROGRESS_APP', False):
+    from progress.models import CourseModuleCompletion
 
 log = logging.getLogger(__name__)
 
@@ -399,8 +399,10 @@ def get_module_system_for_user(user, field_data_cache,
 
     def handle_progress_event(block, event_type, event):
         """
-        tie into the CourseCompletions datamodels that are exposed in the api_manager djangoapp
+        tie into the CourseCompletions datamodels that are exposed in the (optional) progress djangoapp
         """
+        if not settings.FEATURES.get('PROGRESS_APP', False):
+            raise Exception('Progress app is required.')
 
         if not settings.FEATURES.get("ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE", True):
             # if a course has ended, don't register progress events
@@ -423,7 +425,7 @@ def get_module_system_for_user(user, field_data_cache,
         """A function that allows XModules to publish events."""
         if event_type == 'grade':
             handle_grade_event(block, event_type, event)
-        elif event_type == 'progress':
+        elif event_type == 'progress' and settings.FEATURES.get('PROGRESS_APP', False):
             # expose another special case event type which gets sent
             # into the CourseCompletions models
             handle_progress_event(block, event_type, event)

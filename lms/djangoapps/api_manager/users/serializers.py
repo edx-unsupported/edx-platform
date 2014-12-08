@@ -1,10 +1,15 @@
 """ Django REST Framework Serializers """
+from django.conf import settings
 
 from rest_framework import serializers
 
-from api_manager.models import APIUser
-from organizations.serializers import BasicOrganizationSerializer
 from student.models import UserProfile
+
+if settings.FEATURES.get('ORGANIZATIONS_APP', False):
+    from organizations.serializers import BasicOrganizationSerializer
+
+from api_manager.models import APIUser
+
 
 class DynamicFieldsModelSerializer(serializers.ModelSerializer):
     """
@@ -28,7 +33,8 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
 class UserSerializer(DynamicFieldsModelSerializer):
 
     """ Serializer for User model interactions """
-    organizations = BasicOrganizationSerializer(many=True, required=False)
+    if settings.FEATURES.get('ORGANIZATIONS_APP', False):
+        organizations = BasicOrganizationSerializer(many=True, required=False)
     created = serializers.DateTimeField(source='date_joined', required=False)
     avatar_url = serializers.CharField(source='profile.avatar_url')
     city = serializers.CharField(source='profile.city')
@@ -39,7 +45,9 @@ class UserSerializer(DynamicFieldsModelSerializer):
     class Meta:
         """ Serializer/field specification """
         model = APIUser
-        fields = ("id", "email", "username", "first_name", "last_name", "created", "is_active", "organizations", "avatar_url", "city", "title", "country", "full_name")
+        fields = ("id", "email", "username", "first_name", "last_name", "created", "is_active", "avatar_url", "city", "title", "country", "full_name")
+        if settings.FEATURES.get('ORGANIZATIONS_APP'):
+            fields += ("organizations",)
         read_only_fields = ("id", "email", "username")
 
 class UserCountByCitySerializer(serializers.Serializer):

@@ -295,12 +295,12 @@ FEATURES = {
     # Enable the Student Gradebook, which is essentially a cache of calculated grades
     # In order to use the gradebook, you must add it to the list of INSTALLED_APPS in
     # addition to setting the flag to True here.  A reference is available in aws.py
-    'STUDENT_GRADEBOOK': False,
+    'GRADEBOOK_APP': False,
 
     # Enable the Student Progress, which is essentially a cache of module completions
     # In order to use the "progress", you must add it to the list of INSTALLED_APPS in
     # addition to setting the flag to True here.  A reference is available in aws.py
-    'STUDENT_PROGRESS': False,
+    'PROGRESS_APP': False,
 
     # Enable the projects,
     'PROJECTS_APP': False,
@@ -1419,7 +1419,7 @@ INSTALLED_APPS = (
 
     # Country list
     'django_countries',
-    
+
     # EDX API application
     'api_manager',
 )

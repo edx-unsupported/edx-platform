@@ -23,31 +23,35 @@ from courseware.courses import get_course_about_section, get_course_info_section
 from courseware.models import StudentModule
 from courseware.views import get_static_tab_contents
 from django_comment_common.models import FORUM_ROLE_MODERATOR
-from gradebook.models import StudentGradebook
 from instructor.access import revoke_access, update_forum_role
 from lms.lib.comment_client.user import get_course_social_stats
 from lms.lib.comment_client.thread import get_course_thread_stats
 from lms.lib.comment_client.utils import CommentClientRequestError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from progress.models import StudentProgress
-from projects.models import Project, Workgroup
-from projects.serializers import ProjectSerializer, BasicWorkgroupSerializer
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from student.roles import CourseRole, CourseAccessRole, CourseInstructorRole, CourseStaffRole, CourseObserverRole, CourseAssistantRole, UserBasedRole
 from xmodule.modulestore.django import modulestore
 
+if settings.FEATURES.get('GRADEBOOK_APP', False):
+    from gradebook.models import StudentGradebook
+
+if settings.FEATURES.get('PROGRESS_APP', False):
+    from progress.models import CourseModuleCompletion, StudentProgress
+    from progress.serializers import CourseModuleCompletionSerializer
+
+if settings.FEATURES.get('PROJECTS_APP', False):
+    from projects.models import Project, Workgroup
+    from projects.serializers import ProjectSerializer, BasicWorkgroupSerializer
+
 from api_manager.courseware_access import get_course, get_course_child, get_course_leaf_nodes, get_course_key, \
     course_exists, get_modulestore, get_course_descriptor, get_aggregate_exclusion_user_ids
 from api_manager.models import CourseGroupRelationship, CourseContentGroupRelationship, GroupProfile
-from progress.models import CourseModuleCompletion
 from api_manager.permissions import SecureAPIView, SecureListAPIView
 from api_manager.users.serializers import UserSerializer, UserCountByCitySerializer
 from api_manager.utils import generate_base_uri, str2bool, get_time_series_data, parse_datetime
 from .serializers import CourseSerializer
 from .serializers import GradeSerializer, CourseLeadersSerializer, CourseCompletionsLeadersSerializer
-from progress.serializers import CourseModuleCompletionSerializer
-
 
 
 log = logging.getLogger(__name__)
@@ -814,7 +818,7 @@ class CoursesOverview(SecureAPIView):
         if not course_descriptor:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         existing_content = get_course_about_section(course_descriptor, 'overview')
-        if not existing_content:
+        if not existing_content or not len(existing_content):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         if request.GET.get('parse') and request.GET.get('parse') in ['True', 'true']:
             response_data['sections'] = _parse_overview_html(existing_content)
@@ -1051,7 +1055,7 @@ class CoursesUsersList(SecureAPIView):
         """
         GET /api/courses/{course_id}/users
         """
-        orgs = request.QUERY_PARAMS.get('organizations')
+
         groups = request.QUERY_PARAMS.get('groups', None)
         exclude_groups = request.QUERY_PARAMS.get('exclude_groups', None)
         response_data = OrderedDict()
@@ -1063,15 +1067,18 @@ class CoursesUsersList(SecureAPIView):
         # Get a list of all enrolled students
         users = CourseEnrollment.users_enrolled_in(course_key)
         upper_bound = getattr(settings, 'API_LOOKUP_UPPER_BOUND', 100)
-        if orgs:
-            orgs = orgs.split(",")[:upper_bound]
-            users = users.filter(organizations__in=orgs)
-        if groups:
-            groups = groups.split(",")[:upper_bound]
-            users = users.filter(groups__in=groups)
         if exclude_groups:
             exclude_groups = exclude_groups.split(",")[:upper_bound]
             users = users.exclude(groups__in=exclude_groups)
+        if groups:
+            groups = groups.split(",")[:upper_bound]
+            users = users.filter(groups__in=groups)
+
+        if settings.FEATURES.get('ORGANIZATIONS_APP', False):
+            orgs = request.QUERY_PARAMS.get('organizations')
+            if orgs:
+                orgs = orgs.split(",")[:upper_bound]
+                users = users.filter(organizations__in=orgs)
 
         response_data['enrollments'] = []
         for user in users:
@@ -1364,12 +1371,16 @@ class CourseModuleCompletionList(SecureListAPIView):
     * Use GET operation to retrieve list of course completions by user
     * Use GET operation to verify user has completed specific course module
     """
-    serializer_class = CourseModuleCompletionSerializer
+    if settings.FEATURES.get('PROGRESS_APP', False):
+        serializer_class = CourseModuleCompletionSerializer
 
     def get_queryset(self):
         """
         GET /api/courses/{course_id}/completions/
         """
+        if not settings.FEATURES.get('PROGRESS_APP', False):
+            log.error('CourseModuleCompletionList: PROGRESS_APP is required, but not installed/enabled')
+            raise Http404
         user_ids = self.request.QUERY_PARAMS.get('user_id', None)
         content_id = self.request.QUERY_PARAMS.get('content_id', None)
         stage = self.request.QUERY_PARAMS.get('stage', None)
@@ -1398,6 +1409,9 @@ class CourseModuleCompletionList(SecureListAPIView):
         """
         POST /api/courses/{course_id}/completions/
         """
+        if not settings.FEATURES.get('PROGRESS_APP', False):
+            log.error('CourseModuleCompletionList: PROGRESS_APP is required, but not installed/enabled')
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
         content_id = request.DATA.get('content_id', None)
         user_id = request.DATA.get('user_id', None)
         stage = request.DATA.get('stage', None)
@@ -1426,7 +1440,7 @@ class CourseModuleCompletionList(SecureListAPIView):
 class CoursesMetricsGradesList(SecureListAPIView):
     """
     ### The CoursesMetricsGradesList view allows clients to retrieve a list of grades for the specified Course
-    - URI: ```/api/courses/{course_id}/grades/```
+    - URI: ```/api/courses/{course_id}/metrics/grades/```
     - GET: Returns a JSON representation (array) of the set of grade objects
     ### Use Cases/Notes:
     * Example: Display a graph of all of the grades awarded for a given course
@@ -1436,6 +1450,10 @@ class CoursesMetricsGradesList(SecureListAPIView):
         """
         GET /api/courses/{course_id}/metrics/grades?user_ids=1,2
         """
+        # This view will break if the gradebook has not been installed
+        if not settings.FEATURES.get('GRADEBOOK_APP', False):
+            log.error('CoursesMetricsGradesList: GRADEBOOK_APP is required, but not installed/enabled')
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
         if not course_exists(request, request.user, course_id):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         course_key = get_course_key(course_id)
@@ -1486,10 +1504,13 @@ class CoursesProjectList(SecureListAPIView):
     - URI: ```/api/courses/{course_id}/projects/```
     - GET: Provides paginated list of projects for a course
     """
-
-    serializer_class = ProjectSerializer
+    if settings.FEATURES.get('PROJECTS_APP', False):
+        serializer_class = ProjectSerializer
 
     def get_queryset(self):
+        if not settings.FEATURES.get('PROJECTS_APP', False):
+            log.error('CoursesProjectList: PROGRESS_APP is required, but not installed/enabled')
+            raise Http404
         course_id = self.kwargs['course_id']
         course_key = get_course_key(course_id)
         return Project.objects.filter(course_id=course_key)
@@ -1509,6 +1530,12 @@ class CoursesMetrics(SecureAPIView):
         """
         GET /api/courses/{course_id}/metrics/
         """
+        if not settings.FEATURES.get('ORGANIZATIONS_APP', False):
+            log.error('CoursesMetrics: ORGANIZATIONS_APP is required, but not installed/enabled')
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+        if not settings.FEATURES.get('PROGRESS_APP', False):
+            log.error('CoursesMetrics: PROGRESS_APP is required, but not installed/enabled')
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
         if not course_exists(request, request.user, course_id):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
         course_descriptor, course_key, course_content = get_course(request, request.user, course_id)
@@ -1560,10 +1587,19 @@ class CoursesTimeSeriesMetrics(SecureAPIView):
     * Example: Display number of users completed, started or not started in a given course for a given time period
     """
 
-    def get(self, request, course_id):  # pylint: disable=W0613
+    def get(self, request, course_id):  # pylint: disable=W0613,R0915
         """
         GET /api/courses/{course_id}/time-series-metrics/
         """
+        if not settings.FEATURES.get('GRADEBOOK_APP', False):
+            log.error('CoursesTimeSeriesMetrics: GRADEBOOK_APP is required, but not installed/enabled')
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+        if not settings.FEATURES.get('PROGRESS_APP', False):
+            log.error('CoursesTimeSeriesMetrics: PROGRESS_APP is required, but not installed/enabled')
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+        if not settings.FEATURES.get('PROJECTS_APP', False):
+            log.error('CoursesTimeSeriesMetrics: PROJECTS_APP is required, but not installed/enabled')
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
         if not course_exists(request, request.user, course_id):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
 
@@ -1576,66 +1612,124 @@ class CoursesTimeSeriesMetrics(SecureAPIView):
         if interval not in ['days', 'weeks', 'months']:
             return Response({"message": _("Interval parameter is not valid. It should be one of these "
                                           "'days', 'weeks', 'months'")}, status=status.HTTP_400_BAD_REQUEST)
-        start_dt = parse_datetime(start)
-        end_dt = parse_datetime(end)
+
         course_key = get_course_key(course_id)
         exclude_users = get_aggregate_exclusion_user_ids(course_key)
-        grade_complete_match_range = getattr(settings, 'GRADEBOOK_GRADE_COMPLETE_PROFORMA_MATCH_RANGE', 0.01)
-        grades_qs = StudentGradebook.objects.filter(course_id__exact=course_key, user__is_active=True,
-                                                    user__courseenrollment__is_active=True,
-                                                    user__courseenrollment__course_id__exact=course_key).\
-            exclude(user_id__in=exclude_users)
-        grades_complete_qs = grades_qs.filter(proforma_grade__lte=F('grade') + grade_complete_match_range,
-                                              proforma_grade__gt=0)
-        enrolled_qs = CourseEnrollment.objects.filter(course_id__exact=course_key, user__is_active=True,
-                                                      is_active=True).exclude(user_id__in=exclude_users)
-        users_started_qs = StudentProgress.objects.filter(course_id__exact=course_key, user__is_active=True,
-                                                                 user__courseenrollment__is_active=True,
-                                                                 user__courseenrollment__course_id__exact=course_key)\
-            .exclude(user_id__in=exclude_users)
-        modules_completed_qs = CourseModuleCompletion.get_actual_completions().filter(course_id__exact=course_key,
-                                                                                      user__courseenrollment__is_active=True,
-                                                                                      user__courseenrollment__course_id__exact=course_key,
-                                                                                      user__is_active=True)\
-            .exclude(user_id__in=exclude_users)
-        active_users_qs = StudentModule.objects.filter(course_id__exact=course_key, student__is_active=True,
-                                                       student__courseenrollment__is_active=True,
-                                                       student__courseenrollment__course_id__exact=course_key)\
-            .exclude(student_id__in=exclude_users)
 
+        grades_qs = StudentGradebook.objects.filter(
+            course_id__exact=course_key,
+            user__is_active=True,
+            user__courseenrollment__is_active=True,
+            user__courseenrollment__course_id__exact=course_key
+        ).exclude(user_id__in=exclude_users)
+
+        grade_complete_match_range = getattr(settings, 'GRADEBOOK_GRADE_COMPLETE_PROFORMA_MATCH_RANGE', 0.01)
+        grades_complete_qs = grades_qs.filter(
+            proforma_grade__lte=F('grade') + grade_complete_match_range,
+            proforma_grade__gt=0
+        )
+
+        enrolled_qs = CourseEnrollment.objects.filter(
+            course_id__exact=course_key,
+            is_active=True
+        ).exclude(user_id__in=exclude_users)
+
+        users_started_qs = StudentProgress.objects.filter(
+            course_id__exact=course_key,
+            user__courseenrollment__is_active=True,
+            user__courseenrollment__course_id__exact=course_key
+        ).exclude(user_id__in=exclude_users).order_by('created')
+
+        modules_completed_qs = CourseModuleCompletion.get_actual_completions().filter(
+            course_id__exact=course_key,
+            user__courseenrollment__is_active=True,
+            user__courseenrollment__course_id__exact=course_key,
+        ).exclude(user_id__in=exclude_users)
+
+        active_users_qs = StudentModule.objects.filter(
+            course_id__exact=course_key,
+            student__courseenrollment__is_active=True,
+            student__courseenrollment__course_id__exact=course_key
+        ).exclude(student_id__in=exclude_users)
+
+        # Filter the querysets by organization, if specified
         organization = request.QUERY_PARAMS.get('organization', None)
-        if organization:
+        if organization and settings.FEATURES.get('ORGANIZATIONS_APP', False):
             enrolled_qs = enrolled_qs.filter(user__organizations=organization)
             grades_complete_qs = grades_complete_qs.filter(user__organizations=organization)
             users_started_qs = users_started_qs.filter(user__organizations=organization)
             modules_completed_qs = modules_completed_qs.filter(user__organizations=organization)
             active_users_qs = active_users_qs.filter(student__organizations=organization)
 
+        start_dt = parse_datetime(start)
+        end_dt = parse_datetime(end)
+
+        # Calculate the overall counts for the querysets
         total_enrolled = enrolled_qs.filter(created__lt=start_dt).count()
         total_started_count = users_started_qs.filter(created__lt=start_dt).aggregate(Count('user', distinct=True))
         total_started = total_started_count['user__count'] or 0
-        enrolled_series = get_time_series_data(enrolled_qs, start_dt, end_dt, interval=interval,
-                                               date_field='created', aggregate=Count('id'))
-        started_series = get_time_series_data(users_started_qs, start_dt, end_dt, interval=interval,
-                                              date_field='created', date_field_model=StudentProgress,
-                                              aggregate=Count('user'))
-        completed_series = get_time_series_data(grades_complete_qs, start_dt, end_dt, interval=interval,
-                                                date_field='modified', date_field_model=StudentGradebook,
-                                                aggregate=Count('id'))
-        modules_completed_series = get_time_series_data(modules_completed_qs, start_dt, end_dt, interval=interval,
-                                                        date_field='created', date_field_model=CourseModuleCompletion,
-                                                        aggregate=Count('id'))
+
+        # Assemble the time series data based on the querysets
+
+        enrolled_series = get_time_series_data(
+            enrolled_qs,
+            start_dt,
+            end_dt,
+            interval=interval,
+            date_field='created',
+            aggregate=Count('id')
+        )
+
+        started_series = get_time_series_data(
+            users_started_qs,
+            start_dt,
+            end_dt,
+            interval=interval,
+            date_field='created',
+            date_field_model=StudentProgress,
+            aggregate=Count('user', distinct=True)
+        )
+
+        completed_series = get_time_series_data(
+            grades_complete_qs,
+            start_dt,
+            end_dt,
+            interval=interval,
+            date_field='modified',
+            date_field_model=StudentGradebook,
+            aggregate=Count('id')
+        )
+
+        modules_completed_series = get_time_series_data(
+            modules_completed_qs,
+            start_dt,
+            end_dt,
+            interval=interval,
+            date_field='created',
+            date_field_model=CourseModuleCompletion,
+            aggregate=Count('id'))
+
         # active users are those who accessed course in last 24 hours
         start_dt = start_dt + relativedelta(hours=-24)
         end_dt = end_dt + relativedelta(hours=-24)
-        active_users_series = get_time_series_data(active_users_qs, start_dt, end_dt, interval=interval,
-                                                   date_field='modified', date_field_model=StudentModule,
-                                                   aggregate=Count('student', distinct=True))
-        not_started_series = []
-        for enrolled, started in zip(enrolled_series, started_series):
-            not_started_series.append((started[0], (total_enrolled + enrolled[1]) - (total_started + started[1])))
-            total_started += started[1]
-            total_enrolled += enrolled[1]
+        active_users_series = get_time_series_data(
+            active_users_qs,
+            start_dt,
+            end_dt,
+            interval=interval,
+            date_field='modified',
+            date_field_model=StudentModule,
+            aggregate=Count('student', distinct=True)
+        )
+
+        not_started_series, total_enrolled_series = [], []
+        for period_enrolled, period_started in zip(enrolled_series, started_series):
+            period = period_started[0]
+            total_enrolled += period_enrolled[1]
+            total_started += period_started[1]
+            total_not_started = total_enrolled - total_started
+            not_started_series.append((period, total_not_started))
+            total_enrolled_series.append((period, total_enrolled))
 
         data = {
             'users_not_started': not_started_series,
@@ -1666,6 +1760,8 @@ class CoursesMetricsGradesLeadersList(SecureListAPIView):
         """
         GET /api/courses/{course_id}/grades/leaders/
         """
+        if not settings.FEATURES.get('GRADEBOOK_APP', False):
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
         user_id = self.request.QUERY_PARAMS.get('user_id', None)
         count = self.request.QUERY_PARAMS.get('count', 3)
         data = {}
@@ -1713,6 +1809,8 @@ class CoursesMetricsCompletionsLeadersList(SecureAPIView):
         """
         GET /api/courses/{course_id}/metrics/completions/leaders/
         """
+        if not settings.FEATURES.get('PROGRESS_APP', False):
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
         user_id = self.request.QUERY_PARAMS.get('user_id', None)
         count = self.request.QUERY_PARAMS.get('count', None)
         skipleaders = str2bool(self.request.QUERY_PARAMS.get('skipleaders', 'false'))
@@ -1740,7 +1838,7 @@ class CoursesMetricsCompletionsLeadersList(SecureAPIView):
             data['completions'] = completion_percentage
 
         total_users_qs = CourseEnrollment.users_enrolled_in(course_key).exclude(id__in=exclude_users)
-        if orgs_filter:
+        if orgs_filter and settings.FEATURES.get('ORGANIZATIONS_APP', False):
             total_users_qs = total_users_qs.filter(organizations__in=orgs_filter)
         total_users = total_users_qs.count()
         if total_users and total_actual_completions:
@@ -1764,10 +1862,13 @@ class CoursesWorkgroupsList(SecureListAPIView):
     - URI: ```/api/courses/{course_id}/workgroups/```
     - GET: Provides paginated list of workgroups associated to a course
     """
-
-    serializer_class = BasicWorkgroupSerializer
+    if settings.FEATURES.get('PROJECTS_APP', False):
+        serializer_class = BasicWorkgroupSerializer
 
     def get_queryset(self):
+        if not settings.FEATURES.get('PROJECTS_APP', False):
+            log.error('CoursesWorkgroupsList: PROGRESS_APP is required, but not installed/enabled')
+            raise Http404
         course_id = self.kwargs['course_id']
         if not course_exists(self.request, self.request.user, course_id):
             raise Http404
@@ -1787,6 +1888,8 @@ class CoursesMetricsSocial(SecureListAPIView):
     def get(self, request, course_id): # pylint: disable=W0613
 
         try:
+            if not settings.FEATURES.get('ORGANIZATIONS_APP'):
+                return Response({}, status.HTTP_404_NOT_FOUND)
             slash_course_id = get_course_key(course_id, slashseparated=True)
             organization = request.QUERY_PARAMS.get('organization', None)
             # the forum service expects the legacy slash separated string format

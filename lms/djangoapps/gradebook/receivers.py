@@ -1,6 +1,7 @@
 """
 Signal handlers supporting various gradebook use cases
 """
+from django.conf import settings
 from django.dispatch import receiver
 
 from courseware import grades
@@ -17,19 +18,20 @@ def on_score_changed(sender, **kwargs):
     Listens for a  'score_changed' signal and when observed
     recalculates the specified user's gradebook entry
     """
-    user = kwargs['user']
-    course_key = kwargs['course_key']
-    course_descriptor = get_course(course_key, depth=None)
-    request = RequestMockWithoutMiddleware().get('/')
-    request.user = user
-    grade_data = grades.grade(user, request, course_descriptor)
-    grade = grade_data['percent']
-    proforma_grade = grades.calculate_proforma_grade(grade_data, course_descriptor.grading_policy)
-    try:
-        gradebook_entry = StudentGradebook.objects.get(user=user, course_id=course_key)
-        if gradebook_entry.grade != grade:
-            gradebook_entry.grade = grade
-            gradebook_entry.proforma_grade = proforma_grade
-            gradebook_entry.save()
-    except StudentGradebook.DoesNotExist:
-        StudentGradebook.objects.create(user=user, course_id=course_key, grade=grade, proforma_grade=proforma_grade)
+    if settings.FEATURES.get('GRADEBOOK_APP'):
+        user = kwargs['user']
+        course_key = kwargs['course_key']
+        course_descriptor = get_course(course_key, depth=None)
+        request = RequestMockWithoutMiddleware().get('/')
+        request.user = user
+        grade_data = grades.grade(user, request, course_descriptor)
+        grade = grade_data['percent']
+        proforma_grade = grades.calculate_proforma_grade(grade_data, course_descriptor.grading_policy)
+        try:
+            gradebook_entry = StudentGradebook.objects.get(user=user, course_id=course_key)
+            if gradebook_entry.grade != grade:
+                gradebook_entry.grade = grade
+                gradebook_entry.proforma_grade = proforma_grade
+                gradebook_entry.save()
+        except StudentGradebook.DoesNotExist:
+            StudentGradebook.objects.create(user=user, course_id=course_key, grade=grade, proforma_grade=proforma_grade)

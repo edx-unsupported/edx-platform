@@ -73,7 +73,7 @@ urlpatterns = ('',  # nopep8
 )
 
 # OPEN EDX SERVER API
-if settings.FEATURES["API"]:
+if settings.FEATURES["SERVER_API"]:
     urlpatterns += (
         url(r'^api/server/', include('api_manager.urls')),
     )

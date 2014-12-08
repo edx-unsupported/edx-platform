@@ -11,13 +11,15 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from api_manager.courseware_access import get_course_key, get_aggregate_exclusion_user_ids
-from organizations.models import Organization
+from api_manager.models import GroupProfile
 from api_manager.users.serializers import UserSerializer
-from api_manager.groups.serializers import GroupSerializer
 from api_manager.utils import str2bool
-from gradebook.models import StudentGradebook
 from student.models import CourseEnrollment
 
+if settings.FEATURES.get('GRADEBOOK_APP', False):
+    from gradebook.models import StudentGradebook
+
+from .models import Organization
 from .serializers import OrganizationSerializer
 
 
@@ -33,6 +35,8 @@ class OrganizationsViewSet(viewsets.ModelViewSet):
         """
         Provide statistical information for the specified Organization
         """
+        if not settings.FEATURES.get('GRADEBOOK_APP', False):
+            return Response({}, status=status.HTTP_501_NOT_IMPLEMENTED)
         response_data = {}
         grade_avg = 0
         grade_complete_match_range = getattr(settings, 'GRADEBOOK_GRADE_COMPLETE_PROFORMA_MATCH_RANGE', 0.01)
@@ -113,8 +117,17 @@ class OrganizationsViewSet(viewsets.ModelViewSet):
             response_data = []
             if groups:
                 for group in groups:
-                    serializer = GroupSerializer(group)
-                    response_data.append(serializer.data)  # pylint: disable=E1101
+                    group_data = {}
+                    group_data['id'] = group.id
+                    group_data['name'] = group.name
+                    group_data['type'] = None
+                    group_data['data'] = None
+                    group_profile = GroupProfile.objects.filter(group_id=group.id)
+                    if group_profile:
+                        group_data['name'] = group_profile[0].name
+                        group_data['type'] = group_profile[0].group_type
+                        group_data['data'] = group_profile[0].data
+                    response_data.append(group_data)  # pylint: disable=E1101
             return Response(response_data, status=status.HTTP_200_OK)
         else:
             group_id = request.DATA.get('id')

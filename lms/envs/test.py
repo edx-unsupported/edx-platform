@@ -397,26 +397,31 @@ if FEATURES.get('PROFILER'):
         'profiler.middleware.CProfileProfilerMiddleware',
     )
 
+############# OPEN EDX SERVER API #################
+FEATURES['SERVER_API'] = True
+
 
 ############# Student Module #################
-FEATURES['SIGNAL_ON_SCORE_CHANGED'] = True
+FEATURES['STUDENT_MODULE_EMIT_SIGNAL_ON_SCORE_CHANGED'] = True
 
 
 ############# Student Gradebook #################
-FEATURES['STUDENT_GRADEBOOK'] = True
-if FEATURES.get('STUDENT_GRADEBOOK', False) and "'gradebook'" not in INSTALLED_APPS:
+FEATURES['GRADEBOOK_APP'] = True
+if FEATURES.get('GRADEBOOK_APP', False) and "'gradebook'" not in INSTALLED_APPS:
     INSTALLED_APPS += ('gradebook',)
 
 
 ############# Student Progress #################
-FEATURES['STUDENT_PROGRESS'] = True
-if FEATURES.get('STUDENT_PROGRESS', False) and "'progress'" not in INSTALLED_APPS:
+FEATURES['PROGRESS_APP'] = True
+if FEATURES.get('PROGRESS_APP', False) and "'progress'" not in INSTALLED_APPS:
     INSTALLED_APPS += ('progress',)
+
 
 ############# Projects App #################
 FEATURES['PROJECTS_APP'] = True
 if FEATURES.get('PROJECTS_APP') and "projects" not in INSTALLED_APPS:
     INSTALLED_APPS += ('projects',)
+
 
 ############# Organizations App #################
 FEATURES['ORGANIZATIONS_APP'] = True

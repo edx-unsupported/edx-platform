@@ -5,16 +5,19 @@ Run these tests @ Devstack:
 from datetime import datetime
 import uuid
 
+from django.conf import settings
 from django.contrib.auth.models import Group, User
 from django.test import TestCase
 from django.test.utils import override_settings
 
-from progress.models import CourseModuleCompletion
-from api_manager.management.commands import migrate_stage_prefix
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
-from django.db import connection
+if settings.FEATURES.get('PROGRESS_APP', False):
+    from progress.models import CourseModuleCompletion
+
+from api_manager.management.commands import migrate_stage_prefix
+
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class MigrateCourseIdsTests(TestCase):
@@ -34,25 +37,24 @@ class MigrateCourseIdsTests(TestCase):
         self.bad_style_stage2 = 'i4x://upload'
         self.good_style_stage2 = 'upload'
 
-    def test_migrate_stage_prefix(self):
-        """
-        Test the data migration
-        """
-        # Set up the data to be migrated
-        user = User.objects.create(email='testuser@edx.org', username='testuser', password='testpassword', is_active=True)
-        course_module_completion = CourseModuleCompletion.objects.create(user=user, course_id=self.good_style_course_id, content_id=self.good_style_content_id, stage=self.bad_style_stage)
+    if settings.FEATURES.get('PROGRESS_APP', False):
+        def test_migrate_stage_prefix(self):
+            """
+            Test the data migration
+            """
+            # Set up the data to be migrated
+            user = User.objects.create(email='testuser@edx.org', username='testuser', password='testpassword', is_active=True)
+            course_module_completion = CourseModuleCompletion.objects.create(user=user, course_id=self.good_style_course_id, content_id=self.good_style_content_id, stage=self.bad_style_stage)
 
-        user2 = User.objects.create(email='testuser2@edx.org', username='testuser2', password='testpassword2', is_active=True)
-        course_module_completion2 = CourseModuleCompletion.objects.create(user=user2, course_id=self.good_style_course_id2, content_id=self.good_style_content_id2, stage=self.bad_style_stage2)
+            user2 = User.objects.create(email='testuser2@edx.org', username='testuser2', password='testpassword2', is_active=True)
+            course_module_completion2 = CourseModuleCompletion.objects.create(user=user2, course_id=self.good_style_course_id2, content_id=self.good_style_content_id2, stage=self.bad_style_stage2)
 
+            # Run the data migration
+            migrate_stage_prefix.Command().handle()
 
-        # Run the data migration
-        migrate_stage_prefix.Command().handle()
+            updated_completion = CourseModuleCompletion.objects.get(id=course_module_completion.id)
+            self.assertEqual(updated_completion.stage, self.good_style_stage)
 
-
-        updated_course_module_completion = CourseModuleCompletion.objects.get(id=course_module_completion.id)
-        self.assertEqual(updated_course_module_completion.stage, self.good_style_stage)
-
-        updated_course_module_completion = CourseModuleCompletion.objects.get(id=course_module_completion2.id)
-        self.assertEqual(updated_course_module_completion.stage, self.good_style_stage2)
-        print "Course Module Completion Data Migration Passed"
+            updated_completion = CourseModuleCompletion.objects.get(id=course_module_completion2.id)
+            self.assertEqual(updated_completion.stage, self.good_style_stage2)
+            print "Course Module Completion Data Migration Passed"

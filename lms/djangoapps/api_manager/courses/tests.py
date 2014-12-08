@@ -12,6 +12,7 @@ from urllib import urlencode
 from freezegun import freeze_time
 from dateutil.relativedelta import relativedelta
 
+from django.conf import settings
 from django.contrib.auth.models import Group
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
@@ -974,55 +975,6 @@ class CoursesApiTests(TestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
 
-    def test_courses_users_list_get_filter_by_orgs(self):
-        # create 5 users
-        users = []
-        for i in xrange(1, 6):
-            data = {
-                'email': 'test{}@example.com'.format(i),
-                'username': 'test_user{}'.format(i),
-                'password': 'test_pass',
-                'first_name': 'John{}'.format(i),
-                'last_name': 'Doe{}'.format(i)
-            }
-            response = self.do_post(self.base_users_uri, data)
-            self.assertEqual(response.status_code, 201)
-            users.append(response.data['id'])
-
-        # create 3 organizations each one having one user
-        org_ids = []
-        for i in xrange(1, 4):
-            data = {
-                'name': '{} {}'.format('Test Organization', i),
-                'display_name': '{} {}'.format('Test Org Display Name', i),
-                'users': [users[i]]
-            }
-            response = self.do_post(self.base_organizations_uri, data)
-            self.assertEqual(response.status_code, 201)
-            self.assertGreater(response.data['id'], 0)
-            org_ids.append(response.data['id'])
-
-        # enroll all users in course
-        test_uri = self.base_courses_uri + '/' + self.test_course_id + '/users'
-        for user in users:
-            data = {'user_id': user}
-            response = self.do_post(test_uri, data)
-            self.assertEqual(response.status_code, 201)
-
-        # retrieve all users enrolled in the course
-        response = self.do_get(test_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertGreaterEqual(len(response.data['enrollments']), 5)
-
-        # retrieve users by organization
-        response = self.do_get('{}?organizations={}'.format(test_uri, org_ids[0]))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['enrollments']), 1)
-
-        # retrieve all users enrolled in the course
-        response = self.do_get('{}?organizations={},{},{}'.format(test_uri, org_ids[0], org_ids[1], org_ids[2]))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['enrollments']), 3)
 
     def test_courses_users_list_get_filter_by_groups(self):
         # create 2 groups
@@ -1427,826 +1379,6 @@ class CoursesApiTests(TestCase):
         response = self.do_get(invalid_content_uri)
         self.assertEqual(response.status_code, 404)
 
-    def test_coursemodulecompletions_post(self):
-
-        data = {
-            'email': 'test@example.com',
-            'username': 'test_user',
-            'password': 'test_pass',
-            'first_name': 'John',
-            'last_name': 'Doe'
-        }
-        response = self.do_post(self.base_users_uri, data)
-        self.assertEqual(response.status_code, 201)
-        created_user_id = response.data['id']
-        completions_uri = '{}/{}/completions/'.format(self.base_courses_uri, unicode(self.course.id))
-        stage = 'First'
-        completions_data = {'content_id': unicode(self.course_content.scope_ids.usage_id), 'user_id': created_user_id, 'stage': stage}
-        response = self.do_post(completions_uri, completions_data)
-        self.assertEqual(response.status_code, 201)
-        coursemodulecomp_id = response.data['id']
-        self.assertGreater(coursemodulecomp_id, 0)
-        self.assertEqual(response.data['user_id'], created_user_id)
-        self.assertEqual(response.data['course_id'], unicode(self.course.id))
-        self.assertEqual(response.data['content_id'], unicode(self.course_content.scope_ids.usage_id))
-        self.assertEqual(response.data['stage'], stage)
-        self.assertIsNotNone(response.data['created'])
-        self.assertIsNotNone(response.data['modified'])
-
-        # test to create course completion with same attributes
-        response = self.do_post(completions_uri, completions_data)
-        self.assertEqual(response.status_code, 409)
-
-        # test to create course completion with empty user_id
-        completions_data['user_id'] = None
-        response = self.do_post(completions_uri, completions_data)
-        self.assertEqual(response.status_code, 400)
-
-        # test to create course completion with empty content_id
-        completions_data['content_id'] = None
-        response = self.do_post(completions_uri, completions_data)
-        self.assertEqual(response.status_code, 400)
-
-        # test to create course completion with invalid content_id
-        completions_data['content_id'] = self.test_bogus_content_id
-        response = self.do_post(completions_uri, completions_data)
-        self.assertEqual(response.status_code, 400)
-
-    def test_course_module_completions_post_invalid_course(self):
-        completions_uri = '{}/{}/completions/'.format(self.base_courses_uri, self.test_bogus_course_id)
-        completions_data = {'content_id': unicode(self.course_content.scope_ids.usage_id), 'user_id': self.users[0].id}
-        response = self.do_post(completions_uri, completions_data)
-        self.assertEqual(response.status_code, 404)
-
-    def test_course_module_completions_post_invalid_content(self):
-        completions_uri = '{}/{}/completions/'.format(self.base_courses_uri, self.test_course_id)
-        completions_data = {'content_id': self.test_bogus_content_id, 'user_id': self.users[0].id}
-        response = self.do_post(completions_uri, completions_data)
-        self.assertEqual(response.status_code, 400)
-
-    def test_coursemodulecompletions_filters(self):
-        completion_uri = '{}/{}/completions/'.format(self.base_courses_uri, unicode(self.course.id))
-        for i in xrange(1, 3):
-            data = {
-                'email': 'test{}@example.com'.format(i),
-                'username': 'test_user{}'.format(i),
-                'password': 'test_pass',
-                'first_name': 'John{}'.format(i),
-                'last_name': 'Doe{}'.format(i)
-            }
-            response = self.do_post(self.base_users_uri, data)
-            self.assertEqual(response.status_code, 201)
-            created_user_id = response.data['id']
-
-        for i in xrange(1, 26):
-            local_content_name = 'Video_Sequence{}'.format(i)
-            local_content = ItemFactory.create(
-                category="videosequence",
-                parent_location=self.chapter.location,
-                data=self.test_data,
-                display_name=local_content_name
-            )
-            content_id = unicode(local_content.scope_ids.usage_id)
-            if i < 25:
-                content_id = unicode(self.course_content.scope_ids.usage_id) + str(i)
-                stage = None
-            else:
-                content_id = unicode(self.course_content.scope_ids.usage_id)
-                stage = 'Last'
-            completions_data = {'content_id': content_id, 'user_id': created_user_id, 'stage': stage}
-            response = self.do_post(completion_uri, completions_data)
-            self.assertEqual(response.status_code, 201)
-
-        #filter course module completion by user
-        user_filter_uri = '{}?user_id={}&page_size=10&page=3'.format(completion_uri, created_user_id)
-        response = self.do_get(user_filter_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['count'], 25)
-        self.assertEqual(len(response.data['results']), 5)
-        self.assertEqual(response.data['num_pages'], 3)
-
-        #filter course module completion by multiple user ids
-        user_filter_uri = '{}?user_id={}'.format(completion_uri, str(created_user_id) + ',10001,10003')
-        response = self.do_get(user_filter_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['count'], 25)
-        self.assertEqual(len(response.data['results']), 20)
-        self.assertEqual(response.data['num_pages'], 2)
-
-        #filter course module completion by user who has not completed any course module
-        user_filter_uri = '{}?user_id={}'.format(completion_uri, 10001)
-        response = self.do_get(user_filter_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['results']), 0)
-
-        #filter course module completion by course_id
-        course_filter_uri = '{}?course_id={}&page_size=10'.format(completion_uri, unicode(self.course.id))
-        response = self.do_get(course_filter_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertGreaterEqual(response.data['count'], 25)
-        self.assertEqual(len(response.data['results']), 10)
-
-        #filter course module completion by content_id
-        content_id = {'content_id': '{}1'.format(unicode(self.course_content.scope_ids.usage_id))}
-        content_filter_uri = '{}?{}'.format(completion_uri, urlencode(content_id))
-        response = self.do_get(content_filter_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['count'], 1)
-        self.assertEqual(len(response.data['results']), 1)
-
-        #filter course module completion by invalid content_id
-        content_id = {'content_id': '{}1'.format(self.test_bogus_content_id)}
-        content_filter_uri = '{}?{}'.format(completion_uri, urlencode(content_id))
-        response = self.do_get(content_filter_uri)
-        self.assertEqual(response.status_code, 404)
-
-        #filter course module completion by stage
-        content_filter_uri = '{}?stage={}'.format(completion_uri, 'Last')
-        response = self.do_get(content_filter_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['count'], 1)
-        self.assertEqual(len(response.data['results']), 1)
-
-    def test_coursemodulecompletions_get_invalid_course(self):
-        completion_uri = '{}/{}/completions/'.format(self.base_courses_uri, self.test_bogus_course_id)
-        response = self.do_get(completion_uri)
-        self.assertEqual(response.status_code, 404)
-
-    def test_courses_metrics_social_get(self):
-        test_uri = '{}/{}/metrics/social/'.format(self.base_courses_uri, self.test_course_id)
-        response = self.do_get(test_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(len(response.data.keys()), 2)
-        users = response.data['users']
-        self.assertTrue(users.get('1'))
-        self.assertTrue(users.get('2'))
-
-        # make the first user an observer to asset that its content is being filtered out from
-        # the aggregates
-        allow_access(self.course, self.users[0], 'observer')
-
-        response = self.do_get(test_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(len(response.data.keys()), 1)
-        users = response.data['users']
-        self.assertFalse(users.get('1'))
-        self.assertTrue(users.get('2'))
-
-    def test_courses_metrics_grades_leaders_list_get(self):
-        # make the last user an observer to asset that its content is being filtered out from
-        # the aggregates
-        expected_course_average = 0.398
-        allow_access(self.course, self.users[USER_COUNT-1], 'observer')
-
-        item = ItemFactory.create(
-            parent_location=self.chapter.location,
-            category='mentoring',
-            data=StringResponseXMLFactory().build_xml(answer='foo'),
-            display_name=u"test problem same points",
-            metadata={'rerandomize': 'always', 'graded': True, 'format': "Midterm Exam"}
-        )
-
-        points_scored = 2.25
-        points_possible = 4
-        user = self.users[USER_COUNT - 3]
-        module = self.get_module_for_user(user, self.course, item)
-        grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user.id}
-        module.system.publish(module, 'grade', grade_dict)
-
-        points_scored = 2.25
-        points_possible = 4
-        user = self.users[USER_COUNT - 2]
-        module = self.get_module_for_user(user, self.course, item)
-        grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user.id}
-        module.system.publish(module, 'grade', grade_dict)
-
-        test_uri = '{}/{}/metrics/grades/leaders/'.format(self.base_courses_uri, self.test_course_id)
-        response = self.do_get(test_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['leaders']), 3)
-        self.assertEqual(response.data['leaders'][0]['username'], 'testuser4')
-        self.assertEqual(response.data['course_avg'], expected_course_average)
-
-        count_filter_test_uri = '{}?count=4'.format(test_uri)
-        response = self.do_get(count_filter_test_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['leaders']), 4)
-
-        # Filter by user_id, include a user with the exact same score
-        user200 = UserFactory.create(username="testuser200", profile='test')
-        CourseEnrollmentFactory.create(user=user200, course_id=self.course.id)
-
-        self.midterm = ItemFactory.create(
-            parent_location=self.chapter.location,
-            category='problem',
-            data=StringResponseXMLFactory().build_xml(answer='bar'),
-            display_name='Problem 200',
-            metadata={'rerandomize': 'always', 'graded': True, 'format': 'Midterm Exam'}
-        )
-        points_scored = 100
-        points_possible = 100
-        module = self.get_module_for_user(user200, self.course, self.midterm)
-        grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user200.id}
-        module.system.publish(module, 'grade', grade_dict)
-        StudentModuleFactory.create(
-            course_id=self.course.id,
-            module_type='sequential',
-            module_state_key=self.midterm.location,
-        )
-        self.final = ItemFactory.create(
-            parent_location=self.chapter.location,
-            category='problem',
-            data=StringResponseXMLFactory().build_xml(answer='bar'),
-            display_name='Problem 201',
-            metadata={'rerandomize': 'always', 'graded': True, 'format': 'Final Exam'}
-        )
-        points_scored = 100
-        points_possible = 100
-        module = self.get_module_for_user(user200, self.course, self.final)
-        grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user200.id}
-        module.system.publish(module, 'grade', grade_dict)
-        StudentModuleFactory.create(
-            course_id=self.course.id,
-            module_type='sequential',
-            module_state_key=self.final.location,
-        )
-        points_scored = 50
-        points_possible = 100
-        module = self.get_module_for_user(user200, self.course, item)
-        grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user200.id}
-        module.system.publish(module, 'grade', grade_dict)
-
-        user_filter_uri = '{}?user_id={}&count=10'.format(test_uri, self.users[1].id)
-        response = self.do_get(user_filter_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['leaders']), 6)
-        self.assertEqual(response.data['course_avg'], 0.378)
-        self.assertEqual(response.data['user_position'], 4)
-        self.assertEqual(response.data['user_grade'], 0.28)
-
-        # Filter by user who has never accessed a course module
-        test_user = UserFactory.create(username="testusernocoursemod")
-        CourseEnrollmentFactory.create(user=test_user, course_id=self.course.id)
-        user_filter_uri = '{}?user_id={}'.format(test_uri, test_user.id)
-        response = self.do_get(user_filter_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['user_grade'], 0)
-        self.assertEqual(response.data['user_position'], 7)
-        # Also, with this new user now added the course average should be different
-        self.assertNotEqual(response.data['course_avg'], expected_course_average)
-        rounded_avg = float("{0:.2f}".format(response.data['course_avg']))
-        self.assertEqual(rounded_avg, 0.32)
-
-        # test with bogus course
-        bogus_test_uri = '{}/{}/metrics/grades/leaders/'.format(self.base_courses_uri, self.test_bogus_course_id)
-        response = self.do_get(bogus_test_uri)
-        self.assertEqual(response.status_code, 404)
-
-    def test_courses_metrics_grades_leaders_list_get_empty_course(self):
-        test_uri = '{}/{}/metrics/grades/leaders/'.format(self.base_courses_uri, unicode(self.empty_course.id))
-        response = self.do_get(test_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['course_avg'], 0)
-        self.assertEqual(len(response.data['leaders']), 0)
-
-    def test_courses_completions_leaders_list_get(self):
-        course = CourseFactory.create(
-            number='4033',
-            name='leaders_by_completions',
-            start=datetime(2014, 9, 16, 14, 30),
-            end=datetime(2015, 1, 16)
-        )
-
-        chapter = ItemFactory.create(
-            category="chapter",
-            parent_location=course.location,
-            data=self.test_data,
-            due=datetime(2014, 5, 16, 14, 30),
-            display_name="Overview"
-        )
-
-        sub_section = ItemFactory.create(
-            parent_location=chapter.location,
-            category="sequential",
-            display_name=u"test subsection",
-        )
-        unit = ItemFactory.create(
-            parent_location=sub_section.location,
-            category="vertical",
-            metadata={'graded': True, 'format': 'Homework'},
-            display_name=u"test unit",
-        )
-
-        # create 5 users
-        USER_COUNT = 5
-        users = [UserFactory.create(username="testuser_cctest" + str(__), profile='test') for __ in xrange(USER_COUNT)]
-
-        for user in users:
-            CourseEnrollmentFactory.create(user=user, course_id=course.id)
-            CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
-
-        test_course_id = unicode(course.id)
-        completion_uri = '{}/{}/completions/'.format(self.base_courses_uri, test_course_id)
-        leaders_uri = '{}/{}/metrics/completions/leaders/'.format(self.base_courses_uri, test_course_id)
-        # Make last user as observer to make sure that data is being filtered out
-        allow_access(course, users[USER_COUNT-1], 'observer')
-
-        contents = []
-        for i in xrange(1, 26):
-            local_content_name = 'Video_Sequence{}'.format(i)
-            local_content = ItemFactory.create(
-                category="videosequence",
-                parent_location=unit.location,
-                data=self.test_data,
-                display_name=local_content_name
-            )
-            contents.append(local_content)
-            if i < 3:
-                user_id = users[0].id
-            elif i < 10:
-                user_id = users[1].id
-            elif i < 17:
-                user_id = users[2].id
-            else:
-                user_id = users[3].id
-
-            content_id = unicode(local_content.scope_ids.usage_id)
-            completions_data = {'content_id': content_id, 'user_id': user_id}
-            response = self.do_post(completion_uri, completions_data)
-            self.assertEqual(response.status_code, 201)
-
-            # observer should complete everything, so we can assert that it is filtered out
-            response = self.do_post(completion_uri, {
-                'content_id': content_id, 'user_id': users[USER_COUNT-1].id
-            })
-            self.assertEqual(response.status_code, 201)
-
-        expected_course_avg = '25.000'
-        test_uri = '{}?count=6'.format(leaders_uri)
-        response = self.do_get(test_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['leaders']), 4)
-        self.assertEqual('{0:.3f}'.format(response.data['course_avg']), expected_course_avg)
-
-        # without count filter and user_id
-        test_uri = '{}?user_id={}'.format(leaders_uri, users[1].id)
-        response = self.do_get(test_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['leaders']), 4)
-        self.assertEqual(response.data['position'], 2)
-        self.assertEqual('{0:.3f}'.format(response.data['completions']), '28.000')
-
-        # with skipleaders filter
-        test_uri = '{}?user_id={}&skipleaders=true'.format(leaders_uri, users[1].id)
-        response = self.do_get(test_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertIsNone(response.data.get('leaders', None))
-        self.assertEqual('{0:.3f}'.format(response.data['course_avg']), expected_course_avg)
-        self.assertEqual('{0:.3f}'.format(response.data['completions']), '28.000')
-
-        # test with bogus course
-        test_uri = '{}/{}/metrics/completions/leaders/'.format(self.base_courses_uri, self.test_bogus_course_id)
-        response = self.do_get(test_uri)
-        self.assertEqual(response.status_code, 404)
-
-        #filter course module completion by organization
-        data = {
-            'name': 'Test Organization',
-            'display_name': 'Test Org Display Name',
-            'users': [users[1].id]
-        }
-        response = self.do_post(self.base_organizations_uri, data)
-        self.assertEqual(response.status_code, 201)
-        test_uri = '{}?organizations={}'.format(leaders_uri, response.data['id'])
-        response = self.do_get(test_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['leaders']), 1)
-        self.assertEqual(response.data['leaders'][0]['id'], users[1].id)
-        self.assertEqual('{0:.3f}'.format(response.data['leaders'][0]['completions']), '28.000')
-        self.assertEqual('{0:.3f}'.format(response.data['course_avg']), '28.000')
-
-        # test with unknown user
-        test_uri = '{}?user_id={}&skipleaders=true'.format(leaders_uri, '909999')
-        response = self.do_get(test_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertIsNone(response.data.get('leaders', None))
-        self.assertEqual(response.data['position'], 0)
-        self.assertEqual(response.data['completions'], 0)
-
-        # test a case where completions are greater than total course modules. it should not be more than 100
-        contents.append(self.course_content)
-        for content in contents[2:]:
-            user_id = users[0].id
-            content_id = unicode(content.scope_ids.usage_id)
-            completions_data = {'content_id': content_id, 'user_id': user_id}
-            response = self.do_post(completion_uri, completions_data)
-            self.assertEqual(response.status_code, 201)
-
-        test_uri = '{}?user_id={}'.format(leaders_uri, users[0].id)
-        response = self.do_get(test_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual('{0:.3f}'.format(response.data['completions']), '100.000')
-
-
-    def test_courses_metrics_grades_list_get(self):
-        # Retrieve the list of grades for this course
-        # All the course/item/user scaffolding was handled in Setup
-        test_uri = '{}/{}/metrics/grades'.format(self.base_courses_uri, self.test_course_id)
-        response = self.do_get(test_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertGreater(response.data['grade_average'], 0)
-        self.assertGreater(response.data['grade_maximum'], 0)
-        self.assertGreater(response.data['grade_minimum'], 0)
-        self.assertEqual(response.data['grade_count'], USER_COUNT)
-        self.assertGreater(response.data['course_grade_average'], 0)
-        self.assertGreater(response.data['course_grade_maximum'], 0)
-        self.assertGreater(response.data['course_grade_minimum'], 0)
-        self.assertEqual(response.data['course_grade_count'], USER_COUNT)
-        self.assertEqual(len(response.data['grades']), USER_COUNT)
-
-        # Filter by user_id
-        user_filter_uri = '{}?user_id=1,3'.format(test_uri)
-        response = self.do_get(user_filter_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertGreater(response.data['grade_average'], 0)
-        self.assertGreater(response.data['grade_maximum'], 0)
-        self.assertGreater(response.data['grade_minimum'], 0)
-        self.assertEqual(response.data['grade_count'], 2)
-        self.assertGreater(response.data['course_grade_average'], 0)
-        self.assertGreater(response.data['course_grade_maximum'], 0)
-        self.assertGreater(response.data['course_grade_minimum'], 0)
-        self.assertEqual(response.data['course_grade_count'], USER_COUNT)
-        self.assertEqual(len(response.data['grades']), 2)
-
-        # make the last user an observer to asset that its content is being filtered out from
-        # the aggregates
-        user_index = USER_COUNT - 1
-        allow_access(self.course, self.users[user_index], 'observer')
-        test_uri = '{}/{}/metrics/grades'.format(self.base_courses_uri, self.test_course_id)
-        response = self.do_get(test_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['grades']), user_index)
-
-    def test_courses_metrics_grades_list_get_empty_course(self):
-        # Retrieve the list of grades for this course
-        # All the course/item/user scaffolding was handled in Setup
-        test_uri = '{}/{}/metrics/grades'.format(self.base_courses_uri, unicode(self.empty_course.id))
-        response = self.do_get(test_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['grade_count'], 0)
-        self.assertEqual(response.data['course_grade_maximum'], 0)
-
-    def test_courses_grades_list_get_invalid_course(self):
-        # Retrieve the list of grades for this course
-        # All the course/item/user scaffolding was handled in Setup
-        test_uri = '{}/{}/grades'.format(self.base_courses_uri, self.test_bogus_course_id)
-        response = self.do_get(test_uri)
-        self.assertEqual(response.status_code, 404)
-
-    def test_course_project_list(self):
-        projects_uri = self.base_projects_uri
-
-        for i in xrange(0, 25):
-            local_content_name = 'Video_Sequence{}'.format(i)
-            local_content = ItemFactory.create(
-                category="videosequence",
-                parent_location=self.chapter.location,
-                data=self.test_data,
-                display_name=local_content_name
-            )
-            # location:MITx+999+Robot_Super_Course+videosequence+Video_Sequence0
-            data = {
-                'content_id': unicode(local_content.scope_ids.usage_id),
-                'course_id': self.test_course_id
-            }
-            response = self.do_post(projects_uri, data)
-            self.assertEqual(response.status_code, 201)
-
-        response = self.do_get('{}/{}/projects/?page_size=10'.format(self.base_courses_uri, self.test_course_id))
-        self.assertEqual(response.data['count'], 25)
-        self.assertEqual(len(response.data['results']), 10)
-        self.assertEqual(response.data['num_pages'], 3)
-
-    def test_courses_data_metrics(self):
-        test_uri = self.base_courses_uri + '/' + self.test_course_id + '/users'
-        completion_uri = '{}/{}/completions/'.format(self.base_courses_uri, unicode(self.course.id))
-        test_user_uri = self.base_users_uri
-        users_to_add = 5
-        for i in xrange(0, users_to_add):
-            data = {
-                'email': 'test{}@example.com'.format(i), 'username': 'test_user{}'.format(i),
-                'password': 'test_password'
-            }
-            # create a new user
-            response = self.do_post(test_user_uri, data)
-            self.assertEqual(response.status_code, 201)
-            created_user_id = response.data['id']
-
-            # now enroll this user in the course
-            post_data = {'user_id': created_user_id}
-            response = self.do_post(test_uri, post_data)
-            self.assertEqual(response.status_code, 201)
-
-        #create an organization
-        data = {
-            'name': 'Test Organization',
-            'display_name': 'Test Org Display Name',
-            'users': [created_user_id]
-        }
-        response = self.do_post(self.base_organizations_uri, data)
-        self.assertEqual(response.status_code, 201)
-        org_id = response.data['id']
-
-        for i in xrange(1, 5):
-            local_content_name = 'Video_Sequence{}'.format(i)
-            local_content = ItemFactory.create(
-                category="videosequence",
-                parent_location=self.chapter.location,
-                data=self.test_data,
-                display_name=local_content_name
-            )
-            content_id = unicode(local_content.scope_ids.usage_id)
-            completions_data = {'content_id': content_id, 'user_id': created_user_id, 'stage': None}
-            response = self.do_post(completion_uri, completions_data)
-            self.assertEqual(response.status_code, 201)
-
-        # get course metrics
-        course_metrics_uri = '{}/{}/metrics/'.format(self.base_courses_uri, self.test_course_id)
-        response = self.do_get(course_metrics_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['users_enrolled'], users_to_add + USER_COUNT)
-        self.assertGreaterEqual(response.data['users_started'], 1)
-        self.assertIsNotNone(response.data['grade_cutoffs'])
-        self.assertEqual(response.data['num_threads'], 5)
-        self.assertEqual(response.data['num_active_threads'], 3)
-
-        # get course metrics by organization
-        course_metrics_uri = '{}/{}/metrics/?organization={}'.format(self.base_courses_uri, self.test_course_id, org_id)
-        response = self.do_get(course_metrics_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['users_enrolled'], 1)
-        self.assertGreaterEqual(response.data['users_started'], 1)
-
-        # test with bogus course
-        course_metrics_uri = '{}/{}/metrics/'.format(self.base_courses_uri, self.test_bogus_course_id)
-        response = self.do_get(course_metrics_uri)
-        self.assertEqual(response.status_code, 404)
-
-    @mock.patch.dict("django.conf.settings.FEATURES", {'MARK_PROGRESS_ON_GRADING_EVENT': True,
-                                                       'SIGNAL_ON_SCORE_CHANGED': True,
-                                                       'STUDENT_GRADEBOOK': True,
-                                                       'STUDENT_PROGRESS': True})
-    def test_courses_data_time_series_metrics(self):
-        course = CourseFactory.create(
-            number='3033',
-            name='metrics_in_timeseries',
-            start=datetime(2014, 9, 16, 14, 30),
-            end=datetime(2015, 1, 16)
-        )
-
-        chapter = ItemFactory.create(
-            category="chapter",
-            parent_location=course.location,
-            data=self.test_data,
-            due=datetime(2015, 5, 16, 14, 30),
-            display_name="Overview"
-        )
-
-        sub_section = ItemFactory.create(
-            parent_location=chapter.location,
-            category="sequential",
-            display_name=u"test subsection",
-        )
-        unit = ItemFactory.create(
-            parent_location=sub_section.location,
-            category="vertical",
-            metadata={'graded': True, 'format': 'Homework'},
-            display_name=u"test unit",
-        )
-
-        item = ItemFactory.create(
-            parent_location=unit.location,
-            category='problem',
-            data=StringResponseXMLFactory().build_xml(answer='bar'),
-            display_name='Problem to test timeseries',
-            metadata={'rerandomize': 'always', 'graded': True, 'format': 'Midterm Exam'}
-        )
-
-        item2 = ItemFactory.create(
-            parent_location=unit.location,
-            category='problem 2',
-            data=StringResponseXMLFactory().build_xml(answer='bar'),
-            display_name='Problem 2 for test timeseries',
-            metadata={'rerandomize': 'always', 'graded': True, 'format': 'Final Exam'}
-        )
-
-        # create 10 users
-        USER_COUNT = 25
-        users = [UserFactory.create(username="testuser_tstest" + str(__), profile='test') for __ in xrange(USER_COUNT)]
-        user_ids = [user.id for user in users]
-
-        #create an organization
-        data = {
-            'name': 'Test Organization',
-            'display_name': 'Test Org Display Name',
-            'users': user_ids
-        }
-        response = self.do_post(self.base_organizations_uri, data)
-        self.assertEqual(response.status_code, 201)
-        org_id = response.data['id']
-
-        # enroll users with time set to 28 days ago
-        enrolled_time = timezone.now() + relativedelta(days=-25)
-        with freeze_time(enrolled_time):
-            for user in users:
-                CourseEnrollmentFactory.create(user=user, course_id=course.id)
-
-        points_scored = .25
-        points_possible = 1
-        grade_dict = {'value': points_scored, 'max_value': points_possible}
-
-        # Mark users as those who have started course
-        for j, user in enumerate(users):
-            complete_time = timezone.now() + relativedelta(days=-(USER_COUNT - j))
-            with freeze_time(complete_time):
-                module = self.get_module_for_user(user, course, item)
-                grade_dict['user_id'] = user.id
-                module.system.publish(module, 'grade', grade_dict)
-
-                # Last 2 users as those who have completed
-                if j >= USER_COUNT - 2:
-                    try:
-                        sg_entry = StudentGradebook.objects.get(user=user, course_id=course.id)
-                        sg_entry.grade = 0.9
-                        sg_entry.proforma_grade = 0.91
-                        sg_entry.save()
-                    except StudentGradebook.DoesNotExist:
-                        StudentGradebook.objects.create(user=user, course_id=course.id, grade=0.9,
-                                                        proforma_grade=0.91)
-
-        # make more completions
-        for j, user in enumerate(users[:5]):
-            complete_time = timezone.now() + relativedelta(days=-(USER_COUNT - j))
-            with freeze_time(complete_time):
-                module = self.get_module_for_user(user, course, item2)
-                grade_dict['user_id'] = user.id
-                module.system.publish(module, 'grade', grade_dict)
-
-        test_course_id = unicode(course.id)
-        # get course metrics in time series format
-        end_date = datetime.now().date()
-        start_date = end_date + relativedelta(days=-4)
-        course_metrics_uri = '{}/{}/time-series-metrics/?start_date={}&end_date={}&organization={}'\
-            .format(self.base_courses_uri,
-                    test_course_id,
-                    start_date,
-                    end_date,
-                    org_id)
-
-        response = self.do_get(course_metrics_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['users_not_started']), 5)
-        total_not_started = sum([not_started[1] for not_started in response.data['users_not_started']])
-        self.assertEqual(total_not_started, 6)
-        self.assertEqual(len(response.data['users_started']), 5)
-        total_started = sum([started[1] for started in response.data['users_started']])
-        self.assertEqual(total_started, 4)
-        self.assertEqual(len(response.data['users_completed']), 5)
-        total_completed = sum([completed[1] for completed in response.data['users_completed']])
-        self.assertEqual(total_completed, 2)
-        self.assertEqual(len(response.data['modules_completed']), 5)
-        total_modules_completed = sum([completed[1] for completed in response.data['modules_completed']])
-        self.assertEqual(total_modules_completed, 4)
-        self.assertEqual(len(response.data['active_users']), 5)
-        total_active = sum([active[1] for active in response.data['active_users']])
-        self.assertEqual(total_active, 5)
-        self.assertEqual(response.data['users_enrolled'][0][1], 0)
-
-        # get modules completed for first 5 days
-        start_date = datetime.now().date() + relativedelta(days=-USER_COUNT)
-        end_date = datetime.now().date() + relativedelta(days=-(USER_COUNT - 4))
-        course_metrics_uri = '{}/{}/time-series-metrics/?start_date={}&end_date={}'.format(self.base_courses_uri,
-                                                                                           test_course_id,
-                                                                                           start_date,
-                                                                                           end_date)
-
-        response = self.do_get(course_metrics_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['modules_completed']), 5)
-        total_modules_completed = sum([completed[1] for completed in response.data['modules_completed']])
-        self.assertEqual(total_modules_completed, 10)
-        total_enrolled = sum([enrolled[1] for enrolled in response.data['users_enrolled']])
-        self.assertEqual(total_enrolled, 25)
-
-        # metrics with weeks as interval
-        end_date = datetime.now().date()
-        start_date = end_date + relativedelta(weeks=-2)
-        course_metrics_uri = '{}/{}/time-series-metrics/?start_date={}&end_date={}&' \
-                             'interval=weeks'.format(self.base_courses_uri,
-                                                     test_course_id,
-                                                     start_date,
-                                                     end_date)
-
-        response = self.do_get(course_metrics_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertGreaterEqual(len(response.data['users_not_started']), 2)
-        self.assertGreaterEqual(len(response.data['users_started']), 2)
-        self.assertGreaterEqual(len(response.data['users_completed']), 2)
-
-        # metrics with months as interval
-        start_date = end_date + relativedelta(months=-3)
-        end_date = datetime.now().date() + relativedelta(months=1)
-        course_metrics_uri = '{}/{}/time-series-metrics/?start_date={}&end_date={}&' \
-                             'interval=months'.format(self.base_courses_uri,
-                                                      test_course_id,
-                                                      start_date,
-                                                      end_date)
-
-        response = self.do_get(course_metrics_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['users_not_started']), 5)
-        self.assertEqual(len(response.data['users_started']), 5)
-        self.assertEqual(len(response.data['users_completed']), 5)
-
-        # test without end_date
-        course_metrics_uri = '{}/{}/time-series-metrics/?start_date={}'.format(self.base_courses_uri,
-                                                                                           test_course_id,
-                                                                                           start_date)
-        response = self.do_get(course_metrics_uri)
-        self.assertEqual(response.status_code, 400)
-
-        # test with unsupported interval
-        course_metrics_uri = '{}/{}/time-series-metrics/?start_date={}&end_date={}&interval=hours'\
-            .format(self.base_courses_uri,
-                    test_course_id,
-                    start_date,
-                    end_date)
-
-        response = self.do_get(course_metrics_uri)
-        self.assertEqual(response.status_code, 400)
-
-        # Test after un-enrolling some users
-        test_uri = self.base_courses_uri + '/' + test_course_id + '/users'
-        for j, user in enumerate(users[-5:]):
-            response = self.do_delete('{}/{}'.format(test_uri, user.id))
-            self.assertEqual(response.status_code, 204)
-        end_date = datetime.now().date()
-        start_date = end_date + relativedelta(days=-4)
-        course_metrics_uri = '{}/{}/time-series-metrics/?start_date={}&end_date={}'\
-            .format(self.base_courses_uri,
-                    test_course_id,
-                    start_date,
-                    end_date)
-
-        response = self.do_get(course_metrics_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['users_not_started']), 5)
-        total_not_started = sum([not_started[1] for not_started in response.data['users_not_started']])
-        self.assertEqual(total_not_started, 0)
-        self.assertEqual(len(response.data['users_started']), 5)
-        total_started = sum([started[1] for started in response.data['users_started']])
-        self.assertEqual(total_started, 0)
-        self.assertEqual(len(response.data['users_completed']), 5)
-        total_completed = sum([completed[1] for completed in response.data['users_completed']])
-        self.assertEqual(total_completed, 0)
-        self.assertEqual(len(response.data['modules_completed']), 5)
-        total_modules_completed = sum([completed[1] for completed in response.data['modules_completed']])
-        self.assertEqual(total_modules_completed, 0)
-        self.assertEqual(len(response.data['active_users']), 5)
-        total_active = sum([active[1] for active in response.data['active_users']])
-        self.assertEqual(total_active, 0)
-
-    def test_course_workgroups_list(self):
-        projects_uri = self.base_projects_uri
-        data = {
-            'course_id': self.test_course_id,
-            'content_id': 'self.test_course_content_id'
-        }
-        response = self.do_post(projects_uri, data)
-        self.assertEqual(response.status_code, 201)
-        project_id = response.data['id']
-
-        test_workgroups_uri = self.base_workgroups_uri
-        for i in xrange(1, 12):
-            data = {
-                'name': '{} {}'.format('Workgroup', i),
-                'project': project_id
-            }
-            response = self.do_post(test_workgroups_uri, data)
-            self.assertEqual(response.status_code, 201)
-
-        # get workgroups associated to course
-        test_uri = '{}/{}/workgroups/?page_size=10'.format(self.base_courses_uri, self.test_course_id)
-        response = self.do_get(test_uri)
-        self.assertEqual(response.data['count'], 11)
-        self.assertEqual(len(response.data['results']), 10)
-        self.assertEqual(response.data['num_pages'], 2)
-
-        # test with bogus course
-        test_uri = '{}/{}/workgroups/'.format(self.base_courses_uri, self.test_bogus_course_id)
-        response = self.do_get(test_uri)
-        self.assertEqual(response.status_code, 404)
-
     def test_course_users_count_by_city(self):
         test_uri = self.base_users_uri
 
@@ -2402,11 +1534,8 @@ class CoursesApiTests(TestCase):
 
         # Confirm this user no longer has forum moderation permissions
         role = Role.objects.get(course_id=self.course.id, name=FORUM_ROLE_MODERATOR)
-        try:
-            has_role = role.users.get(id=self.users[0].id)
-            self.assertTrue(False)
-        except ObjectDoesNotExist:
-            pass
+        user_role_removed = role.users.filter(id=self.users[0].id)
+        self.assertEqual(len(user_role_removed), 0)  # should bomb if role returns a value
 
     def test_courses_roles_users_detail_delete_invalid_course(self):
         test_uri = '{}/{}/roles/'.format(self.base_courses_uri, self.test_bogus_course_id)
@@ -2424,4 +1553,948 @@ class CoursesApiTests(TestCase):
         test_uri = '{}/{}/roles/'.format(self.base_courses_uri, unicode(self.course.id))
         delete_uri = '{}invalid_role/users/{}'.format(test_uri, self.users[0].id)
         response = self.do_delete(delete_uri)
+        self.assertEqual(response.status_code, 404)
+
+    if settings.FEATURES.get('GRADEBOOK_APP', False):
+        def test_courses_metrics_grades_leaders_list_get(self):  # pylint: disable=R0915
+            # make the last user an observer to asset that its content is being filtered out from
+            # the aggregates
+            expected_course_average = 0.398
+            allow_access(self.course, self.users[USER_COUNT - 1], 'observer')
+
+            item = ItemFactory.create(
+                parent_location=self.chapter.location,
+                category='mentoring',
+                data=StringResponseXMLFactory().build_xml(answer='foo'),
+                display_name=u"test problem same points",
+                metadata={'rerandomize': 'always', 'graded': True, 'format': "Midterm Exam"}
+            )
+
+            points_scored = 2.25
+            points_possible = 4
+            user = self.users[USER_COUNT - 3]
+            module = self.get_module_for_user(user, self.course, item)
+            grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user.id}
+            module.system.publish(module, 'grade', grade_dict)
+
+            points_scored = 2.25
+            points_possible = 4
+            user = self.users[USER_COUNT - 2]
+            module = self.get_module_for_user(user, self.course, item)
+            grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user.id}
+            module.system.publish(module, 'grade', grade_dict)
+
+            test_uri = '{}/{}/metrics/grades/leaders/'.format(self.base_courses_uri, self.test_course_id)
+            response = self.do_get(test_uri)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.data['leaders']), 3)
+            self.assertEqual(response.data['leaders'][0]['username'], 'testuser4')
+            self.assertEqual(response.data['course_avg'], expected_course_average)
+
+            count_filter_test_uri = '{}?count=4'.format(test_uri)
+            response = self.do_get(count_filter_test_uri)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.data['leaders']), 4)
+
+            # Filter by user_id, include a user with the exact same score
+            user200 = UserFactory.create(username="testuser200", profile='test')
+            CourseEnrollmentFactory.create(user=user200, course_id=self.course.id)
+
+            midterm_exam = ItemFactory.create(
+                parent_location=self.chapter.location,
+                category='problem',
+                data=StringResponseXMLFactory().build_xml(answer='bar'),
+                display_name='Problem 200',
+                metadata={'rerandomize': 'always', 'graded': True, 'format': 'Midterm Exam'}
+            )
+            points_scored = 100
+            points_possible = 100
+            module = self.get_module_for_user(user200, self.course, midterm_exam)
+            grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user200.id}
+            module.system.publish(module, 'grade', grade_dict)
+            StudentModuleFactory.create(
+                course_id=self.course.id,
+                module_type='sequential',
+                module_state_key=midterm_exam.location,
+            )
+
+            final_exam = ItemFactory.create(
+                parent_location=self.chapter.location,
+                category='problem',
+                data=StringResponseXMLFactory().build_xml(answer='bar'),
+                display_name='Problem 201',
+                metadata={'rerandomize': 'always', 'graded': True, 'format': 'Final Exam'}
+            )
+            points_scored = 100
+            points_possible = 100
+            module = self.get_module_for_user(user200, self.course, final_exam)
+            grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user200.id}
+            module.system.publish(module, 'grade', grade_dict)
+            StudentModuleFactory.create(
+                course_id=self.course.id,
+                module_type='sequential',
+                module_state_key=final_exam.location,
+            )
+
+            points_scored = 50
+            points_possible = 100
+            module = self.get_module_for_user(user200, self.course, item)
+            grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user200.id}
+            module.system.publish(module, 'grade', grade_dict)
+
+            user_filter_uri = '{}?user_id={}&count=10'.format(test_uri, self.users[1].id)
+            response = self.do_get(user_filter_uri)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.data['leaders']), 6)
+            self.assertEqual(response.data['course_avg'], 0.378)
+            self.assertEqual(response.data['user_position'], 4)
+            self.assertEqual(response.data['user_grade'], 0.28)
+
+            # Filter by user who has never accessed a course module
+            test_user = UserFactory.create(username="testusernocoursemod")
+            CourseEnrollmentFactory.create(user=test_user, course_id=self.course.id)
+            user_filter_uri = '{}?user_id={}'.format(test_uri, test_user.id)
+            response = self.do_get(user_filter_uri)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.data['user_grade'], 0)
+            self.assertEqual(response.data['user_position'], 7)
+            # Also, with this new user now added the course average should be different
+            self.assertNotEqual(response.data['course_avg'], expected_course_average)
+            rounded_avg = float("{0:.2f}".format(response.data['course_avg']))
+            self.assertEqual(rounded_avg, 0.32)
+
+            # test with bogus course
+            bogus_test_uri = '{}/{}/metrics/grades/leaders/'.format(self.base_courses_uri, self.test_bogus_course_id)
+            response = self.do_get(bogus_test_uri)
+            self.assertEqual(response.status_code, 404)
+
+        def test_courses_metrics_grades_leaders_list_get_empty_course(self):
+            test_uri = '{}/{}/metrics/grades/leaders/'.format(self.base_courses_uri, unicode(self.empty_course.id))
+            response = self.do_get(test_uri)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.data['course_avg'], 0)
+            self.assertEqual(len(response.data['leaders']), 0)
+
+        def test_courses_metrics_grades_list_get(self):
+            # Retrieve the list of grades for this course
+            # All the course/item/user scaffolding was handled in Setup
+            test_uri = '{}/{}/metrics/grades'.format(self.base_courses_uri, self.test_course_id)
+            response = self.do_get(test_uri)
+            self.assertEqual(response.status_code, 200)
+            self.assertGreater(response.data['grade_average'], 0)
+            self.assertGreater(response.data['grade_maximum'], 0)
+            self.assertGreater(response.data['grade_minimum'], 0)
+            self.assertEqual(response.data['grade_count'], USER_COUNT)
+            self.assertGreater(response.data['course_grade_average'], 0)
+            self.assertGreater(response.data['course_grade_maximum'], 0)
+            self.assertGreater(response.data['course_grade_minimum'], 0)
+            self.assertEqual(response.data['course_grade_count'], USER_COUNT)
+            self.assertEqual(len(response.data['grades']), USER_COUNT)
+
+            # Filter by user_id
+            user_filter_uri = '{}?user_id=1,3'.format(test_uri)
+            response = self.do_get(user_filter_uri)
+            self.assertEqual(response.status_code, 200)
+            self.assertGreater(response.data['grade_average'], 0)
+            self.assertGreater(response.data['grade_maximum'], 0)
+            self.assertGreater(response.data['grade_minimum'], 0)
+            self.assertEqual(response.data['grade_count'], 2)
+            self.assertGreater(response.data['course_grade_average'], 0)
+            self.assertGreater(response.data['course_grade_maximum'], 0)
+            self.assertGreater(response.data['course_grade_minimum'], 0)
+            self.assertEqual(response.data['course_grade_count'], USER_COUNT)
+            self.assertEqual(len(response.data['grades']), 2)
+
+            # make the last user an observer to asset that its content is being filtered out from
+            # the aggregates
+            user_index = USER_COUNT - 1
+            allow_access(self.course, self.users[user_index], 'observer')
+            test_uri = '{}/{}/metrics/grades'.format(self.base_courses_uri, self.test_course_id)
+            response = self.do_get(test_uri)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.data['grades']), user_index)
+
+        def test_courses_metrics_grades_list_get_empty_course(self):
+            # Retrieve the list of grades for this course
+            # All the course/item/user scaffolding was handled in Setup
+            test_uri = '{}/{}/metrics/grades'.format(self.base_courses_uri, unicode(self.empty_course.id))
+            response = self.do_get(test_uri)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.data['grade_count'], 0)
+            self.assertEqual(response.data['course_grade_maximum'], 0)
+
+        def test_courses_grades_list_get_invalid_course(self):
+            # Retrieve the list of grades for this course
+            # All the course/item/user scaffolding was handled in Setup
+            test_uri = '{}/{}/grades'.format(self.base_courses_uri, self.test_bogus_course_id)
+            response = self.do_get(test_uri)
+            self.assertEqual(response.status_code, 404)
+
+    if settings.FEATURES.get('ORGANIZATIONS_APP', False):
+        def test_courses_users_list_get_filter_by_orgs(self):
+            # create 5 users
+            users = []
+            for i in xrange(1, 6):
+                data = {
+                    'email': 'test{}@example.com'.format(i),
+                    'username': 'test_user{}'.format(i),
+                    'password': 'test_pass',
+                    'first_name': 'John{}'.format(i),
+                    'last_name': 'Doe{}'.format(i)
+                }
+                response = self.do_post(self.base_users_uri, data)
+                self.assertEqual(response.status_code, 201)
+                users.append(response.data['id'])
+
+            # create 3 organizations each one having one user
+            org_ids = []
+            for i in xrange(1, 4):
+                data = {
+                    'name': '{} {}'.format('Test Organization', i),
+                    'display_name': '{} {}'.format('Test Org Display Name', i),
+                    'users': [users[i]]
+                }
+                response = self.do_post(self.base_organizations_uri, data)
+                self.assertEqual(response.status_code, 201)
+                self.assertGreater(response.data['id'], 0)
+                org_ids.append(response.data['id'])
+
+            # enroll all users in course
+            test_uri = self.base_courses_uri + '/' + self.test_course_id + '/users'
+            for user in users:
+                data = {'user_id': user}
+                response = self.do_post(test_uri, data)
+                self.assertEqual(response.status_code, 201)
+
+            # retrieve all users enrolled in the course
+            response = self.do_get(test_uri)
+            self.assertEqual(response.status_code, 200)
+            self.assertGreaterEqual(len(response.data['enrollments']), 5)
+
+            # retrieve users by organization
+            response = self.do_get('{}?organizations={}'.format(test_uri, org_ids[0]))
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.data['enrollments']), 1)
+
+            # retrieve all users enrolled in the course
+            response = self.do_get('{}?organizations={},{},{}'.format(test_uri, org_ids[0], org_ids[1], org_ids[2]))
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.data['enrollments']), 3)
+
+        def test_courses_metrics_social_get(self):
+            test_uri = '{}/{}/metrics/social/'.format(self.base_courses_uri, self.test_course_id)
+            response = self.do_get(test_uri)
+            self.assertEqual(response.status_code, 200)
+            self.assertTrue(len(response.data.keys()), 2)
+            users = response.data['users']
+            self.assertTrue(users.get('1'))
+            self.assertTrue(users.get('2'))
+
+            # make the first user an observer to asset that its content is being filtered out from
+            # the aggregates
+            allow_access(self.course, self.users[0], 'observer')
+
+            response = self.do_get(test_uri)
+            self.assertEqual(response.status_code, 200)
+            self.assertTrue(len(response.data.keys()), 1)
+            users = response.data['users']
+            self.assertFalse(users.get('1'))
+            self.assertTrue(users.get('2'))
+
+    if settings.FEATURES.get('PROGRESS_APP', False):
+        def test_courses_completions_leaders_list_get(self):  # pylint: disable=R0915
+            course = CourseFactory.create(
+                number='4033',
+                name='leaders_by_completions',
+                start=datetime(2014, 9, 16, 14, 30),
+                end=datetime(2015, 1, 16)
+            )
+
+            chapter = ItemFactory.create(
+                category="chapter",
+                parent_location=course.location,
+                data=self.test_data,
+                due=datetime(2014, 5, 16, 14, 30),
+                display_name="Overview"
+            )
+
+            sub_section = ItemFactory.create(
+                parent_location=chapter.location,
+                category="sequential",
+                display_name=u"test subsection",
+            )
+            unit = ItemFactory.create(
+                parent_location=sub_section.location,
+                category="vertical",
+                metadata={'graded': True, 'format': 'Homework'},
+                display_name=u"test unit",
+            )
+
+            # create 5 users
+            num_users = 5
+            users = [UserFactory.create(username="testuser_cctest" + str(__), profile='test') for __ in xrange(num_users)]
+
+            for user in users:
+                CourseEnrollmentFactory.create(user=user, course_id=course.id)
+                CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
+
+            test_course_id = unicode(course.id)
+            completion_uri = '{}/{}/completions/'.format(self.base_courses_uri, test_course_id)
+            leaders_uri = '{}/{}/metrics/completions/leaders/'.format(self.base_courses_uri, test_course_id)
+            # Make last user as observer to make sure that data is being filtered out
+            allow_access(course, users[num_users - 1], 'observer')
+
+            contents = []
+            for i in xrange(1, 26):
+                local_content_name = 'Video_Sequence{}'.format(i)
+                local_content = ItemFactory.create(
+                    category="videosequence",
+                    parent_location=unit.location,
+                    data=self.test_data,
+                    display_name=local_content_name
+                )
+                contents.append(local_content)
+                if i < 3:
+                    user_id = users[0].id
+                elif i < 10:
+                    user_id = users[1].id
+                elif i < 17:
+                    user_id = users[2].id
+                else:
+                    user_id = users[3].id
+
+                content_id = unicode(local_content.scope_ids.usage_id)
+                completions_data = {'content_id': content_id, 'user_id': user_id}
+                response = self.do_post(completion_uri, completions_data)
+                self.assertEqual(response.status_code, 201)
+
+                # observer should complete everything, so we can assert that it is filtered out
+                response = self.do_post(completion_uri, {
+                    'content_id': content_id, 'user_id': users[num_users - 1].id
+                })
+                self.assertEqual(response.status_code, 201)
+
+            expected_course_avg = '25.000'
+            test_uri = '{}?count=6'.format(leaders_uri)
+            response = self.do_get(test_uri)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.data['leaders']), 4)
+            self.assertEqual('{0:.3f}'.format(response.data['course_avg']), expected_course_avg)
+
+            # without count filter and user_id
+            test_uri = '{}?user_id={}'.format(leaders_uri, users[1].id)
+            response = self.do_get(test_uri)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.data['leaders']), 4)
+            self.assertEqual(response.data['position'], 2)
+            self.assertEqual('{0:.3f}'.format(response.data['completions']), '28.000')
+
+            # with skipleaders filter
+            test_uri = '{}?user_id={}&skipleaders=true'.format(leaders_uri, users[1].id)
+            response = self.do_get(test_uri)
+            self.assertEqual(response.status_code, 200)
+            self.assertIsNone(response.data.get('leaders', None))
+            self.assertEqual('{0:.3f}'.format(response.data['course_avg']), expected_course_avg)
+            self.assertEqual('{0:.3f}'.format(response.data['completions']), '28.000')
+
+            # test with bogus course
+            test_uri = '{}/{}/metrics/completions/leaders/'.format(self.base_courses_uri, self.test_bogus_course_id)
+            response = self.do_get(test_uri)
+            self.assertEqual(response.status_code, 404)
+
+            #filter course module completion by organization
+            data = {
+                'name': 'Test Organization',
+                'display_name': 'Test Org Display Name',
+                'users': [users[1].id]
+            }
+            response = self.do_post(self.base_organizations_uri, data)
+            self.assertEqual(response.status_code, 201)
+            test_uri = '{}?organizations={}'.format(leaders_uri, response.data['id'])
+            response = self.do_get(test_uri)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.data['leaders']), 1)
+            self.assertEqual(response.data['leaders'][0]['id'], users[1].id)
+            self.assertEqual('{0:.3f}'.format(response.data['leaders'][0]['completions']), '28.000')
+            self.assertEqual('{0:.3f}'.format(response.data['course_avg']), '28.000')
+
+            # test with unknown user
+            test_uri = '{}?user_id={}&skipleaders=true'.format(leaders_uri, '909999')
+            response = self.do_get(test_uri)
+            self.assertEqual(response.status_code, 200)
+            self.assertIsNone(response.data.get('leaders', None))
+            self.assertEqual(response.data['position'], 0)
+            self.assertEqual(response.data['completions'], 0)
+
+            # test a case where completions are greater than total course modules. it should not be more than 100
+            contents.append(self.course_content)
+            for content in contents[2:]:
+                user_id = users[0].id
+                content_id = unicode(content.scope_ids.usage_id)
+                completions_data = {'content_id': content_id, 'user_id': user_id}
+                response = self.do_post(completion_uri, completions_data)
+                self.assertEqual(response.status_code, 201)
+
+            test_uri = '{}?user_id={}'.format(leaders_uri, users[0].id)
+            response = self.do_get(test_uri)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual('{0:.3f}'.format(response.data['completions']), '100.000')
+
+        def test_courses_data_metrics(self):
+            test_uri = self.base_courses_uri + '/' + self.test_course_id + '/users'
+            completion_uri = '{}/{}/completions/'.format(self.base_courses_uri, unicode(self.course.id))
+            test_user_uri = self.base_users_uri
+            users_to_add = 5
+            for i in xrange(0, users_to_add):
+                data = {
+                    'email': 'test{}@example.com'.format(i), 'username': 'test_user{}'.format(i),
+                    'password': 'test_password'
+                }
+                # create a new user
+                response = self.do_post(test_user_uri, data)
+                self.assertEqual(response.status_code, 201)
+                created_user_id = response.data['id']
+
+                # now enroll this user in the course
+                post_data = {'user_id': created_user_id}
+                response = self.do_post(test_uri, post_data)
+                self.assertEqual(response.status_code, 201)
+
+            #create an organization
+            data = {
+                'name': 'Test Organization',
+                'display_name': 'Test Org Display Name',
+                'users': [created_user_id]
+            }
+            response = self.do_post(self.base_organizations_uri, data)
+            self.assertEqual(response.status_code, 201)
+            org_id = response.data['id']
+
+            for i in xrange(1, 5):
+                local_content_name = 'Video_Sequence{}'.format(i)
+                local_content = ItemFactory.create(
+                    category="videosequence",
+                    parent_location=self.chapter.location,
+                    data=self.test_data,
+                    display_name=local_content_name
+                )
+                content_id = unicode(local_content.scope_ids.usage_id)
+                completions_data = {'content_id': content_id, 'user_id': created_user_id, 'stage': None}
+                response = self.do_post(completion_uri, completions_data)
+                self.assertEqual(response.status_code, 201)
+
+            # get course metrics
+            course_metrics_uri = '{}/{}/metrics/'.format(self.base_courses_uri, self.test_course_id)
+            response = self.do_get(course_metrics_uri)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.data['users_enrolled'], users_to_add + USER_COUNT)
+            self.assertEqual(response.data['users_started'], 1)
+            self.assertIsNotNone(response.data['grade_cutoffs'])
+            self.assertEqual(response.data['num_threads'], 5)
+            self.assertEqual(response.data['num_active_threads'], 3)
+
+            # get course metrics by organization
+            course_metrics_uri = '{}/{}/metrics/?organization={}'.format(self.base_courses_uri, self.test_course_id, org_id)
+            response = self.do_get(course_metrics_uri)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.data['users_enrolled'], 1)
+            self.assertEqual(response.data['users_started'], 1)
+
+            # test with bogus course
+            course_metrics_uri = '{}/{}/metrics/'.format(self.base_courses_uri, self.test_bogus_course_id)
+            response = self.do_get(course_metrics_uri)
+            self.assertEqual(response.status_code, 404)
+
+        def test_coursemodulecompletions_filters(self):
+            completion_uri = '{}/{}/completions/'.format(self.base_courses_uri, unicode(self.course.id))
+            for i in xrange(1, 3):
+                data = {
+                    'email': 'test{}@example.com'.format(i),
+                    'username': 'test_user{}'.format(i),
+                    'password': 'test_pass',
+                    'first_name': 'John{}'.format(i),
+                    'last_name': 'Doe{}'.format(i)
+                }
+                response = self.do_post(self.base_users_uri, data)
+                self.assertEqual(response.status_code, 201)
+                created_user_id = response.data['id']
+
+            for i in xrange(1, 26):
+                local_content_name = 'Video_Sequence{}'.format(i)
+                local_content = ItemFactory.create(
+                    category="videosequence",
+                    parent_location=self.chapter.location,
+                    data=self.test_data,
+                    display_name=local_content_name
+                )
+                content_id = unicode(local_content.scope_ids.usage_id)
+                if i < 25:
+                    content_id = unicode(self.course_content.scope_ids.usage_id) + str(i)
+                    stage = None
+                else:
+                    content_id = unicode(self.course_content.scope_ids.usage_id)
+                    stage = 'Last'
+                completions_data = {'content_id': content_id, 'user_id': created_user_id, 'stage': stage}
+                response = self.do_post(completion_uri, completions_data)
+                self.assertEqual(response.status_code, 201)
+
+            #filter course module completion by user
+            user_filter_uri = '{}?user_id={}&page_size=10&page=3'.format(completion_uri, created_user_id)
+            response = self.do_get(user_filter_uri)
+            self.assertEqual(response.data['count'], 25)
+            self.assertEqual(len(response.data['results']), 5)
+            self.assertEqual(response.data['num_pages'], 3)
+
+            #filter course module completion by multiple user ids
+            user_filter_uri = '{}?user_id={}'.format(completion_uri, str(created_user_id) + ',3,4')
+            response = self.do_get(user_filter_uri)
+            self.assertEqual(response.data['count'], 25)
+            self.assertEqual(len(response.data['results']), 20)
+            self.assertEqual(response.data['num_pages'], 2)
+
+            #filter course module completion by user who has not completed any course module
+            user_filter_uri = '{}?user_id={}'.format(completion_uri, 1)
+            response = self.do_get(user_filter_uri)
+            self.assertEqual(len(response.data['results']), 0)
+
+            #filter course module completion by course_id
+            course_filter_uri = '{}?course_id={}&page_size=10'.format(completion_uri, unicode(self.course.id))
+            response = self.do_get(course_filter_uri)
+            self.assertEqual(response.data['count'], 25)
+            self.assertEqual(len(response.data['results']), 10)
+
+            #filter course module completion by content_id
+            content_id = {'content_id': '{}1'.format(unicode(self.course_content.scope_ids.usage_id))}
+            content_filter_uri = '{}?{}'.format(completion_uri, urlencode(content_id))
+            response = self.do_get(content_filter_uri)
+            self.assertEqual(response.data['count'], 1)
+            self.assertEqual(len(response.data['results']), 1)
+
+            #filter course module completion by invalid content_id
+            content_id = {'content_id': '{}1'.format(self.test_bogus_content_id)}
+            content_filter_uri = '{}?{}'.format(completion_uri, urlencode(content_id))
+            response = self.do_get(content_filter_uri)
+            self.assertEqual(response.status_code, 404)
+
+            #filter course module completion by stage
+            content_filter_uri = '{}?stage={}'.format(completion_uri, 'Last')
+            response = self.do_get(content_filter_uri)
+            self.assertEqual(response.data['count'], 1)
+            self.assertEqual(len(response.data['results']), 1)
+
+        def test_coursemodulecompletions_get_invalid_course(self):
+            completion_uri = '{}/{}/completions/'.format(self.base_courses_uri, self.test_bogus_course_id)
+            response = self.do_get(completion_uri)
+            self.assertEqual(response.status_code, 404)
+
+        def test_course_module_completions_post_invalid_content(self):
+            completions_uri = '{}/{}/completions/'.format(self.base_courses_uri, self.test_course_id)
+            completions_data = {'content_id': self.test_bogus_content_id, 'user_id': self.users[0].id}
+            response = self.do_post(completions_uri, completions_data)
+            self.assertEqual(response.status_code, 400)
+
+        def test_course_module_completions_post_invalid_course(self):
+            completions_uri = '{}/{}/completions/'.format(self.base_courses_uri, self.test_bogus_course_id)
+            completions_data = {'content_id': unicode(self.course_content.scope_ids.usage_id), 'user_id': self.users[0].id}
+            response = self.do_post(completions_uri, completions_data)
+            self.assertEqual(response.status_code, 404)
+
+        def test_coursemodulecompletions_post(self):
+
+            data = {
+                'email': 'test@example.com',
+                'username': 'test_user',
+                'password': 'test_pass',
+                'first_name': 'John',
+                'last_name': 'Doe'
+            }
+            response = self.do_post(self.base_users_uri, data)
+            self.assertEqual(response.status_code, 201)
+            created_user_id = response.data['id']
+            completions_uri = '{}/{}/completions/'.format(self.base_courses_uri, unicode(self.course.id))
+            stage = 'First'
+            completions_data = {'content_id': unicode(self.course_content.scope_ids.usage_id), 'user_id': created_user_id, 'stage': stage}
+            response = self.do_post(completions_uri, completions_data)
+            self.assertEqual(response.status_code, 201)
+            coursemodulecomp_id = response.data['id']
+            self.assertGreater(coursemodulecomp_id, 0)
+            self.assertEqual(response.data['user_id'], created_user_id)
+            self.assertEqual(response.data['course_id'], unicode(self.course.id))
+            self.assertEqual(response.data['content_id'], unicode(self.course_content.scope_ids.usage_id))
+            self.assertEqual(response.data['stage'], stage)
+            self.assertIsNotNone(response.data['created'])
+            self.assertIsNotNone(response.data['modified'])
+
+            # test to create course completion with same attributes
+            response = self.do_post(completions_uri, completions_data)
+            self.assertEqual(response.status_code, 409)
+
+            # test to create course completion with empty user_id
+            completions_data['user_id'] = None
+            response = self.do_post(completions_uri, completions_data)
+            self.assertEqual(response.status_code, 400)
+
+            # test to create course completion with empty content_id
+            completions_data['content_id'] = None
+            response = self.do_post(completions_uri, completions_data)
+            self.assertEqual(response.status_code, 400)
+
+            # test to create course completion with invalid content_id
+            completions_data['content_id'] = self.test_bogus_content_id
+            response = self.do_post(completions_uri, completions_data)
+            self.assertEqual(response.status_code, 400)
+
+        def test_course_workgroups_list(self):
+            projects_uri = self.base_projects_uri
+            data = {
+                'course_id': self.test_course_id,
+                'content_id': 'self.test_course_content_id'
+            }
+            response = self.do_post(projects_uri, data)
+            self.assertEqual(response.status_code, 201)
+            project_id = response.data['id']
+
+            test_workgroups_uri = self.base_workgroups_uri
+            for i in xrange(1, 12):
+                data = {
+                    'name': '{} {}'.format('Workgroup', i),
+                    'project': project_id
+                }
+                response = self.do_post(test_workgroups_uri, data)
+                self.assertEqual(response.status_code, 201)
+
+            # get workgroups associated to course
+            test_uri = '{}/{}/workgroups/?page_size=10'.format(self.base_courses_uri, self.test_course_id)
+            response = self.do_get(test_uri)
+            self.assertEqual(response.data['count'], 11)
+            self.assertEqual(len(response.data['results']), 10)
+            self.assertEqual(response.data['num_pages'], 2)
+
+            # test with bogus course
+            test_uri = '{}/{}/workgroups/'.format(self.base_courses_uri, self.test_bogus_course_id)
+            response = self.do_get(test_uri)
+            self.assertEqual(response.status_code, 404)
+
+    if settings.FEATURES.get('PROJECTS_APP', False):
+        def test_course_project_list(self):
+            projects_uri = self.base_projects_uri
+
+            for i in xrange(0, 25):
+                local_content_name = 'Video_Sequence{}'.format(i)
+                local_content = ItemFactory.create(
+                    category="videosequence",
+                    parent_location=self.chapter.location,
+                    data=self.test_data,
+                    display_name=local_content_name
+                )
+                # location:MITx+999+Robot_Super_Course+videosequence+Video_Sequence0
+                data = {
+                    'content_id': unicode(local_content.scope_ids.usage_id),
+                    'course_id': self.test_course_id
+                }
+                response = self.do_post(projects_uri, data)
+                self.assertEqual(response.status_code, 201)
+
+            response = self.do_get('{}/{}/projects/?page_size=10'.format(self.base_courses_uri, self.test_course_id))
+            self.assertEqual(response.data['count'], 25)
+            self.assertEqual(len(response.data['results']), 10)
+            self.assertEqual(response.data['num_pages'], 3)
+
+    if settings.FEATURES.get('GRADEBOOK_APP', False) and settings.FEATURES.get('PROGRESS_APP', False):
+        def _test_courses_data_time_series_metrics_setup(self):
+            """
+            Helper method for bootstrapping time series tests
+            """
+            ts_course = CourseFactory.create(
+                number='3033',
+                name='metrics_in_timeseries',
+                start=datetime(2014, 9, 16, 14, 30),
+                end=datetime(2015, 1, 16)
+            )
+
+            chapter = ItemFactory.create(
+                category="chapter",
+                parent_location=ts_course.location,
+                data=self.test_data,
+                due=datetime(2015, 5, 16, 14, 30),
+                display_name="Overview"
+            )
+
+            sub_section = ItemFactory.create(
+                parent_location=chapter.location,
+                category="sequential",
+                display_name=u"test subsection",
+            )
+            unit = ItemFactory.create(
+                parent_location=sub_section.location,
+                category="vertical",
+                metadata={'graded': True, 'format': 'Homework'},
+                display_name=u"test unit",
+            )
+
+            ts_item = ItemFactory.create(
+                parent_location=unit.location,
+                category='problem',
+                data=StringResponseXMLFactory().build_xml(answer='bar'),
+                display_name='Problem to test timeseries',
+                metadata={'rerandomize': 'always', 'graded': True, 'format': 'Midterm Exam'}
+            )
+
+            ts_item2 = ItemFactory.create(
+                parent_location=unit.location,
+                category='problem 2',
+                data=StringResponseXMLFactory().build_xml(answer='bar'),
+                display_name='Problem 2 for test timeseries',
+                metadata={'rerandomize': 'always', 'graded': True, 'format': 'Final Exam'}
+            )
+
+            return ts_course, ts_item, ts_item2
+
+        def test_courses_data_time_series_metrics(self):  # pylint: disable=R0915
+
+            # Run the bootstrapper
+            course, item, item2 = self._test_courses_data_time_series_metrics_setup()
+
+            # Enable some scenario-specific settings (patch doesn't seem to work here for some reason)
+            settings._wrapped.default_settings.FEATURES['MARK_PROGRESS_ON_GRADING_EVENT'] = True  # pylint: disable=W0212
+            settings._wrapped.default_settings.FEATURES['STUDENT_MODULE_EMIT_SIGNAL_ON_SCORE_CHANGED'] = True  # pylint: disable=W0212
+
+            # create some users
+            num_users = 25
+            users = [UserFactory.create(username="testuser_tstest" + str(__), profile='test') for __ in xrange(num_users)]
+
+            # enroll users with time set to 28 days ago
+            enrolled_time = timezone.now() + relativedelta(days=-28)
+            with freeze_time(enrolled_time):
+                for user in users:
+                    CourseEnrollmentFactory.create(user=user, course_id=course.id)
+
+            points_scored = .25
+            points_possible = 1
+            grade_dict = {'value': points_scored, 'max_value': points_possible}
+
+            # Mark users as those who have started course
+            for j, user in enumerate(users):
+                complete_time = timezone.now() + relativedelta(days=-(num_users - j))
+                with freeze_time(complete_time):
+                    module = self.get_module_for_user(user, course, item)
+                    grade_dict['user_id'] = user.id
+                    module.system.publish(module, 'grade', grade_dict)
+
+                    # Last 2 users as those who have completed
+                    if j >= num_users - 2:
+                        sg_entry = StudentGradebook.objects.get(user=user, course_id=course.id)
+                        sg_entry.grade = 0.9
+                        sg_entry.proforma_grade = 0.91
+                        sg_entry.save()
+
+            # make more completions
+            for j, user in enumerate(users[:5]):
+                complete_time = timezone.now() + relativedelta(days=-(num_users - j))
+                with freeze_time(complete_time):
+                    module = self.get_module_for_user(user, course, item2)
+                    grade_dict['user_id'] = user.id
+                    module.system.publish(module, 'grade', grade_dict)
+
+            test_course_id = unicode(course.id)
+
+            # create an organization and assign the users to it
+            # Note: organizations are only supported when the organizations app is installed
+            org_id = 0
+            if settings.FEATURES.get('ORGANIZATIONS_APP', False):
+                user_ids = [user.id for user in users]
+                data = {
+                    'name': 'Test Organization',
+                    'display_name': 'Test Org Display Name',
+                    'users': user_ids
+                }
+                response = self.do_post(self.base_organizations_uri, data)
+                self.assertEqual(response.status_code, 201)
+                org_id = response.data['id']
+
+            # get course metrics in time series format
+            end_date = datetime.now().date()
+            start_date = end_date + relativedelta(days=-4)
+            course_metrics_uri = '{}/{}/time-series-metrics/?start_date={}&end_date={}&organization={}'\
+                .format(self.base_courses_uri,
+                        test_course_id,
+                        start_date,
+                        end_date,
+                        org_id)
+
+            response = self.do_get(course_metrics_uri)
+            self.assertEqual(response.status_code, 200)
+
+            self.assertEqual(response.data['users_enrolled'][0][1], 25)
+            self.assertEqual(len(response.data['users_not_started']), 5)
+            total_not_started = sum([not_started[1] for not_started in response.data['users_not_started']])
+            self.assertEqual(total_not_started, 6)
+
+            self.assertEqual(len(response.data['users_started']), 5)
+            total_started = sum([started[1] for started in response.data['users_started']])
+            self.assertEqual(total_started, 4)
+
+            self.assertEqual(len(response.data['users_completed']), 5)
+            total_completed = sum([completed[1] for completed in response.data['users_completed']])
+            self.assertEqual(total_completed, 2)
+
+            self.assertEqual(len(response.data['modules_completed']), 5)
+            total_modules_completed = sum([completed[1] for completed in response.data['modules_completed']])
+            self.assertEqual(total_modules_completed, 4)
+
+            self.assertEqual(len(response.data['active_users']), 5)
+            total_active = sum([active[1] for active in response.data['active_users']])
+            self.assertEqual(total_active, 5)
+
+            # get modules completed for first 5 days
+            start_date = datetime.now().date() + relativedelta(days=-num_users)
+            end_date = datetime.now().date() + relativedelta(days=-(num_users - 4))
+            course_metrics_uri = '{}/{}/time-series-metrics/?start_date={}&end_date={}'.format(self.base_courses_uri,
+                                                                                               test_course_id,
+                                                                                               start_date,
+                                                                                               end_date)
+
+            response = self.do_get(course_metrics_uri)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.data['modules_completed']), 5)
+            total_modules_completed = sum([completed[1] for completed in response.data['modules_completed']])
+            self.assertEqual(total_modules_completed, 10)
+
+            # metrics with weeks as interval
+            end_date = datetime.now().date()
+            start_date = end_date + relativedelta(weeks=-2)
+            course_metrics_uri = '{}/{}/time-series-metrics/?start_date={}&end_date={}&' \
+                                 'interval=weeks'.format(self.base_courses_uri,
+                                                         test_course_id,
+                                                         start_date,
+                                                         end_date)
+
+            response = self.do_get(course_metrics_uri)
+            self.assertEqual(response.status_code, 200)
+            self.assertGreaterEqual(len(response.data['users_not_started']), 2)
+            self.assertGreaterEqual(len(response.data['users_started']), 2)
+            self.assertGreaterEqual(len(response.data['users_completed']), 2)
+
+            # metrics with months as interval
+            start_date = end_date + relativedelta(months=-3)
+            end_date = datetime.now().date() + relativedelta(months=1)
+            course_metrics_uri = '{}/{}/time-series-metrics/?start_date={}&end_date={}&' \
+                                 'interval=months'.format(self.base_courses_uri,
+                                                          test_course_id,
+                                                          start_date,
+                                                          end_date)
+
+            response = self.do_get(course_metrics_uri)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.data['users_not_started']), 5)
+            self.assertEqual(len(response.data['users_started']), 5)
+            self.assertEqual(len(response.data['users_completed']), 5)
+
+            # test without end_date
+            course_metrics_uri = '{}/{}/time-series-metrics/?start_date={}'.format(
+                self.base_courses_uri,
+                test_course_id,
+                start_date
+            )
+            response = self.do_get(course_metrics_uri)
+            self.assertEqual(response.status_code, 400)
+
+            # test with unsupported interval
+            course_metrics_uri = '{}/{}/time-series-metrics/?start_date={}&end_date={}&interval=hours'\
+                .format(self.base_courses_uri,
+                        test_course_id,
+                        start_date,
+                        end_date)
+
+            response = self.do_get(course_metrics_uri)
+            self.assertEqual(response.status_code, 400)
+
+            # Test after un-enrolling some users
+            test_uri = self.base_courses_uri + '/' + test_course_id + '/users'
+            for j, user in enumerate(users[-5:]):
+                response = self.do_delete('{}/{}'.format(test_uri, user.id))
+                self.assertEqual(response.status_code, 204)
+            end_date = datetime.now().date()
+            start_date = end_date + relativedelta(days=-4)
+            course_metrics_uri = '{}/{}/time-series-metrics/?start_date={}&end_date={}'\
+                .format(self.base_courses_uri,
+                        test_course_id,
+                        start_date,
+                        end_date)
+
+            response = self.do_get(course_metrics_uri)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.data['users_not_started']), 5)
+            total_not_started = sum([not_started[1] for not_started in response.data['users_not_started']])
+            self.assertEqual(total_not_started, 0)
+            self.assertEqual(len(response.data['users_started']), 5)
+            total_started = sum([started[1] for started in response.data['users_started']])
+            self.assertEqual(total_started, 0)
+            self.assertEqual(len(response.data['users_completed']), 5)
+            total_completed = sum([completed[1] for completed in response.data['users_completed']])
+            self.assertEqual(total_completed, 0)
+            self.assertEqual(len(response.data['modules_completed']), 5)
+            total_modules_completed = sum([completed[1] for completed in response.data['modules_completed']])
+            self.assertEqual(total_modules_completed, 0)
+            self.assertEqual(len(response.data['active_users']), 5)
+            total_active = sum([active[1] for active in response.data['active_users']])
+            self.assertEqual(total_active, 0)
+            self.assertEqual(response.data['users_enrolled'][0][1], 20)
+
+    # Test when optional apps are disabled
+    def test_courses_disabled_gradebook_app_throws_exceptions(self):
+        settings._wrapped.default_settings.FEATURES['GRADEBOOK_APP'] = False  # pylint: disable=W0212
+        test_uri = '{}/{}/time-series-metrics/'.format(self.base_courses_uri, self.course.id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+        test_uri = '{}/{}/metrics/grades'.format(self.base_courses_uri, self.course.id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+        test_uri = '{}/{}/metrics/grades/leaders'.format(self.base_courses_uri, self.course.id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+
+    def test_courses_disabled_organizations_app_throws_exceptions(self):
+        settings._wrapped.default_settings.FEATURES['ORGANIZATIONS_APP'] = False  # pylint: disable=W0212
+        test_uri = '{}/{}/metrics/'.format(self.base_courses_uri, self.course.id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+        test_uri = '{}/{}/metrics/social/?organization=1'.format(self.base_courses_uri, self.course.id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+
+    def test_courses_disabled_progress_app_throws_exceptions(self):
+        settings._wrapped.default_settings.FEATURES['PROGRESS_APP'] = False  # pylint: disable=W0212
+        test_uri = '{}/{}/time-series-metrics/'.format(self.base_courses_uri, self.course.id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+        test_uri = '{}/{}/metrics/'.format(self.base_courses_uri, self.course.id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+        test_uri = '{}/{}/completions/'.format(self.base_courses_uri, self.course.id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+        response = self.do_post(test_uri, {})
+        self.assertEqual(response.status_code, 404)
+        test_uri = '{}/{}/metrics/completions/leaders/'.format(self.base_courses_uri, self.course.id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+        try:
+            module = self.get_module_for_user(self.users[0], self.course, self.item)
+            grade_dict = {'value': 95, 'max_value': 100, 'user_id': self.users[0].id}
+            settings._wrapped.default_settings.FEATURES['MARK_PROGRESS_ON_GRADING_EVENT'] = True  # pylint: disable=W0212
+            module.system.publish(module, 'grade', grade_dict)
+        except Exception, err:  # pylint: disable=W0703
+            self.assertEqual(str(err), 'Progress app is required.')
+
+    def test_courses_disabled_projects_app_throws_exceptions(self):
+        settings._wrapped.default_settings.FEATURES['PROJECTS_APP'] = False  # pylint: disable=W0212
+        test_uri = '{}/{}/time-series-metrics/'.format(self.base_courses_uri, self.course.id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+        test_uri = '{}/{}/projects/'.format(self.base_courses_uri, self.course.id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+        test_uri = '{}/{}/workgroups/'.format(self.base_courses_uri, self.course.id)
+        response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)

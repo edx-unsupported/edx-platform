@@ -1,5 +1,5 @@
 """ Database ORM models managed by this Django app """
-
+from django.conf import settings
 from django.contrib.auth.models import Group, User
 from django.db import models
 from django.core.exceptions import ValidationError
@@ -14,17 +14,19 @@ class Project(TimeStampedModel):
     """
     course_id = models.CharField(max_length=255)
     content_id = models.CharField(max_length=255)
-    organization = models.ForeignKey(
-        'organizations.Organization',
-        blank=True,
-        null=True,
-        related_name="projects",
-        on_delete=models.SET_NULL
-    )
+    if settings.FEATURES.get('ORGANIZATIONS_APP', False):
+        organization = models.ForeignKey(
+            'organizations.Organization',
+            blank=True,
+            null=True,
+            related_name="projects",
+            on_delete=models.SET_NULL
+        )
 
     class Meta:
         """ Meta class for defining additional model characteristics """
-        unique_together = ("course_id", "content_id", "organization")
+        if settings.FEATURES.get('ORGANIZATIONS_APP', False):
+            unique_together = ("course_id", "content_id", "organization")
 
 
 class Workgroup(TimeStampedModel):
@@ -35,9 +37,14 @@ class Workgroup(TimeStampedModel):
     """
     name = models.CharField(max_length=255, null=True, blank=True)
     project = models.ForeignKey(Project, related_name="workgroups")
-    users = models.ManyToManyField(User, related_name="workgroups",
-                                   through="WorkgroupUser", blank=True, null=True)
-    groups = models.ManyToManyField(Group, related_name="workgroups", blank=True, null=True)
+    if settings.FEATURES.get('PROJECTS_APP', False):
+        users = models.ManyToManyField(
+            User,
+            related_name="workgroups",
+            through="WorkgroupUser",
+            blank=True, null=True
+        )
+        groups = models.ManyToManyField(Group, related_name="workgroups", blank=True, null=True)
 
     @property
     def cohort_name(self):

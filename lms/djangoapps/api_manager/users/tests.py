@@ -12,13 +12,13 @@ import uuid
 from urllib import urlencode
 import mock
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase, Client
 from django.test.utils import override_settings
 from django.utils import timezone
-from django.utils.translation import ugettext as _
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware import module_render
@@ -176,120 +176,8 @@ class UsersApiTests(TestCase):
         user_id = response.data['id']
         return user_id
 
-    def test_user_list_get(self):
-        test_uri = self.users_base_uri
-        users = []
-        # create a 25 new users
-        for i in xrange(1, 26):
-            data = {
-                'email': 'test{}@example.com'.format(i),
-                'username': 'test_user{}'.format(i),
-                'password': self.test_password,
-                'first_name': 'John{}'.format(i),
-                'last_name': 'Doe{}'.format(i),
-                'avatar_url': 'http://avatar.com/{}.jpg'.format(i),
-                'city': 'Boston',
-                'title': "The King",
-            }
 
-            response = self.do_post(test_uri, data)
-            self.assertEqual(response.status_code, 201)
-            users.append(response.data['id'])
 
-        # create organizations and add users to them
-        total_orgs = 30
-        for i in xrange(0, total_orgs):
-            data = {
-                'name': '{} {}'.format('Org', i),
-                'display_name': '{} {}'.format('Org display name', i),
-                'users': users
-            }
-            response = self.do_post(self.org_base_uri, data)
-            self.assertEqual(response.status_code, 201)
-
-        # fetch data without any filters applied
-        response = self.do_get('{}?page=1'.format(test_uri))
-        self.assertEqual(response.status_code, 400)
-        # fetch users data with page outside range
-        response = self.do_get('{}?ids={}&page=5'.format(test_uri, '2,3,7,11,6,21,34'))
-        self.assertEqual(response.status_code, 404)
-        # fetch user data by single id
-        response = self.do_get('{}?ids={}'.format(test_uri, '23'))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['results']), 1)
-        self.assertEqual(len(response.data['results'][0]['organizations']), total_orgs)
-        self.assertIsNotNone(response.data['results'][0]['organizations'][0]['name'])
-        self.assertIsNotNone(response.data['results'][0]['organizations'][0]['id'])
-        self.assertIsNotNone(response.data['results'][0]['organizations'][0]['url'])
-        self.assertIsNotNone(response.data['results'][0]['created'])
-        # fetch user data by multiple ids
-        response = self.do_get('{}?page_size=5&ids={}'.format(test_uri, '2,3,7,11,6,21,34'))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['count'], 6)
-        self.assertEqual(len(response.data['results']), 5)
-        self.assertEqual(response.data['num_pages'], 2)
-        self.assertIn('page=2', response.data['next'])
-        self.assertEqual(response.data['previous'], None)
-        # fetch user data by username
-        response = self.do_get('{}?username={}'.format(test_uri, 'test_user1'))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['results']), 1)
-        # fetch user data by email
-        response = self.do_get('{}?email={}'.format(test_uri, 'test2@example.com'))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['results']), 1)
-        self.assertIsNotNone(response.data['results'][0]['id'])
-        # fetch by username with a non existing user
-        response = self.do_get('{}?email={}'.format(test_uri, 'john@example.com'))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['results']), 0)
-        # add some additional fields and filter the response to only these fields
-        response = self.do_get('{}?email=test2@example.com&fields=avatar_url,city,title'.format(test_uri))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['results']), 1)
-        self.assertEqual(response.data['results'][0]['avatar_url'], 'http://avatar.com/2.jpg')
-        self.assertEqual(response.data['results'][0]['city'], 'Boston')
-        self.assertEqual(response.data['results'][0]['title'], 'The King')
-        if 'id' in response.data['results'][0]:
-            self.fail("Dynamic field filtering error in UserSerializer")
-
-    def test_user_list_get_with_org_filter(self):
-        test_uri = self.users_base_uri
-        users = []
-        # create a 7 new users
-        for i in xrange(1, 8):
-            data = {
-                'email': 'test{}@example.com'.format(i),
-                'username': 'test_user{}'.format(i),
-                'password': self.test_password,
-                'first_name': 'John{}'.format(i),
-                'last_name': 'Doe{}'.format(i)
-            }
-
-            response = self.do_post(test_uri, data)
-            self.assertEqual(response.status_code, 201)
-            users.append(response.data['id'])
-
-        # create organizations and add users to them
-        total_orgs = 4
-        for i in xrange(1, total_orgs):
-            data = {
-                'name': '{} {}'.format('Org', i),
-                'display_name': '{} {}'.format('Org display name', i),
-                'users': users[:i]
-            }
-            response = self.do_post(self.org_base_uri, data)
-            self.assertEqual(response.status_code, 201)
-
-        # fetch users without any organization association
-        response = self.do_get('{}?has_organizations=true'.format(test_uri))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['results']), 3)
-        self.assertIsNotNone(response.data['results'][0]['is_active'])
-
-        response = self.do_get('{}?has_organizations=false'.format(test_uri))
-        self.assertEqual(response.status_code, 200)
-        self.assertGreaterEqual(len(response.data['results']), 4)
 
     def test_user_list_post(self):
         test_uri = self.users_base_uri
@@ -421,8 +309,7 @@ class UsersApiTests(TestCase):
 
         data["username"] = '@'
         response = self.do_post(test_uri, data)
-        message = _(
-            'Username should only consist of A-Z and 0-9, with no spaces.')
+        message = 'Username should only consist of A-Z and 0-9, with no spaces.'
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data['message'], message)
 
@@ -1084,17 +971,6 @@ class UsersApiTests(TestCase):
         response = self.do_delete(test_uri)
         self.assertEqual(response.status_code, 204)
 
-    def test_user_course_grades_course_not_found(self):
-        test_uri = '{}/{}/courses/some/unknown/course/grades'.format(self.users_base_uri, self.user.id)
-        response = self.do_get(test_uri)
-        self.assertEqual(response.status_code, 404)
-
-    def test_user_course_grades_user_not_found(self):
-        course = CourseFactory.create(org='TUCGUNF', run='TUCGUNF1')
-        test_uri = '{}/99999999/courses/{}/grades'.format(self.users_base_uri, course.id)
-        response = self.do_get(test_uri)
-        self.assertEqual(response.status_code, 404)
-
     def test_user_preferences_user_list_get_not_found(self):
         test_uri = '{}/{}/preferences'.format(self.users_base_uri, '999999')
         response = self.do_get(test_uri)
@@ -1190,204 +1066,6 @@ class UsersApiTests(TestCase):
         response = self.do_delete(test_uri)
         self.assertEqual(response.status_code, 404)
 
-    def test_user_courses_grades_list_get(self):
-        user_id = self.user.id
-
-        course = CourseFactory.create(org='TUCGLG', run='TUCGLG1')
-        test_data = '<html>{}</html>'.format(str(uuid.uuid4()))
-        chapter1 = ItemFactory.create(
-            category="chapter",
-            parent_location=course.location,
-            data=test_data,
-            display_name="Chapter 1"
-        )
-        chapter2 = ItemFactory.create(
-            category="chapter",
-            parent_location=course.location,
-            data=test_data,
-            display_name="Chapter 2"
-        )
-        ItemFactory.create(
-            category="sequential",
-            parent_location=chapter1.location,
-            data=test_data,
-            display_name="Sequence 1",
-        )
-        ItemFactory.create(
-            category="sequential",
-            parent_location=chapter2.location,
-            data=test_data,
-            display_name="Sequence 2",
-        )
-
-        ItemFactory.create(
-            parent_location=chapter2.location,
-            category='problem',
-            data=StringResponseXMLFactory().build_xml(answer='foo'),
-            metadata={'rerandomize': 'always'},
-            display_name="test problem 1",
-            max_grade=45
-        )
-
-        problem = ItemFactory.create(
-            parent_location=chapter2.location,
-            category='problem',
-            data=StringResponseXMLFactory().build_xml(answer='bar'),
-            metadata={'rerandomize': 'always'},
-            display_name="test problem 2"
-        )
-
-        item = ItemFactory.create(
-            parent_location=chapter2.location,
-            category='mentoring',
-            data=StringResponseXMLFactory().build_xml(answer='foo'),
-            display_name=u"test mentoring midterm",
-            metadata={'rerandomize': 'always', 'graded': True, 'format': "Midterm Exam"}
-        )
-        points_scored = 1
-        points_possible = 1
-        user = self.user
-        module = self.get_module_for_user(user, course, item)
-        grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user.id}
-        module.system.publish(module, 'grade', grade_dict)
-
-        item2 = ItemFactory.create(
-            parent_location=chapter2.location,
-            category='mentoring',
-            data=StringResponseXMLFactory().build_xml(answer='bar'),
-            display_name=u"test mentoring final",
-            metadata={'rerandomize': 'always', 'graded': True, 'format': "Final Exam"}
-        )
-        points_scored = 95
-        points_possible = 100
-        user = self.user
-        module = self.get_module_for_user(user, course, item2)
-        grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user.id}
-        module.system.publish(module, 'grade', grade_dict)
-
-        item3 = ItemFactory.create(
-            parent_location=chapter2.location,
-            category='mentoring',
-            data=StringResponseXMLFactory().build_xml(answer='bar'),
-            display_name=u"test mentoring homework",
-            metadata={'rerandomize': 'always', 'graded': True, 'format': "Homework"}
-        )
-        points_scored = 7
-        points_possible = 10
-        user = self.user
-        module = self.get_module_for_user(user, course, item3)
-        grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user.id}
-        module.system.publish(module, 'grade', grade_dict)
-
-        item4 = ItemFactory.create(
-            parent_location=chapter2.location,
-            category='mentoring',
-            data=StringResponseXMLFactory().build_xml(answer='bar'),
-            display_name=u"test mentoring homework 2",
-            metadata={'rerandomize': 'always', 'graded': True, 'format': "Homework"}
-        )
-        points_scored = 9
-        points_possible = 10
-        user = self.user
-        module = self.get_module_for_user(user, course, item4)
-        grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user.id}
-        module.system.publish(module, 'grade', grade_dict)
-
-        item5 = ItemFactory.create(
-            parent_location=chapter2.location,
-            category='mentoring',
-            data=StringResponseXMLFactory().build_xml(answer='bar'),
-            display_name=u"test mentoring homework 3",
-            metadata={'rerandomize': 'always', 'graded': True, 'format': "Homework"},
-            due=datetime(2015, 1, 16, 14, 30).replace(tzinfo=timezone.utc)
-        )
-        points_scored = 1
-        points_possible = 1
-        user = self.user
-        module = self.get_module_for_user(user, course, item)
-        grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user.id}
-        module.system.publish(module, 'grade', grade_dict)
-
-        item2 = ItemFactory.create(
-            parent_location=chapter2.location,
-            category='mentoring',
-            data=StringResponseXMLFactory().build_xml(answer='bar'),
-            display_name=u"test mentoring final",
-            metadata={'rerandomize': 'always', 'graded': True, 'format': "Final Exam"}
-        )
-        points_scored = 95
-        points_possible = 100
-        user = self.user
-        module = self.get_module_for_user(user, course, item2)
-        grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user.id}
-        module.system.publish(module, 'grade', grade_dict)
-
-        item3 = ItemFactory.create(
-            parent_location=chapter2.location,
-            category='mentoring',
-            data=StringResponseXMLFactory().build_xml(answer='bar'),
-            display_name=u"test mentoring homework",
-            metadata={'rerandomize': 'always', 'graded': True, 'format': "Homework"}
-        )
-        points_scored = 7
-        points_possible = 10
-        user = self.user
-        module = self.get_module_for_user(user, course, item3)
-        grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user.id}
-        module.system.publish(module, 'grade', grade_dict)
-
-        item4 = ItemFactory.create(
-            parent_location=chapter2.location,
-            category='mentoring',
-            data=StringResponseXMLFactory().build_xml(answer='bar'),
-            display_name=u"test mentoring homework 2",
-            metadata={'rerandomize': 'always', 'graded': True, 'format': "Homework"}
-        )
-        points_scored = 9
-        points_possible = 10
-        user = self.user
-        module = self.get_module_for_user(user, course, item4)
-        grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user.id}
-        module.system.publish(module, 'grade', grade_dict)
-
-        item5 = ItemFactory.create(
-            parent_location=chapter2.location,
-            category='mentoring',
-            data=StringResponseXMLFactory().build_xml(answer='bar'),
-            display_name=u"test mentoring homework 3",
-            metadata={'rerandomize': 'always', 'graded': True, 'format': "Homework"},
-            due=datetime(2015, 1, 16, 14, 30).replace(tzinfo=timezone.utc)
-        )
-
-        test_uri = '{}/{}/courses/{}/grades'.format(self.users_base_uri, user_id, unicode(course.id))
-
-        response = self.do_get(test_uri)
-        self.assertEqual(response.status_code, 200)
-
-        courseware_summary = response.data['courseware_summary']
-        self.assertEqual(len(courseware_summary), 2)
-        self.assertEqual(courseware_summary[0]['course'], 'Robot Super Course')
-        self.assertEqual(courseware_summary[0]['display_name'], 'Chapter 1')
-
-        sections = courseware_summary[0]['sections']
-        self.assertEqual(len(sections), 1)
-        self.assertEqual(sections[0]['display_name'], 'Sequence 1')
-        self.assertEqual(sections[0]['graded'], False)
-
-        sections = courseware_summary[1]['sections']
-        self.assertEqual(len(sections), 12)
-        self.assertEqual(sections[0]['display_name'], 'Sequence 2')
-        self.assertEqual(sections[0]['graded'], False)
-
-        grade_summary = response.data['grade_summary']
-        self.assertGreater(len(grade_summary['section_breakdown']), 0)
-        grading_policy = response.data['grading_policy']
-        self.assertGreater(len(grading_policy['GRADER']), 0)
-        self.assertIsNotNone(grading_policy['GRADE_CUTOFFS'])
-
-        self.assertEqual(response.data['current_grade'], 0.73)
-        self.assertEqual(response.data['proforma_grade'], 0.9375)
-
     def is_user_profile_created_updated(self, response, data):
         """This function compare response with user profile data """
 
@@ -1402,146 +1080,6 @@ class UsersApiTests(TestCase):
             response.data['level_of_education'], data["level_of_education"])
         self.assertEqual(
             str(response.data['year_of_birth']), data["year_of_birth"])
-
-    def test_user_organizations_list(self):
-        user_id = self.user.id
-        anonymous_id = anonymous_id_for_user(self.user, self.course.id)
-        for i in xrange(1, 7):
-            data = {
-                'name': 'Org ' + str(i),
-                'display_name': 'Org display name' + str(i),
-                'users': [user_id]
-            }
-            response = self.do_post(self.org_base_uri, data)
-            self.assertEqual(response.status_code, 201)
-
-        test_uri = '{}/{}/organizations/'.format(self.users_base_uri, user_id)
-        response = self.do_get(test_uri)
-        self.assertEqual(response.data['count'], 6)
-        self.assertEqual(len(response.data['results']), 6)
-        self.assertEqual(response.data['num_pages'], 1)
-
-        # test with anonymous user id
-        test_uri = '{}/{}/organizations/'.format(self.users_base_uri, anonymous_id)
-        response = self.do_get(test_uri)
-        self.assertEqual(response.data['count'], 6)
-
-        # test with invalid user
-        response = self.do_get('{}/4356340/organizations/'.format(self.users_base_uri))
-        self.assertEqual(response.status_code, 404)
-
-    def test_user_workgroups_list(self):
-        test_workgroups_uri = self.workgroups_base_uri
-        project_1 = Project.objects.create(
-            course_id=unicode(self.course.id),
-            content_id=unicode(self.course_content.scope_ids.usage_id),
-        )
-        p1_workgroup_1 = Workgroup.objects.create(
-            name = 'Workgroup 1',
-            project = project_1
-        )
-
-        project_2 = Project.objects.create(
-            course_id=unicode(self.course2.id),
-            content_id=unicode(self.course2_content.scope_ids.usage_id),
-        )
-        p2_workgroup_1 = Workgroup.objects.create(
-            name = 'Workgroup 2',
-            project = project_2
-        )
-        for i in xrange(1,12):
-            test_user = UserFactory()
-            users_uri = '{}{}/users/'.format(self.workgroups_base_uri, 1)
-            data = {"id": test_user.id}
-            response = self.do_post(users_uri, data)
-            self.assertEqual(response.status_code, 201)
-            if test_user.id > 6:
-                users_uri = '{}{}/users/'.format(self.workgroups_base_uri, 2)
-                data = {"id": test_user.id}
-                response = self.do_post(users_uri, data)
-                self.assertEqual(response.status_code, 201)
-
-        # test with anonymous user id
-        anonymous_id = anonymous_id_for_user(test_user, self.course.id)
-        test_uri = '{}/{}/workgroups/?page_size=1'.format(self.users_base_uri, anonymous_id)
-        response = self.do_get(test_uri)
-        self.assertEqual(response.data['count'], 2)
-        self.assertEqual(len(response.data['results']), 1)
-        self.assertEqual(response.data['num_pages'], 2)
-
-        # test with course_id filter and integer user id
-        course_id = {'course_id': unicode(self.course.id)}
-        response = self.do_get('{}/{}/workgroups/?{}'.format(self.users_base_uri, test_user.id, urlencode(course_id)))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['count'], 1)
-        self.assertEqual(len(response.data['results']), 1)
-        self.assertIsNotNone(response.data['results'][0]['name'])
-        self.assertIsNotNone(response.data['results'][0]['project'])
-
-        # test with invalid user
-        response = self.do_get('{}/4356340/workgroups/'.format(self.users_base_uri))
-        self.assertEqual(response.status_code, 404)
-
-        # test with valid user but has no workgroup
-        another_user_id = self._create_test_user()
-        response = self.do_get('{}/{}/workgroups/'.format(self.users_base_uri, another_user_id))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['count'], 0)
-        self.assertEqual(len(response.data['results']), 0)
-
-    def test_user_completions_list(self):
-        user_id = self.user.id
-        another_user_id = UserFactory().id
-        completion_uri = '{}/{}/completions/'.format(self.courses_base_uri, unicode(self.course.id))
-
-        for i in xrange(1, 26):
-            if i > 12:
-                course_user_id = another_user_id
-            else:
-                course_user_id = user_id
-            local_content_name = 'Video_Sequence{}'.format(i)
-            local_content = ItemFactory.create(
-                category="videosequence",
-                parent_location=self.course_content.location,
-                data=str(uuid.uuid4()),
-                display_name=local_content_name
-            )
-            completions_data = {'content_id': unicode(local_content.scope_ids.usage_id), 'user_id': course_user_id}
-            response = self.do_post(completion_uri, completions_data)
-            self.assertEqual(response.status_code, 201)
-
-        # Get course module completion by user
-        completion_list_uri = '{}/{}/courses/{}/completions/?page_size=6'.format(self.users_base_uri, user_id, unicode(self.course.id))
-        response = self.do_get(completion_list_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['count'], 12)
-        self.assertEqual(len(response.data['results']), 6)  # 12 matches, but only 6 per page
-        self.assertEqual(response.data['results'][0]['user_id'], user_id)
-        self.assertEqual(response.data['results'][0]['course_id'], unicode(self.course.id))
-        self.assertEqual(response.data['num_pages'], 2)
-
-        # Get course module completion by other user
-        completion_list_uri = '{}/{}/courses/{}/completions/'.format(self.users_base_uri, another_user_id, unicode(self.course.id))
-        response = self.do_get(completion_list_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['count'], 13)
-
-        # Get course module completion by other user and course module id (content_id)
-        content_id = {'content_id': unicode(local_content.scope_ids.usage_id)}
-        completion_list_uri = '{}/{}/courses/{}/completions/?{}'.format(
-            self.users_base_uri,
-            course_user_id,
-            unicode(self.course.id),
-            urlencode(content_id)
-        )
-        response = self.do_get(completion_list_uri)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['count'], 1)
-
-        # Get course module completion by bogus user
-        completion_list_uri = '{}/{}/courses/{}/completions/'.format(self.users_base_uri, '34323422', unicode(self.course.id))
-        response = self.do_get(completion_list_uri)
-        self.assertEqual(response.status_code, 404)
 
     def test_user_count_by_city(self):
         test_uri = self.users_base_uri
@@ -1830,4 +1368,491 @@ class UsersApiTests(TestCase):
         test_uri = '{}/{}/roles/'.format(self.users_base_uri, self.user.id)
         delete_uri = '{}invalid_role/courses/{}'.format(test_uri, unicode(self.course.id))
         response = self.do_delete(delete_uri)
+        self.assertEqual(response.status_code, 404)
+
+    if settings.FEATURES.get('GRADEBOOK_APP', False):
+        def _test_user_courses_grades_list_get_setup(self):
+            """
+            Helper method to bootstrap related test below
+            """
+            course = CourseFactory.create(org='TUCGLG', run='TUCGLG1')
+            test_data = '<html>{}</html>'.format(str(uuid.uuid4()))
+            chapter1 = ItemFactory.create(
+                category="chapter",
+                parent_location=course.location,
+                data=test_data,
+                display_name="Chapter 1"
+            )
+            chapter2 = ItemFactory.create(
+                category="chapter",
+                parent_location=course.location,
+                data=test_data,
+                display_name="Chapter 2"
+            )
+            ItemFactory.create(
+                category="sequential",
+                parent_location=chapter1.location,
+                data=test_data,
+                display_name="Sequence 1",
+            )
+            ItemFactory.create(
+                category="sequential",
+                parent_location=chapter2.location,
+                data=test_data,
+                display_name="Sequence 2",
+            )
+
+            ItemFactory.create(
+                parent_location=chapter2.location,
+                category='problem',
+                data=StringResponseXMLFactory().build_xml(answer='foo'),
+                metadata={'rerandomize': 'always'},
+                display_name="test problem 1",
+                max_grade=45
+            )
+
+            ItemFactory.create(
+                parent_location=chapter2.location,
+                category='problem',
+                data=StringResponseXMLFactory().build_xml(answer='bar'),
+                metadata={'rerandomize': 'always'},
+                display_name="test problem 2"
+            )
+            return course, chapter2
+
+        def test_user_courses_grades_list_get(self):  # pylint: disable=R0915
+            # Run the bootstrapper
+            course, chapter2 = self._test_user_courses_grades_list_get_setup()
+
+            item = ItemFactory.create(
+                parent_location=chapter2.location,
+                category='mentoring',
+                data=StringResponseXMLFactory().build_xml(answer='foo'),
+                display_name=u"test mentoring midterm",
+                metadata={'rerandomize': 'always', 'graded': True, 'format': "Midterm Exam"}
+            )
+
+            points_scored = 1
+            points_possible = 1
+            module = self.get_module_for_user(self.user, course, item)
+            grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': self.user.id}
+            module.system.publish(module, 'grade', grade_dict)
+
+            item2 = ItemFactory.create(
+                parent_location=chapter2.location,
+                category='mentoring',
+                data=StringResponseXMLFactory().build_xml(answer='bar'),
+                display_name=u"test mentoring final",
+                metadata={'rerandomize': 'always', 'graded': True, 'format': "Final Exam"}
+            )
+            points_scored = 95
+            points_possible = 100
+            module = self.get_module_for_user(self.user, course, item2)
+            grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': self.user.id}
+            module.system.publish(module, 'grade', grade_dict)
+
+            item3 = ItemFactory.create(
+                parent_location=chapter2.location,
+                category='mentoring',
+                data=StringResponseXMLFactory().build_xml(answer='bar'),
+                display_name=u"test mentoring homework",
+                metadata={'rerandomize': 'always', 'graded': True, 'format': "Homework"}
+            )
+            points_scored = 7
+            points_possible = 10
+            module = self.get_module_for_user(self.user, course, item3)
+            grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': self.user.id}
+            module.system.publish(module, 'grade', grade_dict)
+
+            item4 = ItemFactory.create(
+                parent_location=chapter2.location,
+                category='mentoring',
+                data=StringResponseXMLFactory().build_xml(answer='bar'),
+                display_name=u"test mentoring homework 2",
+                metadata={'rerandomize': 'always', 'graded': True, 'format': "Homework"}
+            )
+            points_scored = 9
+            points_possible = 10
+            module = self.get_module_for_user(self.user, course, item4)
+            grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': self.user.id}
+            module.system.publish(module, 'grade', grade_dict)
+
+            ItemFactory.create(
+                parent_location=chapter2.location,
+                category='mentoring',
+                data=StringResponseXMLFactory().build_xml(answer='bar'),
+                display_name=u"test mentoring homework 3",
+                metadata={'rerandomize': 'always', 'graded': True, 'format': "Homework"},
+                due=datetime(2015, 1, 16, 14, 30).replace(tzinfo=timezone.utc)
+            )
+            points_scored = 1
+            points_possible = 1
+            module = self.get_module_for_user(self.user, course, item)
+            grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': self.user.id}
+            module.system.publish(module, 'grade', grade_dict)
+
+            item2 = ItemFactory.create(
+                parent_location=chapter2.location,
+                category='mentoring',
+                data=StringResponseXMLFactory().build_xml(answer='bar'),
+                display_name=u"test mentoring final",
+                metadata={'rerandomize': 'always', 'graded': True, 'format': "Final Exam"}
+            )
+            points_scored = 95
+            points_possible = 100
+            module = self.get_module_for_user(self.user, course, item2)
+            grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': self.user.id}
+            module.system.publish(module, 'grade', grade_dict)
+
+            item3 = ItemFactory.create(
+                parent_location=chapter2.location,
+                category='mentoring',
+                data=StringResponseXMLFactory().build_xml(answer='bar'),
+                display_name=u"test mentoring homework",
+                metadata={'rerandomize': 'always', 'graded': True, 'format': "Homework"}
+            )
+            points_scored = 7
+            points_possible = 10
+            module = self.get_module_for_user(self.user, course, item3)
+            grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': self.user.id}
+            module.system.publish(module, 'grade', grade_dict)
+
+            item4 = ItemFactory.create(
+                parent_location=chapter2.location,
+                category='mentoring',
+                data=StringResponseXMLFactory().build_xml(answer='bar'),
+                display_name=u"test mentoring homework 2",
+                metadata={'rerandomize': 'always', 'graded': True, 'format': "Homework"}
+            )
+            points_scored = 9
+            points_possible = 10
+            module = self.get_module_for_user(self.user, course, item4)
+            grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': self.user.id}
+            module.system.publish(module, 'grade', grade_dict)
+
+            ItemFactory.create(
+                parent_location=chapter2.location,
+                category='mentoring',
+                data=StringResponseXMLFactory().build_xml(answer='bar'),
+                display_name=u"test mentoring homework 3",
+                metadata={'rerandomize': 'always', 'graded': True, 'format': "Homework"},
+                due=datetime(2015, 1, 16, 14, 30).replace(tzinfo=timezone.utc)
+            )
+
+            response = self.do_get('{}/{}/courses/{}/grades'.format(self.users_base_uri, self.user.id, unicode(course.id)))
+
+            courseware_summary = response.data['courseware_summary']
+            self.assertEqual(len(courseware_summary), 2)
+            self.assertEqual(courseware_summary[0]['course'], 'Robot Super Course')
+            self.assertEqual(courseware_summary[0]['display_name'], 'Chapter 1')
+
+            sections = courseware_summary[0]['sections']
+            self.assertEqual(len(sections), 1)
+            self.assertEqual(sections[0]['display_name'], 'Sequence 1')
+            self.assertEqual(sections[0]['graded'], False)
+
+            sections = courseware_summary[1]['sections']
+            self.assertEqual(len(sections), 12)
+            self.assertEqual(sections[0]['display_name'], 'Sequence 2')
+            self.assertEqual(sections[0]['graded'], False)
+
+            grade_summary = response.data['grade_summary']
+            self.assertGreater(len(grade_summary['section_breakdown']), 0)
+            grading_policy = response.data['grading_policy']
+            self.assertGreater(len(grading_policy['GRADER']), 0)
+            self.assertIsNotNone(grading_policy['GRADE_CUTOFFS'])
+
+            self.assertEqual(response.data['current_grade'], 0.73)
+            self.assertEqual(response.data['proforma_grade'], 0.9375)
+
+        def test_user_course_grades_course_not_found(self):
+            test_uri = '{}/{}/courses/some/unknown/course/grades'.format(self.users_base_uri, self.user.id)
+            response = self.do_get(test_uri)
+            self.assertEqual(response.status_code, 404)
+
+        def test_user_course_grades_user_not_found(self):
+            course = CourseFactory.create(org='TUCGUNF', run='TUCGUNF1')
+            test_uri = '{}/99999999/courses/{}/grades'.format(self.users_base_uri, course.id)
+            response = self.do_get(test_uri)
+            self.assertEqual(response.status_code, 404)
+
+    if settings.FEATURES.get('ORGANIZATIONS_APP', False):
+        def test_user_list_get(self):
+            test_uri = self.users_base_uri
+            users = []
+            # create a 25 new users
+            for i in xrange(1, 26):
+                data = {
+                    'email': 'test{}@example.com'.format(i),
+                    'username': 'test_user{}'.format(i),
+                    'password': self.test_password,
+                    'first_name': 'John{}'.format(i),
+                    'last_name': 'Doe{}'.format(i),
+                    'avatar_url': 'http://avatar.com/{}.jpg'.format(i),
+                    'city': 'Boston',
+                    'title': "The King",
+                }
+
+                response = self.do_post(test_uri, data)
+                self.assertEqual(response.status_code, 201)
+                users.append(response.data['id'])
+
+            # create organizations and add users to them
+            total_orgs = 30
+            for i in xrange(0, total_orgs):
+                data = {
+                    'name': '{} {}'.format('Org', i),
+                    'display_name': '{} {}'.format('Org display name', i),
+                    'users': users
+                }
+                response = self.do_post(self.org_base_uri, data)
+                self.assertEqual(response.status_code, 201)
+
+            # fetch data without any filters applied
+            response = self.do_get('{}?page=1'.format(test_uri))
+            self.assertEqual(response.status_code, 400)
+            # fetch users data with page outside range
+            response = self.do_get('{}?ids={}&page=5'.format(test_uri, '2,3,7,11,6,21,34'))
+            self.assertEqual(response.status_code, 404)
+            # fetch user data by single id
+            response = self.do_get('{}?ids={}'.format(test_uri, '23'))
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.data['results']), 1)
+            self.assertEqual(len(response.data['results'][0]['organizations']), total_orgs)
+            self.assertIsNotNone(response.data['results'][0]['organizations'][0]['name'])
+            self.assertIsNotNone(response.data['results'][0]['organizations'][0]['id'])
+            self.assertIsNotNone(response.data['results'][0]['organizations'][0]['url'])
+            self.assertIsNotNone(response.data['results'][0]['created'])
+            # fetch user data by multiple ids
+            response = self.do_get('{}?page_size=5&ids={}'.format(test_uri, '2,3,7,11,6,21,34'))
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.data['count'], 6)
+            self.assertEqual(len(response.data['results']), 5)
+            self.assertEqual(response.data['num_pages'], 2)
+            self.assertIn('page=2', response.data['next'])
+            self.assertEqual(response.data['previous'], None)
+            # fetch user data by username
+            response = self.do_get('{}?username={}'.format(test_uri, 'test_user1'))
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.data['results']), 1)
+            # fetch user data by email
+            response = self.do_get('{}?email={}'.format(test_uri, 'test2@example.com'))
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.data['results']), 1)
+            self.assertIsNotNone(response.data['results'][0]['id'])
+            # fetch by username with a non existing user
+            response = self.do_get('{}?email={}'.format(test_uri, 'john@example.com'))
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.data['results']), 0)
+            # add some additional fields and filter the response to only these fields
+            response = self.do_get('{}?email=test2@example.com&fields=avatar_url,city,title'.format(test_uri))
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.data['results']), 1)
+            self.assertEqual(response.data['results'][0]['avatar_url'], 'http://avatar.com/2.jpg')
+            self.assertEqual(response.data['results'][0]['city'], 'Boston')
+            self.assertEqual(response.data['results'][0]['title'], 'The King')
+            self.assertIsNone(response.data['results'][0].get('id'), None)
+
+        def test_user_list_get_with_org_filter(self):
+            test_uri = self.users_base_uri
+            users = []
+            # create a 7 new users
+            for i in xrange(1, 8):
+                data = {
+                    'email': 'test{}@example.com'.format(i),
+                    'username': 'test_user{}'.format(i),
+                    'password': self.test_password,
+                    'first_name': 'John{}'.format(i),
+                    'last_name': 'Doe{}'.format(i)
+                }
+
+                response = self.do_post(test_uri, data)
+                self.assertEqual(response.status_code, 201)
+                users.append(response.data['id'])
+
+            # create organizations and add users to them
+            total_orgs = 4
+            for i in xrange(1, total_orgs):
+                data = {
+                    'name': '{} {}'.format('Org', i),
+                    'display_name': '{} {}'.format('Org display name', i),
+                    'users': users[:i]
+                }
+                response = self.do_post(self.org_base_uri, data)
+                self.assertEqual(response.status_code, 201)
+
+            # fetch users without any organization association
+            response = self.do_get('{}?has_organizations=true'.format(test_uri))
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(response.data['results']), 3)
+            self.assertIsNotNone(response.data['results'][0]['is_active'])
+
+            response = self.do_get('{}?has_organizations=false'.format(test_uri))
+            self.assertEqual(response.status_code, 200)
+            self.assertGreaterEqual(len(response.data['results']), 4)
+
+        def test_user_organizations_list(self):
+            user_id = self.user.id
+            anonymous_id = anonymous_id_for_user(self.user, self.course.id)
+            for i in xrange(1, 7):
+                data = {
+                    'name': 'Org ' + str(i),
+                    'display_name': 'Org display name' + str(i),
+                    'users': [user_id]
+                }
+                response = self.do_post(self.org_base_uri, data)
+                self.assertEqual(response.status_code, 201)
+
+            test_uri = '{}/{}/organizations/'.format(self.users_base_uri, user_id)
+            response = self.do_get(test_uri)
+            self.assertEqual(response.data['count'], 6)
+            self.assertEqual(len(response.data['results']), 6)
+            self.assertEqual(response.data['num_pages'], 1)
+
+            # test with anonymous user id
+            test_uri = '{}/{}/organizations/'.format(self.users_base_uri, anonymous_id)
+            response = self.do_get(test_uri)
+            self.assertEqual(response.data['count'], 6)
+
+            # test with invalid user
+            response = self.do_get('{}/4356340/organizations/'.format(self.users_base_uri))
+            self.assertEqual(response.status_code, 404)
+
+    if settings.FEATURES.get('PROGRESS_APP', False):
+        def test_user_completions_list(self):
+            user_id = self.user.id
+            another_user_id = UserFactory().id
+            completion_uri = '{}/{}/completions/'.format(self.courses_base_uri, unicode(self.course.id))
+
+            for i in xrange(1, 26):
+                if i > 12:
+                    course_user_id = another_user_id
+                else:
+                    course_user_id = user_id
+                local_content_name = 'Video_Sequence{}'.format(i)
+                local_content = ItemFactory.create(
+                    category="videosequence",
+                    parent_location=self.course_content.location,
+                    data=str(uuid.uuid4()),
+                    display_name=local_content_name
+                )
+                completions_data = {'content_id': unicode(local_content.scope_ids.usage_id), 'user_id': course_user_id}
+                response = self.do_post(completion_uri, completions_data)
+                self.assertEqual(response.status_code, 201)
+
+            # Get course module completion by user
+            completion_list_uri = '{}/{}/courses/{}/completions/?page_size=6'.format(self.users_base_uri, user_id, unicode(self.course.id))
+            response = self.do_get(completion_list_uri)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.data['count'], 12)
+            self.assertEqual(len(response.data['results']), 6)  # 12 matches, but only 6 per page
+            self.assertEqual(response.data['results'][0]['user_id'], user_id)
+            self.assertEqual(response.data['results'][0]['course_id'], unicode(self.course.id))
+            self.assertEqual(response.data['num_pages'], 2)
+
+            # Get course module completion by other user
+            completion_list_uri = '{}/{}/courses/{}/completions/'.format(self.users_base_uri, another_user_id, unicode(self.course.id))
+            response = self.do_get(completion_list_uri)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.data['count'], 13)
+
+            # Get course module completion by other user and course module id (content_id)
+            content_id = {'content_id': unicode(local_content.scope_ids.usage_id)}
+            completion_list_uri = '{}/{}/courses/{}/completions/?{}'.format(
+                self.users_base_uri,
+                course_user_id,
+                unicode(self.course.id),
+                urlencode(content_id)
+            )
+            response = self.do_get(completion_list_uri)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.data['count'], 1)
+
+            # Get course module completion by bogus user
+            completion_list_uri = '{}/{}/courses/{}/completions/'.format(self.users_base_uri, '34323422', unicode(self.course.id))
+            response = self.do_get(completion_list_uri)
+            self.assertEqual(response.status_code, 404)
+
+    if settings.FEATURES.get('PROJECTS_APP', False):
+        def test_user_workgroups_list(self):
+            project_1 = Project.objects.create(
+                course_id=unicode(self.course.id),
+                content_id=unicode(self.course_content.scope_ids.usage_id),
+            )
+            Workgroup.objects.create(
+                name='Workgroup 1',
+                project=project_1
+            )
+
+            project_2 = Project.objects.create(
+                course_id=unicode(self.course2.id),
+                content_id=unicode(self.course2_content.scope_ids.usage_id),
+            )
+            Workgroup.objects.create(
+                name='Workgroup 2',
+                project=project_2
+            )
+            for _ in xrange(1, 12):
+                test_user = UserFactory()
+                users_uri = '{}{}/users/'.format(self.workgroups_base_uri, 1)
+                data = {"id": test_user.id}
+                response = self.do_post(users_uri, data)
+                self.assertEqual(response.status_code, 201)
+                if test_user.id > 6:
+                    users_uri = '{}{}/users/'.format(self.workgroups_base_uri, 2)
+                    data = {"id": test_user.id}
+                    response = self.do_post(users_uri, data)
+                    self.assertEqual(response.status_code, 201)
+
+            # test with anonymous user id
+            anonymous_id = anonymous_id_for_user(test_user, self.course.id)
+            test_uri = '{}/{}/workgroups/?page_size=1'.format(self.users_base_uri, anonymous_id)
+            response = self.do_get(test_uri)
+            self.assertEqual(response.data['count'], 2)
+            self.assertEqual(len(response.data['results']), 1)
+            self.assertEqual(response.data['num_pages'], 2)
+
+            # test with course_id filter and integer user id
+            course_id = {'course_id': unicode(self.course.id)}
+            response = self.do_get('{}/{}/workgroups/?{}'.format(self.users_base_uri, test_user.id, urlencode(course_id)))
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.data['count'], 1)
+            self.assertEqual(len(response.data['results']), 1)
+            self.assertIsNotNone(response.data['results'][0]['name'])
+            self.assertIsNotNone(response.data['results'][0]['project'])
+
+            # test with invalid user
+            response = self.do_get('{}/4356340/workgroups/'.format(self.users_base_uri))
+            self.assertEqual(response.status_code, 404)
+
+            # test with valid user but has no workgroup
+            another_user_id = self._create_test_user()
+            response = self.do_get('{}/{}/workgroups/'.format(self.users_base_uri, another_user_id))
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.data['count'], 0)
+            self.assertEqual(len(response.data['results']), 0)
+
+    # Test when optional apps are disabled
+    def test_users_disabled_gradebook_app_throws_exceptions(self):
+        settings._wrapped.default_settings.FEATURES['GRADEBOOK_APP'] = False  # pylint: disable=W0212
+        test_uri = '{}/1/courses/{}/grades'.format(self.users_base_uri, self.course.id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+
+    def test_users_disabled_organizations_app_throws_exceptions(self):
+        settings._wrapped.default_settings.FEATURES['ORGANIZATIONS_APP'] = False  # pylint: disable=W0212
+        test_uri = '{}/1/organizations/'.format(self.users_base_uri)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+
+    def test_users_disabled_progress_app_throws_exceptions(self):
+        settings._wrapped.default_settings.FEATURES['PROGRESS_APP'] = False  # pylint: disable=W0212
+        test_uri = '{}/1/courses/{}/completions/'.format(self.users_base_uri, self.course.id)
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 404)
+
+    def test_users_disabled_projects_app_throws_exceptions(self):
+        settings._wrapped.default_settings.FEATURES['PROJECTS_APP'] = False  # pylint: disable=W0212
+        test_uri = '{}/1/workgroups/'.format(self.users_base_uri, self.course.id)
+        response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 404)

@@ -8,14 +8,18 @@
         System: General context and intended usage
         API: Top-level description of overall API (must live somewhere)
 """
-
+from django.conf import settings
 from django.conf.urls import include, patterns, url
 
 from rest_framework.routers import SimpleRouter
 
-from organizations.views import OrganizationsViewSet
 from api_manager.system import views as system_views
-from projects import views as project_views
+
+if settings.FEATURES.get('ORGANIZATIONS_APP', False):
+    from organizations.views import OrganizationsViewSet
+
+if settings.FEATURES.get('PROJECTS_APP', False):
+    from projects import views as project_views
 
 urlpatterns = patterns(
     '',
@@ -28,15 +32,20 @@ urlpatterns = patterns(
 )
 
 server_api_router = SimpleRouter()
-server_api_router.register(r'organizations', OrganizationsViewSet)
 
-# Project-related ViewSets
-server_api_router.register(r'projects', project_views.ProjectsViewSet)
-server_api_router.register(r'workgroups', project_views.WorkgroupsViewSet)
-server_api_router.register(r'submissions', project_views.WorkgroupSubmissionsViewSet)
-server_api_router.register(r'workgroup_reviews', project_views.WorkgroupReviewsViewSet)
-server_api_router.register(r'submission_reviews', project_views.WorkgroupSubmissionReviewsViewSet)
-server_api_router.register(r'peer_reviews', project_views.WorkgroupPeerReviewsViewSet)
-server_api_router.register(r'groups', project_views.GroupViewSet)
-server_api_router.register(r'users', project_views.UserViewSet)
+# Organizations-related ViewSets
+if settings.FEATURES.get('ORGANIZATIONS_APP', False):
+    server_api_router.register(r'organizations', OrganizationsViewSet)
+
+# Projects-related ViewSets
+if settings.FEATURES.get('PROJECTS_APP'):
+    server_api_router.register(r'projects', project_views.ProjectsViewSet)
+    server_api_router.register(r'workgroups', project_views.WorkgroupsViewSet)
+    server_api_router.register(r'submissions', project_views.WorkgroupSubmissionsViewSet)
+    server_api_router.register(r'workgroup_reviews', project_views.WorkgroupReviewsViewSet)
+    server_api_router.register(r'submission_reviews', project_views.WorkgroupSubmissionReviewsViewSet)
+    server_api_router.register(r'peer_reviews', project_views.WorkgroupPeerReviewsViewSet)
+    server_api_router.register(r'groups', project_views.GroupViewSet)
+    server_api_router.register(r'users', project_views.UserViewSet)
+
 urlpatterns += server_api_router.urls

@@ -486,11 +486,11 @@ AUTO_REGISTRATION_AB_TEST_EXCLUDE_COURSES = set(ENV_TOKENS.get('AUTO_REGISTRATIO
 
 
 ############# Student Gradebook #################
-if FEATURES.get('STUDENT_GRADEBOOK') and "'gradebook'" not in INSTALLED_APPS:
+if FEATURES.get('GRADEBOOK_APP') and "'gradebook'" not in INSTALLED_APPS:
     INSTALLED_APPS += ('gradebook',)
 
 ############# Student Progress #################
-if FEATURES.get('STUDENT_PROGRESS') and "progress" not in INSTALLED_APPS:
+if FEATURES.get('PROGRESS_APP') and "progress" not in INSTALLED_APPS:
     INSTALLED_APPS += ('progress',)
 
 ############# Projects App #################

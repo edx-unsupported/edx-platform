@@ -99,18 +99,17 @@ class GroupProfile(TimeStampedModel):
     This table will provide additional tables regarding groups. This has a foreign key to
     the auth_groups table
     """
+    group = models.OneToOneField(Group, db_index=True)
+    group_type = models.CharField(null=True, max_length=32, db_index=True)
+    name = models.CharField(max_length=255, null=True, blank=True)
+    data = models.TextField(blank=True)  # JSON dictionary for generic key/value pairs
+    record_active = models.BooleanField(default=True)
 
     class Meta:
         """
         Meta class for modifying things like table name
         """
         db_table = "auth_groupprofile"
-
-    group = models.OneToOneField(Group, db_index=True)
-    group_type = models.CharField(null=True, max_length=32, db_index=True)
-    name = models.CharField(max_length=255, null=True, blank=True)
-    data = models.TextField(blank=True)  # JSON dictionary for generic key/value pairs
-    record_active = models.BooleanField(default=True)
 
 
 class CourseContentGroupRelationship(TimeStampedModel):

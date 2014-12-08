@@ -1,15 +1,18 @@
 import json
-from django.core.exceptions import ObjectDoesNotExist
 
 from django.contrib.auth.models import Group
+from django.core.exceptions import ObjectDoesNotExist
+
 from rest_framework import serializers
 
 
-class GroupSerializer(serializers.HyperlinkedModelSerializer):
+class GroupSerializer(serializers.Serializer):
     """ Serializer for model interactions """
+    id = serializers.IntegerField()
     name = serializers.SerializerMethodField('get_group_name')
     type = serializers.SerializerMethodField('get_group_type')
     data = serializers.SerializerMethodField('get_group_data')
+    url = serializers.SerializerMethodField('get_group_url')
 
     def get_group_name(self, group):
         """
@@ -46,8 +49,14 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
         except ObjectDoesNotExist:
             return None
 
+    def get_group_url(self, group):
+        """
+        Builds a URL for resource referencing
+        """
+        return '/api/server/groups/{}'.format(group.id)
+
     class Meta:
         """ Meta class for defining additional serializer characteristics """
         model = Group
-        fields = ('id', 'url', 'name', 'type', 'data')
-
+        lookup_field = 'id'
+        fields = ('id', 'name', 'type', 'data', 'url')
