@@ -620,6 +620,9 @@ INSTALLED_APPS = (
 
     # Additional problem types
     'edx_jsme',    # Molecular Structure
+
+    # experimental search engine
+    'search',
 )
 
 
