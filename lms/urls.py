@@ -76,6 +76,8 @@ urlpatterns = ('',  # nopep8
     # Enrollment API RESTful endpoints
     url(r'^enrollment/v0/', include('enrollment.urls')),
 
+    url(r'^search', include('search.urls')),
+
 )
 
 if settings.FEATURES["ENABLE_MOBILE_REST_API"]:
