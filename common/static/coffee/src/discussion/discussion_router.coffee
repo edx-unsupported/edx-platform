@@ -1,16 +1,22 @@
 if Backbone?
   class @DiscussionRouter extends Backbone.Router
-    routes:
-      "": "allThreads"
-      ":forum_name/threads/:thread_id" : "showThread"
-
     initialize: (options) ->
+        @allThreadsRoute = DiscussionUtil.route_prefix
+        @singleThreadRoute = @getSingleThreadRoute(":forum_name", ":thread_id")
+
+        @route(@allThreadsRoute, "allThreads")
+        @route(@singleThreadRoute, "showThread")
+
         @discussion = options['discussion']
         @course_settings = options['course_settings']
 
-        @nav = new DiscussionThreadListView(collection: @discussion, el: $(".forum-nav"))
+        @nav = new DiscussionThreadListView(
+            collection: @discussion,
+            el: $(".forum-nav"),
+            courseSettings: @course_settings
+        )
         @nav.on "thread:selected", @navigateToThread
-        @nav.on "thread:removed", @navigateToAllThreads
+        @nav.on "thread:deselected", @navigateToAllThreads
         @nav.on "threads:rendered", @setActiveThread
         @nav.on "thread:created", @navigateToThread
         @nav.render()
@@ -23,9 +29,15 @@ if Backbone?
           mode: "tab"
         )
         @newPostView.render()
+        @listenTo( @newPostView, 'newPost:cancel', @hideNewPost )
         $('.new-post-btn').bind "click", @showNewPost
         $('.new-post-btn').bind "keydown", (event) => DiscussionUtil.activateOnSpace(event, @showNewPost)
-        @newPostView.$('.cancel').bind "click", @hideNewPost
+
+    getSingleThreadRoute: (commentable_id, thread_id) ->
+      base_route = "#{commentable_id}/threads/#{thread_id}"
+      if DiscussionUtil.route_prefix
+        base_route = "#{DiscussionUtil.route_prefix}/#{base_route}"
+      base_route
 
     allThreads: ->
       @nav.updateSidebar()
@@ -42,6 +54,9 @@ if Backbone?
       @thread.set("unread_comments_count", 0)
       @thread.set("read", true)
       @setActiveThread()
+      @showMain()
+
+    showMain: =>
       if(@main)
         @main.cleanup()
         @main.undelegateEvents()
@@ -50,17 +65,24 @@ if Backbone?
       if(@newPost.is(":visible"))
         @newPost.fadeOut()
 
-      @main = new DiscussionThreadView(el: $(".forum-content"), model: @thread, mode: "tab")
+      @main = new DiscussionThreadView(
+        el: $(".forum-content"),
+
+        model: @thread,
+        mode: "tab",
+        course_settings: @course_settings,
+      )
       @main.render()
       @main.on "thread:responses:rendered", =>
         @nav.updateSidebar()
+      @thread.on "thread:thread_type_updated", @showMain
 
     navigateToThread: (thread_id) =>
       thread = @discussion.get(thread_id)
-      @navigate("#{thread.get("commentable_id")}/threads/#{thread_id}", trigger: true)
+      @navigate(@getSingleThreadRoute(thread.get("commentable_id"), thread_id), trigger: true)
 
     navigateToAllThreads: =>
-      @navigate("", trigger: true)
+      @navigate(@allThreadsRoute, trigger: true)
 
     showNewPost: (event) =>
       $('.forum-content').fadeOut(
@@ -70,10 +92,9 @@ if Backbone?
           $('.new-post-title').focus()
       )
 
-    hideNewPost: (event) =>
+    hideNewPost: =>
       @newPost.fadeOut(
         duration: 200
         complete: =>
           $('.forum-content').fadeIn(200)
       )
-

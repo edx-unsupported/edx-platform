@@ -5,15 +5,18 @@ if Backbone?
       "keypress .forum-nav-browse-filter-input": (event) => DiscussionUtil.ignoreEnterKey(event)
       "keyup .forum-nav-browse-filter-input": "filterTopics"
       "click .forum-nav-browse-menu-wrapper": "ignoreClick"
-      "click .forum-nav-browse-title": "selectTopic"
+      "click .forum-nav-browse-title": "selectTopicHandler"
       "keydown .forum-nav-search-input": "performSearch"
+      "click .icon-search": "performSearch"
       "change .forum-nav-sort-control": "sortThreads"
       "click .forum-nav-thread-link": "threadSelected"
       "click .forum-nav-load-more-link": "loadMorePages"
       "change .forum-nav-filter-main-control": "chooseFilter"
       "change .forum-nav-filter-cohort-control": "chooseCohort"
 
-    initialize: ->
+    initialize: (options) ->
+      @active_thread_id = null
+      @courseSettings = options.courseSettings
       @displayedCollection = new Discussion(@collection.models, pages: @collection.pages)
       @collection.on "change", @reloadDisplayedCollection
       @discussionIds=""
@@ -27,8 +30,9 @@ if Backbone?
         # if target.length > 0
         #   @filterTopic($.Event("filter", {'target': target[0]}))
       @collection.on "add", @addAndSelectThread
+      @collection.on "thread:remove", @threadRemoved
       @sidebar_padding = 10
-      @boardName
+      @boardName = null
       @template = _.template($("#thread-list-template").html())
       @current_search = ""
       @mode = 'all'
@@ -121,15 +125,20 @@ if Backbone?
 
     render: ->
       @timer = 0
-      @$el.html(@template())
+      @$el.html(
+        @template({
+          isCohorted: @courseSettings.get("is_cohorted"),
+          isPrivilegedUser: DiscussionUtil.isPrivilegedUser()
+        })
+      )
       @$(".forum-nav-sort-control").val(@collection.sort_preference)
 
-      $(window).bind "load", @updateSidebar
-      $(window).bind "scroll", @updateSidebar
-      $(window).bind "resize", @updateSidebar
+      $(window).bind "load scroll resize", @updateSidebar
 
       @displayedCollection.on "reset", @renderThreads
       @displayedCollection.on "thread:remove", @renderThreads
+      @displayedCollection.on "change:commentable_id", (model, commentable_id) =>
+        @retrieveDiscussions @discussionIds.split(",") if @mode is "commentables"
       @renderThreads()
       @
 
@@ -179,10 +188,9 @@ if Backbone?
         when 'search'
           options.search_text = @current_search
           if @group_id
-            options.group_id = @group_id          
+            options.group_id = @group_id
         when 'followed'
           options.user_id = window.user.id
-          options.group_id = "all"
         when 'commentables'
           options.commentable_ids = @discussionIds
           if @group_id
@@ -190,8 +198,7 @@ if Backbone?
         when 'all'
           if @group_id
             options.group_id = @group_id
-        
-    
+
       lastThread = @collection.last()?.get('id')
       if lastThread
         # Pagination; focus the first thread after what was previously the last thread
@@ -234,10 +241,12 @@ if Backbone?
       @trigger("thread:selected", thread_id)  # This triggers a callback in the DiscussionRouter which calls the line above...
       false
 
-    threadRemoved: (thread_id) =>
-      @trigger("thread:removed", thread_id)
+    threadRemoved: (thread) =>
+      if @active_thread_id == thread.id
+        @trigger("thread:deselected", thread.id)
 
     setActiveThread: (thread_id) ->
+      @active_thread_id = thread_id
       @$(".forum-nav-thread[data-id!='#{thread_id}'] .forum-nav-thread-link").removeClass("is-active")
       @$(".forum-nav-thread[data-id='#{thread_id}'] .forum-nav-thread-link").addClass("is-active")
 
@@ -248,15 +257,13 @@ if Backbone?
       $("input.email-setting").bind "click", @updateEmailNotifications
       url = DiscussionUtil.urlFor("notifications_status",window.user.get("id"))
       DiscussionUtil.safeAjax
-          url: url
-          type: "GET"
-          success: (response, textStatus) =>
-            if response.status
-              $('input.email-setting').attr('checked','checked')
-            else
-              $('input.email-setting').removeAttr('checked')
-      thread_id = null
-      @trigger("thread:removed")  
+        url: url
+        type: "GET"
+        success: (response, textStatus) =>
+          if response.status
+            $('input.email-setting').attr('checked','checked')
+          else
+            $('input.email-setting').removeAttr('checked')
       #select all threads
 
     isBrowseMenuVisible: =>
@@ -353,12 +360,15 @@ if Backbone?
         name =  prefix + rawName + gettext("…")
       return name
 
-    selectTopic: (event) ->
+    selectTopicHandler: (event) ->
       event.preventDefault()
+      @selectTopic $(event.target)
+
+    selectTopic: ($target) ->
       @hideBrowseMenu()
       @clearSearch()
 
-      item = $(event.target).closest('.forum-nav-browse-menu-item')
+      item = $target.closest('.forum-nav-browse-menu-item')
       @setCurrentTopicDisplay(@getPathText(item))
       if item.hasClass("forum-nav-browse-menu-all")
         @discussionIds = ""
@@ -382,7 +392,7 @@ if Backbone?
     chooseCohort: (event) =>
       @group_id = @$('.forum-nav-filter-cohort-control :selected').val()
       @retrieveFirstPage()
-      
+
     retrieveDiscussion: (discussion_id, callback=null) ->
       url = DiscussionUtil.urlFor("retrieve_discussion", discussion_id)
       DiscussionUtil.safeAjax
@@ -397,7 +407,7 @@ if Backbone?
           if callback?
             callback()
 
-    
+
     retrieveDiscussions: (discussion_ids) ->
       @discussionIds = discussion_ids.join(',')
       @mode = 'commentables'
@@ -418,7 +428,8 @@ if Backbone?
       @retrieveFirstPage(event)
 
     performSearch: (event) ->
-      if event.which == 13
+      #event.which 13 represent the Enter button 
+      if event.which == 13 or event.type == 'click'
         event.preventDefault()
         @hideBrowseMenu()
         @setCurrentTopicDisplay(gettext("Search Results"))
