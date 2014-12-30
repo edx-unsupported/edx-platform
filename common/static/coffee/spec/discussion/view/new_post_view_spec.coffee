@@ -23,8 +23,11 @@ describe "NewPostView", ->
       beforeEach ->
         @course_settings = new DiscussionCourseSettings({
           "category_map": {
-            "children": ["Topic"],
-            "entries": {"Topic": {"is_cohorted": true, "id": "topic"}}
+            "children": ["Topic", "General"],
+            "entries": {
+              "Topic": {"is_cohorted": true, "id": "topic"},
+              "General": {"is_cohorted": false, "id": "general"}
+            }
           },
           "allow_anonymous": false,
           "allow_anonymous_to_peers": false,
@@ -51,6 +54,19 @@ describe "NewPostView", ->
       it "allows moderators to see the cohort selector", ->
         DiscussionSpecHelper.makeModerator()
         checkVisibility(@view, true)
+
+      it "only shows the cohort selector when applicable", ->
+        DiscussionSpecHelper.makeModerator()
+        # We start on the cohorted discussion
+        checkVisibility(@view, true)
+        # Select the uncohorted topic
+        $('.topic-title:contains(General)').click()
+        # The menu should now be hidden.
+        checkVisibility(@view, false, true)
+        # Select the cohorted topic again
+        $('.topic-title:contains(Topic)').click()
+        # It should be visible once more.
+        checkVisibility(@view, true, false)
 
       it "allows the user to make a cohort selection", ->
         DiscussionSpecHelper.makeModerator()
