@@ -15,15 +15,18 @@ if Backbone?
               cohort_options: @getCohortOptions(),
               is_commentable_cohorted: @is_commentable_cohorted,
               mode: @mode,
+              is_commentable_cohorted: @is_commentable_cohorted,
               form_id: @mode + (if @topicId then "-" + @topicId else "")
           })
           @$el.html(_.template($("#new-post-template").html(), context))
           threadTypeTemplate = _.template($("#thread-type-template").html());
+          if $('.js-group-select').is(':disabled')
+              $('.group-selector-wrapper').hide()
           @addField(threadTypeTemplate({form_id: _.uniqueId("form-")}));
           if @isTabMode()
               @topicView = new DiscussionTopicMenuView {
                   topicId:  @topicId
-                  course_settings: @course_settings
+                  course_settings: @course_settings,
               }
               @topicView.on('thread:topic_change', @toggleGroupDropdown)
               @addField(@topicView.render())

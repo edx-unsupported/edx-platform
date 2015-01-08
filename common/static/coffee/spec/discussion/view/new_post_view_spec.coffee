@@ -41,6 +41,7 @@ describe "NewPostView", ->
           el: $("#fixture-element"),
           collection: @discussion,
           course_settings: @course_settings,
+          is_commentable_cohorted: true,
           mode: "tab"
         )
 
@@ -66,7 +67,7 @@ describe "NewPostView", ->
         # Select the cohorted topic again
         $('.topic-title:contains(Topic)').click()
         # It should be visible once more.
-        checkVisibility(@view, true, false)
+        checkVisibility(@view, true, true)
 
       it "allows the user to make a cohort selection", ->
         DiscussionSpecHelper.makeModerator()
@@ -112,12 +113,12 @@ describe "NewPostView", ->
           mode: "tab"
         )
 
-      it "disables the cohort menu if it is set false", ->
+      it "hides the cohort menu if it is set false", ->
         DiscussionSpecHelper.makeModerator()
         @view.is_commentable_cohorted = false
-        checkVisibility(@view, true, true)
+        checkVisibility(@view, false)
 
-      it "enables the cohort menu if it is set true", ->
+      it "shows the cohort menu if it is set true", ->
         DiscussionSpecHelper.makeModerator()
         @view.is_commentable_cohorted = true
         checkVisibility(@view, true)
