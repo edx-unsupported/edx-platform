@@ -14,6 +14,7 @@ from django.test.utils import override_settings
 from django.contrib.auth.models import AnonymousUser
 from mock import MagicMock, patch, Mock
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from courseware.module_render import hash_resource
 from xblock.field_data import FieldData
 from xblock.runtime import Runtime
 from xblock.fields import ScopeIds
@@ -240,6 +241,14 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         field_data_cache = FieldDataCache([self.toy_course, descriptor], self.toy_course.id, self.mock_user)
         render.get_module_for_descriptor(self.mock_user, request, descriptor, field_data_cache, self.toy_course.id)
         render.get_module_for_descriptor(self.mock_user, request, descriptor, field_data_cache, self.toy_course.id)
+
+    def test_hash_resource(self):
+        """
+        Ensure that the resource hasher works and does not fail on unicode,
+        decoded or otherwise.
+        """
+        resources = ['ASCII text', u'❄ I am a special snowflake.', "❄ So am I, but I didn't tell you."]
+        self.assertEqual(hash_resource(resources), 'a76e27c8e80ca3efd7ce743093aa59e0')
 
 
 @override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
