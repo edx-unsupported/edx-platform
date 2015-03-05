@@ -8,6 +8,7 @@ from django.conf import settings
 settings.INSTALLED_APPS  # pylint: disable=W0104
 
 from django_startup import autostartup
+from edx_notifications import startup
 from monkey_patch import django_utils_translation
 
 
@@ -25,6 +26,9 @@ def run():
 
     add_mimetypes()
 
+    if settings.FEATURES.get('NOTIFICATIONS_ENABLED', False):
+        startup_notification_subsystem()
+
 
 def add_mimetypes():
     """
@@ -38,3 +42,10 @@ def add_mimetypes():
     mimetypes.add_type('application/x-font-opentype', '.otf')
     mimetypes.add_type('application/x-font-ttf', '.ttf')
     mimetypes.add_type('application/font-woff', '.woff')
+
+
+def startup_notification_subsystem():
+    """
+    Initialize the Notification subsystem
+    """
+    startup.initialize()

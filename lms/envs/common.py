@@ -306,7 +306,10 @@ FEATURES = {
     'PROJECTS_APP': False,
 
     # Enable the Organizations,
-    'ORGANIZATIONS_APP': False
+    'ORGANIZATIONS_APP': False,
+
+    # Enable the edx-notifications subssytem
+    'NOTIFICATIONS_ENABLED': False,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -966,7 +969,10 @@ courseware_js = (
 
 main_vendor_js = [
     'js/vendor/require.js',
-    'js/RequireJS-namespace-undefine.js',
+    # Use the RequireJS-namespace.js rather than the 'undefine' version of it
+    # because otherwise our use of a 'text' plugin for RequireJS will fail
+    # 'js/RequireJS-namespace-undefine.js',
+    'js/RequireJS-namespace.js',
     'js/vendor/json2.js',
     'js/vendor/jquery.min.js',
     'js/vendor/jquery-ui.min.js',
@@ -1419,7 +1425,7 @@ INSTALLED_APPS = (
 
     # Country list
     'django_countries',
-    
+
     # EDX API application
     'api_manager',
 )
@@ -1806,3 +1812,48 @@ AUTO_REGISTRATION_AB_TEST_EXCLUDE_COURSES = set([
     "HarvardX/SW12.9x/3T2014",
     "HarvardX/SW12.8x/3T2014",
 ])
+
+################################### EDX-NOTIFICATIONS SUBSYSTEM ######################################
+
+INSTALLED_APPS += (
+    'edx_notifications',
+    'edx_notifications.server.web',
+)
+
+TEMPLATE_LOADERS += (
+    'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader',
+)
+
+NOTIFICATION_STORE_PROVIDER = {
+    "class": "edx_notifications.stores.sql.store_provider.SQLNotificationStoreProvider",
+    "options": {
+    }
+}
+
+if not 'SOUTH_MIGRATION_MODULES' in vars() and not 'SOUTH_MIGRATION_MODULES' in globals():
+    SOUTH_MIGRATION_MODULES = {}
+
+SOUTH_MIGRATION_MODULES.update({
+    'edx_notifications': 'edx_notifications.stores.sql.migrations',
+})
+
+# to prevent run-away queries from happening
+MAX_NOTIFICATION_LIST_SIZE = 100
+
+# list all known channel providers
+NOTIFICATION_CHANNEL_PROVIDERS = {
+    'durable': {
+        'class': 'edx_notifications.channels.durable.BaseDurableNotificationChannel',
+        'options': {}
+    },
+    'null': {
+        'class': 'edx_notifications.channels.null.NullNotificationChannel',
+        'options': {}
+    }
+}
+
+# list all of the mappings of notification types to channel
+NOTIFICATION_CHANNEL_PROVIDER_TYPE_MAPS = {
+    '*': 'durable',  # default global mapping
+}

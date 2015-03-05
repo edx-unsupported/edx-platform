@@ -106,6 +106,9 @@ FEATURES = {
 
     # Modulestore to use for new courses
     'DEFAULT_STORE_FOR_NEW_COURSE': 'mongo',
+
+    # edx-notifications subsystem
+    'NOTIFICATIONS_ENABLED': False,
 }
 ENABLE_JASMINE = False
 
@@ -703,3 +706,49 @@ ADVANCED_PROBLEM_TYPES = [
         'boilerplate_name': None,
     }
 ]
+
+
+################################### EDX-NOTIFICATIONS SUBSYSTEM ######################################
+
+INSTALLED_APPS += (
+    'edx_notifications',
+    'edx_notifications.server.web',
+)
+
+TEMPLATE_LOADERS += (
+    'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader',
+)
+
+NOTIFICATION_STORE_PROVIDER = {
+    "class": "edx_notifications.stores.sql.store_provider.SQLNotificationStoreProvider",
+    "options": {
+    }
+}
+
+if not 'SOUTH_MIGRATION_MODULES' in vars() and not 'SOUTH_MIGRATION_MODULES' in globals():
+    SOUTH_MIGRATION_MODULES = {}
+
+SOUTH_MIGRATION_MODULES.update({
+    'edx_notifications': 'edx_notifications.stores.sql.migrations',
+})
+
+# to prevent run-away queries from happening
+MAX_NOTIFICATION_LIST_SIZE = 100
+
+# list all known channel providers
+NOTIFICATION_CHANNEL_PROVIDERS = {
+    'durable': {
+        'class': 'edx_notifications.channels.durable.BaseDurableNotificationChannel',
+        'options': {}
+    },
+    'null': {
+        'class': 'edx_notifications.channels.null.NullNotificationChannel',
+        'options': {}
+    }
+}
+
+# list all of the mappings of notification types to channel
+NOTIFICATION_CHANNEL_PROVIDER_TYPE_MAPS = {
+    '*': 'durable',  # default global mapping
+}
