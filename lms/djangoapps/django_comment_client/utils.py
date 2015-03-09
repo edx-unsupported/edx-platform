@@ -1,5 +1,6 @@
+""" Utility functions for django_comment_client """
 import json
-import string
+import string  # http://www.logilab.org/ticket/2481 pylint: disable=deprecated-module
 import pytz
 from collections import defaultdict
 import logging
@@ -18,12 +19,12 @@ from django_comment_client.permissions import check_permissions_by_view, cached_
 from edxmako import lookup_template
 import pystache_custom as pystache
 
+from django.utils.timezone import UTC
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_by_id, get_cohort_id, is_commentable_cohorted, is_course_cohorted
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from opaque_keys.edx.locations import i4xEncoder
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
-
 log = logging.getLogger(__name__)
 
 
@@ -494,7 +495,7 @@ def get_group_id_for_comments_service(request, course_key, commentable_id=None):
         return None
 
 
-def format_filename(s):
+def format_filename(filename):
     """Take a string and return a valid filename constructed from the string.
     Uses a whitelist approach: any characters not present in valid_chars are
     removed. Also spaces are replaced with underscores.
@@ -507,6 +508,6 @@ def format_filename(s):
     https://gist.github.com/seanh/93666
     """
     valid_chars = "-_.() %s%s" % (string.ascii_letters, string.digits)
-    filename = ''.join(c for c in s if c in valid_chars)
+    filename = ''.join(c for c in filename if c in valid_chars)
     filename = filename.replace(' ', '_')
     return filename
