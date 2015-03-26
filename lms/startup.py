@@ -13,8 +13,13 @@ import logging
 from monkey_patch import django_utils_translation
 import analytics
 
+from course_groups.scope_resolver import CourseGroupScopeResolver
+from student.scope_resolver import CourseEnrollmentsScopeResolver
+from edx_notifications.scopes import register_user_scope_resolver
+
 log = logging.getLogger(__name__)
 
+from edx_notifications import startup
 
 def run():
     """
@@ -31,6 +36,9 @@ def run():
 
     add_mimetypes()
 
+    if settings.FEATURES.get('ENABLE_NOTIFICATIONS', False):
+        startup_notification_subsystem()
+
     if settings.FEATURES.get('USE_CUSTOM_THEME', False):
         enable_theme()
 
@@ -40,7 +48,7 @@ def run():
     if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH', False):
         enable_third_party_auth()
 
-    # Initialize Segment.io analytics module. Flushes first time a message is received and 
+    # Initialize Segment.io analytics module. Flushes first time a message is received and
     # every 50 messages thereafter, or if 10 seconds have passed since last flush
     if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY'):
         analytics.init(settings.SEGMENT_IO_LMS_KEY, flush_at=50)
@@ -144,3 +152,22 @@ def enable_third_party_auth():
 
     from third_party_auth import settings as auth_settings
     auth_settings.apply_settings(settings.THIRD_PARTY_AUTH, settings)
+
+
+def startup_notification_subsystem():
+    """
+    Initialize the Notification subsystem
+    """
+    try:
+        startup.initialize()
+
+        # register the two scope resolvers that the LMS will be providing
+        # to edx-notifications
+        register_user_scope_resolver('course_enrollments', CourseEnrollmentsScopeResolver())
+        register_user_scope_resolver('course_group', CourseGroupScopeResolver())
+    except Exception, ex:
+        # Note this will fail when we try to run migrations as manage.py will call startup.py
+        # and startup.initialze() will try to manipulate some database tables.
+        # We need to research how to identify when we are being started up as part of
+        # a migration script
+        log.exception(ex)
