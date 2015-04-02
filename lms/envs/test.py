@@ -460,3 +460,52 @@ FEATURES['MILESTONES_APP'] = True
 
 # ENTRANCE EXAMS
 FEATURES['ENTRANCE_EXAMS'] = True
+
+########################## SECURITY #######################
+
+FEATURES['ENFORCE_PASSWORD_POLICY'] = False
+FEATURES['ENABLE_MAX_FAILED_LOGIN_ATTEMPTS'] = False
+FEATURES['SQUELCH_PII_IN_LOGS'] = False
+FEATURES['PREVENT_CONCURRENT_LOGINS'] = False
+FEATURES['ADVANCED_SECURITY'] = False
+
+PASSWORD_MIN_LENGTH = None
+PASSWORD_COMPLEXITY = {}
+
+
+############# Performance Profiler #################
+# Note: We've added profiler support to this configuration in order
+# to enable analysis when running unit tests.  (outputs to console)
+FEATURES['PROFILER'] = False
+if FEATURES.get('PROFILER'):
+    INSTALLED_APPS += ('profiler',)
+    MIDDLEWARE_CLASSES += (
+        'profiler.middleware.HotshotProfilerMiddleware',
+        'profiler.middleware.CProfileProfilerMiddleware',
+    )
+
+
+############# Student Module #################
+FEATURES['SIGNAL_ON_SCORE_CHANGED'] = True
+
+
+############# Student Gradebook #################
+FEATURES['STUDENT_GRADEBOOK'] = True
+if FEATURES.get('STUDENT_GRADEBOOK', False) and "'gradebook'" not in INSTALLED_APPS:
+    INSTALLED_APPS += ('gradebook',)
+
+
+############# Student Progress #################
+FEATURES['STUDENT_PROGRESS'] = True
+if FEATURES.get('STUDENT_PROGRESS', False) and "'progress'" not in INSTALLED_APPS:
+    INSTALLED_APPS += ('progress',)
+
+############# Projects App #################
+FEATURES['PROJECTS_APP'] = True
+if FEATURES.get('PROJECTS_APP') and "projects" not in INSTALLED_APPS:
+    INSTALLED_APPS += ('projects',)
+
+############# Organizations App #################
+FEATURES['ORGANIZATIONS_APP'] = True
+if FEATURES.get('ORGANIZATIONS_APP') and "organizations" not in INSTALLED_APPS:
+    INSTALLED_APPS += ('organizations',)

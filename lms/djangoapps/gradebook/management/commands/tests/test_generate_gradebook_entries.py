@@ -7,21 +7,23 @@ from mock import MagicMock, patch
 import uuid
 
 from django.conf import settings
-from django.test import TestCase
 from django.test.utils import override_settings
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware import module_render
 from courseware.model_data import FieldDataCache
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from gradebook.management.commands import generate_gradebook_entries
 from gradebook.models import StudentGradebook, StudentGradebookHistory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
+
+MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-class GenerateGradebookEntriesTests(TestCase):
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
+@patch.dict("django.conf.settings.FEATURES", {'SIGNAL_ON_SCORE_CHANGED': False})
+class GenerateGradebookEntriesTests(ModuleStoreTestCase):
     """
     Test suite for grade generation script
     """
@@ -137,7 +139,7 @@ class GenerateGradebookEntriesTests(TestCase):
 
     @patch.dict(settings.FEATURES, {
                 'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False,
-                'SIGNAL_ON_SCORE_CHANGED': True
+                'SIGNAL_ON_SCORE_CHANGED': False
     })
     def test_generate_gradebook_entries(self):
         """
