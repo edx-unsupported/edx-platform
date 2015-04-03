@@ -18,7 +18,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from courseware.access import has_access
 from util.file import store_uploaded_file
 from courseware.courses import get_course_with_access, get_course_by_id
-from course_groups.cohorts import get_cohort_by_id
+from openedx.core.djangoapps.course_groups.cohorts import get_cohort_by_id
 import django_comment_client.settings as cc_settings
 from django_comment_client.utils import (
     add_courseware_context,

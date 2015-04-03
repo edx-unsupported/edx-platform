@@ -335,6 +335,27 @@ FEATURES = {
 
     # For easily adding modes to courses during acceptance testing
     'MODE_CREATION_FOR_TESTING': False,
+    # Whether an xBlock publishing a 'grade' event should be considered a 'progress' event as well
+    'MARK_PROGRESS_ON_GRADING_EVENT': False,
+
+    # Broadcast score changes to the rest of the system
+    'SIGNAL_ON_SCORE_CHANGED': False,
+
+    # Enable the Student Gradebook, which is essentially a cache of calculated grades
+    # In order to use the gradebook, you must add it to the list of INSTALLED_APPS in
+    # addition to setting the flag to True here.  A reference is available in aws.py
+    'STUDENT_GRADEBOOK': False,
+
+    # Enable the Student Progress, which is essentially a cache of module completions
+    # In order to use the "progress", you must add it to the list of INSTALLED_APPS in
+    # addition to setting the flag to True here.  A reference is available in aws.py
+    'STUDENT_PROGRESS': False,
+
+    # Enable the projects,
+    'PROJECTS_APP': False,
+
+    # Enable the Organizations,
+    'ORGANIZATIONS_APP': False
 }
 
 # Ignore static asset files on import which match this pattern
@@ -520,7 +541,8 @@ USAGE_KEY_PATTERN = r'(?P<usage_key_string>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@
 ASSET_KEY_PATTERN = r'(?P<asset_key_string>(?:/?c4x(:/)?/[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
 USAGE_ID_PATTERN = r'(?P<usage_id>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
 
-
+# Modules having these categories would be excluded from progress calculations
+PROGRESS_DETACHED_CATEGORIES = ['discussion-course', 'group-project', 'discussion-forum']
 ############################## EVENT TRACKING #################################
 
 # FIXME: Should we be doing this truncation?
@@ -600,10 +622,11 @@ VIRTUAL_UNIVERSITIES = []
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore import prefer_xmodules
 from xmodule.x_module import XModuleMixin
+from xmodule.modulestore.edit_info import EditInfoMixin
 
 # This should be moved into an XBlock Runtime/Application object
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
-XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin)
+XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin, EditInfoMixin)
 
 # Allow any XBlock in the LMS
 XBLOCK_SELECT_FUNCTION = prefer_xmodules
@@ -1624,7 +1647,7 @@ INSTALLED_APPS = (
     'lms.djangoapps.lms_xblock',
     
     # EDX API application
-    'api_manager',    
+    'api_manager',
 )
 
 ######################### MARKETING SITE ###############################
@@ -1679,13 +1702,9 @@ if FEATURES.get('AUTH_USE_CAS'):
 ############# CORS headers for cross-domain requests #################
 
 if FEATURES.get('ENABLE_CORS_HEADERS'):
-    INSTALLED_APPS += ('corsheaders', 'cors_csrf')
-    MIDDLEWARE_CLASSES = (
-        'corsheaders.middleware.CorsMiddleware',
-        'cors_csrf.middleware.CorsCSRFMiddleware',
-    ) + MIDDLEWARE_CLASSES
     CORS_ALLOW_CREDENTIALS = True
     CORS_ORIGIN_WHITELIST = ()
+    CORS_ORIGIN_ALLOW_ALL = False
 
 
 ###################### Registration ##################################
@@ -1726,6 +1745,7 @@ PROGRESS_SUCCESS_BUTTON_URL = 'http://<domain>/<path>/{course_id}'
 PROGRESS_SUCCESS_BUTTON_TEXT_OVERRIDE = None
 
 #### PASSWORD POLICY SETTINGS #####
+
 PASSWORD_MIN_LENGTH = 8
 PASSWORD_MAX_LENGTH = None
 PASSWORD_COMPLEXITY = {"UPPER": 1, "LOWER": 1, "DIGITS": 1}
@@ -1961,6 +1981,9 @@ OPTIONAL_APPS = (
 
     # milestones
     'milestones',
+
+    'projects',
+    'organizations',
 )
 
 for app_name in OPTIONAL_APPS:

@@ -1,10 +1,8 @@
 import logging
 
 from xblock.core import XBlock
-from xblock.fields import Scope, String
+from xblock.fields import Scope, String, UNIQUE_ID
 from xblock.fragment import Fragment
-
-from uuid import uuid4
 
 from .utils import (
     render_template,
@@ -19,9 +17,7 @@ log = logging.getLogger(__name__)
 @XBlock.needs('discussion')
 class DiscussionXBlock(XBlock):
     """ Provides functionality similar to discussion XModule in inline mode """
-    FIELDS_TO_INIT = ('discussion_id',)
-
-    discussion_id = String(scope=Scope.settings, default=lambda: uuid4().hex)
+    discussion_id = String(scope=Scope.settings, default=UNIQUE_ID)
     display_name = String(
         display_name="Display Name",
         help="Display name for this module",
