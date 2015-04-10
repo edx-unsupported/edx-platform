@@ -85,7 +85,11 @@ div.discussion-course, div.content-wrapper {
   position: absolute;
   margin-top: -6px;
   top: 50%;
+<<<<<<< HEAD
   @include right($baseline/4 + 1px + $baseline / 4); // Wrapper padding + border + input padding
+=======
+  right: ($baseline/4 + 1px + $baseline / 4); // Wrapper padding + border + input padding
+>>>>>>> 62f722e... changes to make things work as expected
 }
 
 .forum-nav-search-input {
@@ -157,14 +161,22 @@ div.discussion-course, div.content-wrapper {
   @include box-sizing(border-box);
   display: inline-block;
   width: 50%;
+<<<<<<< HEAD
   @include text-align(left);
+=======
+  text-align: left;
+>>>>>>> 62f722e... changes to make things work as expected
 }
 
 .forum-nav-filter-cohort, .forum-nav-sort {
   @include box-sizing(border-box);
   display: inline-block;
   width: 50%;
+<<<<<<< HEAD
   @include text-align(right);
+=======
+  text-align: right;
+>>>>>>> 62f722e... changes to make things work as expected
 }
 
 %forum-nav-select {
@@ -224,7 +236,10 @@ div.discussion-course, div.content-wrapper {
     @include font-size(14);
 
     &:before {
+<<<<<<< HEAD
 
+=======
+>>>>>>> 62f722e... changes to make things work as expected
       @include rtl {
         @include transform(scale(-1, 1)); // RTL for font awesome question mark
       }
@@ -252,7 +267,11 @@ div.discussion-course, div.content-wrapper {
 .forum-nav-thread-wrapper-2 {
   @extend %forum-nav-thread-wrapper;
   width: 13%;
+<<<<<<< HEAD
   @include text-align(right);
+=======
+  text-align: right;
+>>>>>>> 62f722e... changes to make things work as expected
 }
 
 .forum-nav-thread-title {
@@ -293,12 +312,22 @@ div.discussion-course, div.content-wrapper {
     display: block;
     position: absolute;
     bottom: (-$baseline/4);
+<<<<<<< HEAD
     @include right($baseline/4);
     width: 0;
     height: 0;
     border-style: solid;
     @include border-width(0, ($baseline/4), ($baseline/4), 0);
     @include border-color(transparent, $gray-l3, transparent, transparent);
+=======
+    right: ($baseline/4);
+    width: 0;
+    height: 0;
+    border-style: solid;
+
+    border-width: 0 ($baseline/4) ($baseline/4) 0;
+    border-color: transparent $gray-l3 transparent transparent;
+>>>>>>> 62f722e... changes to make things work as expected
   }
 
   &.is-unread {
