@@ -2052,6 +2052,7 @@ if not 'SOUTH_MIGRATION_MODULES' in vars() and not 'SOUTH_MIGRATION_MODULES' in 
 
 SOUTH_MIGRATION_MODULES.update({
     'edx_notifications': 'edx_notifications.stores.sql.migrations',
+    'problem_builder': 'problem_builder.south_migrations',
 })
 
 # to prevent run-away queries from happening
