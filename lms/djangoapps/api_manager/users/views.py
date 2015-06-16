@@ -25,7 +25,7 @@ from openedx.core.djangoapps.course_groups.cohorts import (
     add_user_to_cohort,
     remove_user_from_cohort
 )
-from django_comment_common.models import Role, FORUM_ROLE_MODERATOR
+from django_comment_common.models import Role, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA
 from gradebook.models import StudentGradebook
 from instructor.access import revoke_access, update_forum_role
 from lang_pref import LANGUAGE_KEY
@@ -143,7 +143,10 @@ def _manage_role(course_descriptor, user, role, action):
     Helper method for managing course/forum roles
     """
     supported_roles = ('instructor', 'staff', 'observer', 'assistant')
-    forum_moderator_roles = ('instructor', 'staff', 'assistant')
+    role_perm_map = {
+        FORUM_ROLE_MODERATOR: ('instructor', 'staff'),
+        FORUM_ROLE_COMMUNITY_TA: ('assistant',),
+    }
     if role not in supported_roles:
         raise ValueError
     if action is 'allow':
@@ -151,39 +154,42 @@ def _manage_role(course_descriptor, user, role, action):
         if not existing_role:
             new_role = CourseAccessRole(user=user, role=role, course_id=course_descriptor.id, org=course_descriptor.org)
             new_role.save()
-        if role in forum_moderator_roles:
-            try:
-                dep_string = course_descriptor.id.to_deprecated_string()
-                ssck = SlashSeparatedCourseKey.from_deprecated_string(dep_string)
-                update_forum_role(ssck, user, FORUM_ROLE_MODERATOR, 'allow')
-            except Role.DoesNotExist:
-                try:
-                    update_forum_role(course_descriptor.id, user, FORUM_ROLE_MODERATOR, 'allow')
-                except Role.DoesNotExist:
-                    pass
-
-    elif action is 'revoke':
-        revoke_access(course_descriptor, user, role)
-        if role in forum_moderator_roles:
-            # There's a possibilty that the user may play more than one role in a course
-            # And that more than one of these roles allow for forum moderation
-            # So we need to confirm the removed role was the only role for this user for this course
-            # Before we can safely remove the corresponding forum moderator role
-            user_instructor_courses = UserBasedRole(user, CourseInstructorRole.ROLE).courses_with_role()
-            user_staff_courses = UserBasedRole(user, CourseStaffRole.ROLE).courses_with_role()
-            user_assistant_courses = UserBasedRole(user, CourseAssistantRole.ROLE).courses_with_role()
-            queryset = user_instructor_courses | user_staff_courses | user_assistant_courses
-            queryset = queryset.filter(course_id=course_descriptor.id)
-            if len(queryset) == 0:
+        for perm, role_labels in role_perm_map.items():
+            if role in role_labels:
                 try:
                     dep_string = course_descriptor.id.to_deprecated_string()
                     ssck = SlashSeparatedCourseKey.from_deprecated_string(dep_string)
-                    update_forum_role(ssck, user, FORUM_ROLE_MODERATOR, 'revoke')
+                    update_forum_role(ssck, user, perm, 'allow')
                 except Role.DoesNotExist:
                     try:
-                        update_forum_role(course_descriptor.id, user, FORUM_ROLE_MODERATOR, 'revoke')
+                        update_forum_role(course_descriptor.id, user, perm, 'allow')
                     except Role.DoesNotExist:
                         pass
+                break
+
+    elif action is 'revoke':
+        revoke_access(course_descriptor, user, role)
+        for perm, role_labels in role_perm_map.items():
+            if role in role_labels:
+                # There's a possibilty that the user may play more than one role in a course
+                # And that more than one of these roles allow for forum moderation
+                # So we need to confirm the removed role was the only role for this user for this course
+                # Before we can safely remove the corresponding forum moderator role
+                user_instructor_courses = UserBasedRole(user, CourseInstructorRole.ROLE).courses_with_role()
+                user_staff_courses = UserBasedRole(user, CourseStaffRole.ROLE).courses_with_role()
+                user_assistant_courses = UserBasedRole(user, CourseAssistantRole.ROLE).courses_with_role()
+                queryset = user_instructor_courses | user_staff_courses | user_assistant_courses
+                queryset = queryset.filter(course_id=course_descriptor.id)
+                if len(queryset) == 0:
+                    try:
+                        dep_string = course_descriptor.id.to_deprecated_string()
+                        ssck = SlashSeparatedCourseKey.from_deprecated_string(dep_string)
+                        update_forum_role(ssck, user, perm, 'revoke')
+                    except Role.DoesNotExist:
+                        try:
+                            update_forum_role(course_descriptor.id, user, perm, 'revoke')
+                        except Role.DoesNotExist:
+                            pass
 
 
 class UsersList(SecureListAPIView):

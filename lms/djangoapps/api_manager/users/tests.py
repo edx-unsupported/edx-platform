@@ -26,7 +26,7 @@ from capa.tests.response_xml_factory import StringResponseXMLFactory
 from courseware import module_render
 from courseware.model_data import FieldDataCache
 from courseware.tests.factories import StudentModuleFactory
-from django_comment_common.models import Role, FORUM_ROLE_MODERATOR
+from django_comment_common.models import Role, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA
 from instructor.access import allow_access
 from notification_prefs import NOTIFICATION_PREF_KEY
 from projects.models import Project, Workgroup
@@ -1776,7 +1776,8 @@ class UsersApiTests(ModuleStoreTestCase):
         )
         Role.objects.get_or_create(
             name=FORUM_ROLE_MODERATOR,
-            course_id=course2.id)
+            course_id=course2.id
+        )
 
         course3 = CourseFactory.create(
             display_name="TEST COURSE3",
@@ -1787,7 +1788,8 @@ class UsersApiTests(ModuleStoreTestCase):
         )
         Role.objects.get_or_create(
             name=FORUM_ROLE_MODERATOR,
-            course_id=course3.id)
+            course_id=course3.id,
+        )
 
         course4 = CourseFactory.create(
             display_name="COURSE4 NO MODERATOR",
@@ -1795,6 +1797,23 @@ class UsersApiTests(ModuleStoreTestCase):
             end=datetime(2020, 1, 16, 14, 30),
             org='TURLP4',
             run='TURLP4'
+        )
+
+        course5 = CourseFactory.create(
+            display_name="COURSE5 COMMUNITY TA",
+            start=datetime(2014, 6, 16, 14, 30),
+            end=datetime(2020, 1, 16, 14, 30),
+            org='TURLP5',
+            run='TURLP5'
+        )
+
+        moderator_role, _ = Role.objects.get_or_create(
+            name=FORUM_ROLE_MODERATOR,
+            course_id=course5.id,
+        )
+        ta_role, _ = Role.objects.get_or_create(
+            name=FORUM_ROLE_COMMUNITY_TA,
+            course_id=course5.id,
         )
 
         test_uri = '{}/{}/roles/'.format(self.users_base_uri, self.user.id)
@@ -1842,6 +1861,16 @@ class UsersApiTests(ModuleStoreTestCase):
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 2)
+
+        # Make sure that TAs aren't treated as moderators
+        data = {'roles': [
+            {'course_id': unicode(course5.id), 'role': 'assistant'},
+        ]}
+        response = self.do_put(test_uri, data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['roles'][0]['role'], 'assistant')
+        ta_role.users.get(id=self.user.id)
+        self.assertRaises(ObjectDoesNotExist, moderator_role.users.get, id=self.user.id)
 
     def test_users_roles_list_put_invalid_user(self):
         test_uri = '{}/2131/roles/'.format(self.users_base_uri)
