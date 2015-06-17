@@ -148,7 +148,12 @@ class UsersApiTests(ModuleStoreTestCase):
 
         Role.objects.get_or_create(
             name=FORUM_ROLE_MODERATOR,
-            course_id=self.course.id)
+            course_id=self.course.id,
+        )
+        Role.objects.get_or_create(
+            name=FORUM_ROLE_COMMUNITY_TA,
+            course_id=self.course.id,
+        )
 
     def do_post(self, uri, data):
         """Submit an HTTP POST request"""
@@ -1743,8 +1748,8 @@ class UsersApiTests(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 1)
 
-        # Confirm this user also has forum moderation permissions
-        role = Role.objects.get(course_id=self.course.id, name=FORUM_ROLE_MODERATOR)
+        # Confirm this user also has forum TA Permissions
+        role = Role.objects.get(course_id=self.course.id, name=FORUM_ROLE_COMMUNITY_TA)
         has_role = role.users.get(id=self.user.id)
         self.assertTrue(has_role)
 
@@ -1871,6 +1876,16 @@ class UsersApiTests(ModuleStoreTestCase):
         self.assertEqual(response.data['roles'][0]['role'], 'assistant')
         ta_role.users.get(id=self.user.id)
         self.assertRaises(ObjectDoesNotExist, moderator_role.users.get, id=self.user.id)
+
+        # Make sure Internal Admins aren't treated as TAs for the forum, and are treated as instructors on the course.
+        data = {'roles': [
+            {'course_id': unicode(course5.id), 'role': 'internal_admin'},
+        ]}
+        response = self.do_put(test_uri, data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['roles'][0]['role'], 'internal_admin')
+        moderator_role.users.get(id=self.user.id)
+        self.assertRaises(ObjectDoesNotExist, ta_role.users.get, id=self.user.id)
 
     def test_users_roles_list_put_invalid_user(self):
         test_uri = '{}/2131/roles/'.format(self.users_base_uri)
