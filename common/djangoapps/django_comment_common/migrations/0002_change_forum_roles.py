@@ -11,7 +11,7 @@ class Migration(DataMigration):
         After this is run in production, it should be commented out as a no-op for any teams that follow after.
         """
         Role = orm['django_comment_common.Role']
-        for role in Role.objects.filter(name__in=['instructor', 'staff', 'moderator']):
+        for role in Role.objects.filter(name__in=['Administrator', 'Moderator']):
             ta_role, _ = Role.objects.get_or_create(name='Community TA', course_id=role.course_id)
             ta_role.users.add(*role.users.all())
             role.users.clear()
