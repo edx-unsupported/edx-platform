@@ -3,202 +3,37 @@ set -e
 
 ###############################################################################
 #
-#   edx-all-tests.sh
+#   all-tests.sh
 #
-#   Execute all tests for edx-platform.
-#
-#   This script can be called from a Jenkins
-#   multiconfiguration job that defines these environment
-#   variables:
-#
-#   `TEST_SUITE` defines which kind of test to run.
-#   Possible values are:
-#
-#       - "quality": Run the quality (pep8/pylint) checks
-#       - "unit": Run the JavaScript and Python unit tests
-#            (also tests building the Sphinx documentation,
-#             because we couldn't think of a better place to put it)
-#       - "lms-acceptance": Run the acceptance (Selenium) tests for the LMS
-#       - "cms-acceptance": Run the acceptance (Selenium) tests for Studio
-#       - "bok-choy": Run acceptance tests that use the bok-choy framework
-#
-#   `SHARD` is a number (1, 2, or 3) indicating which subset of the tests
-#       to build.  Currently, "lms-acceptance" and "bok-choy" each have two
-#       shards (1 and 2), "cms-acceptance" has three shards (1, 2, and 3),
-#       and all the other test suites have one shard.
-#
-#       For the "bok-choy", the tests are put into shard groups using the nose
-#       'attr' decorator (e.g. "@attr('shard_1')").  Currently, anything with
-#       the 'shard_1' attribute will run in the first shard.  All other bok-choy
-#       tests will run in shard 2.
-#
-#       For the lettuce acceptance tests, ("lms-" and "cms-acceptance") they
-#       are decorated with "@shard_{}" (e.g. @shard_1 for the first shard).
-#       The lettuce tests must have a shard specified to be run in jenkins,
-#       as there is no shard that runs unspecified tests.
-#
-#
-#   Jenkins configuration:
-#
-#   - The edx-platform git repository is checked out by the Jenkins git plugin.
-#
-#   - Jenkins logs in as user "jenkins"
-#
-#   - The Jenkins file system root is "/home/jenkins"
-#
-#   - An init script creates a virtualenv at "/home/jenkins/edx-venv"
-#     with some requirements pre-installed (such as scipy)
-#
-#  Jenkins worker setup:
-#  See the edx/configuration repo for Jenkins worker provisioning scripts.
-#  The provisioning scripts install requirements that this script depends on!
+#   Execute tests for edx-platform. This script is designed to be the
+#   entry point for various CI systems.
 #
 ###############################################################################
 
 # Violations thresholds for failing the build
-PYLINT_THRESHOLD=6300
-PEP8_THRESHOLD=0
+export PYLINT_THRESHOLD=6200
+export JSHINT_THRESHOLD=3700
 
-source $HOME/jenkins_env
+doCheckVars() {
+    if [ -n "$CIRCLECI" ] ; then
+        SCRIPT_TO_RUN=scripts/circle-ci-tests.sh
 
-# Clean up previous builds
-git clean -qxfd
+    elif [ -n "$JENKINS_HOME" ] ; then
+        source scripts/jenkins-common.sh
+        SCRIPT_TO_RUN=scripts/generic-ci-tests.sh
+    fi
+}
 
-# Clear the mongo database
-# Note that this prevents us from running jobs in parallel on a single worker.
-mongo --quiet --eval 'db.getMongo().getDBNames().forEach(function(i){db.getSiblingDB(i).dropDatabase()})'
+# Determine the CI system for the environment
+doCheckVars
 
-# Ensure we have fetched origin/master
-# Some of the reporting tools compare the checked out branch to origin/master;
-# depending on how the GitHub plugin refspec is configured, this may
-# not already be fetched.
-git fetch origin master:refs/remotes/origin/master
+# Run appropriate CI system script
+if [ -n "$SCRIPT_TO_RUN" ] ; then
+    $SCRIPT_TO_RUN
 
-# Reset the jenkins worker's ruby environment back to
-# the state it was in when the instance was spun up.
-if [ -e $HOME/edx-rbenv_clean.tar.gz ]; then
-    rm -rf $HOME/.rbenv
-    tar -C $HOME -xf $HOME/edx-rbenv_clean.tar.gz
+    # Exit with the exit code of the called script
+    exit $?
+else
+    echo "ERROR. Could not detect continuous integration system."
+    exit 1
 fi
-
-# Bootstrap Ruby requirements so we can run the tests
-bundle install
-
-# Ensure the Ruby environment contains no stray gems
-bundle clean --force
-
-# Reset the jenkins worker's virtualenv back to the
-# state it was in when the instance was spun up.
-if [ -e $HOME/edx-venv_clean.tar.gz ]; then
-    rm -rf $HOME/edx-venv
-    tar -C $HOME -xf $HOME/edx-venv_clean.tar.gz
-fi
-
-# Activate the Python virtualenv
-source $HOME/edx-venv/bin/activate
-
-# If the environment variable 'SHARD' is not set, default to 'all'.
-# This could happen if you are trying to use this script from
-# jenkins and do not define 'SHARD' in your multi-config project.
-# Note that you will still need to pass a value for 'TEST_SUITE'
-# or else no tests will be executed.
-SHARD=${SHARD:="all"}
-
-case "$TEST_SUITE" in
-
-    "quality")
-        paver find_fixme > fixme.log || { cat fixme.log; EXIT=1; }
-        paver run_pep8 -l $PEP8_THRESHOLD > pep8.log || { cat pep8.log; EXIT=1; }
-        paver run_pylint -l $PYLINT_THRESHOLD > pylint.log || { cat pylint.log; EXIT=1; }
-        # Run quality task. Pass in the 'fail-under' percentage to diff-quality
-        paver run_quality -p 100
-
-        # Need to create an empty test result so the post-build
-        # action doesn't fail the build.
-        mkdir -p reports
-        cat > reports/quality.xml <<END
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="quality" tests="1" errors="0" failures="0" skip="0">
-<testcase classname="quality" name="quality" time="0.604"></testcase>
-</testsuite>
-END
-        exit $EXIT
-        ;;
-
-    "unit")
-        paver test
-        paver coverage
-        ;;
-
-    "lms-acceptance")
-        case "$SHARD" in
-
-            "all")
-                paver test_acceptance -s lms --extra_args="-v 3"
-                ;;
-
-            *)
-                paver test_acceptance -s lms --extra_args="-v 3 --tag shard_${SHARD}"
-                ;;
-        esac
-        ;;
-
-    "cms-acceptance")
-        case "$SHARD" in
-
-            "all")
-                paver test_acceptance -s cms --extra_args="-v 3"
-                ;;
-
-            *)
-                paver test_acceptance -s cms --extra_args="-v 3 --tag shard_${SHARD}"
-                ;;
-        esac
-        ;;
-
-    "bok-choy")
-        case "$SHARD" in
-
-            "all")
-                paver test_bokchoy
-                paver bokchoy_coverage
-                ;;
-
-            "1")
-                paver test_bokchoy --extra_args="-a shard_1"
-                paver bokchoy_coverage
-                ;;
-
-            "2")
-                paver test_bokchoy --extra_args="-a 'shard_2'"
-                paver bokchoy_coverage
-                ;;
-
-            "3")
-                paver test_bokchoy --extra_args="-a shard_1=False,shard_2=False"
-                paver bokchoy_coverage
-                ;;
-
-            # Default case because if we later define another bok-choy shard on Jenkins
-            # (e.g. Shard 4) in the multi-config project and expand this file
-            # with an additional case condition, old branches without that commit
-            # would not execute any tests on the worker assigned to that shard
-            # and thus their build would fail.
-            # This way they will just report 1 test executed and passed.
-            *)
-                # Need to create an empty test result so the post-build
-                # action doesn't fail the build.
-                # May be unnecessary if we changed the "Skip if there are no test files"
-                # option to True in the jenkins job definitions.
-                mkdir -p reports/bok_choy
-                cat > reports/bok_choy/xunit.xml <<END
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="nosetests" tests="1" errors="0" failures="0" skip="0">
-<testcase classname="acceptance.tests" name="shard_placeholder" time="0.001"></testcase>
-</testsuite>
-END
-                ;;
-        esac
-        ;;
-
-esac
