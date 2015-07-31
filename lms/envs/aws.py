@@ -74,10 +74,13 @@ BROKER_HEARTBEAT_CHECKRATE = 2
 # Each worker should only fetch one message at a time
 CELERYD_PREFETCH_MULTIPLIER = 1
 
+if not 'SOUTH_MIGRATION_MODULES' in vars() and not 'SOUTH_MIGRATION_MODULES' in globals():
+    SOUTH_MIGRATION_MODULES = {}
+
 # Skip djcelery migrations, since we don't use the database as the broker
-SOUTH_MIGRATION_MODULES = {
+SOUTH_MIGRATION_MODULES.update({
     'djcelery': 'ignore',
-}
+})
 
 # Rename the exchange and queues for each variant
 
@@ -331,6 +334,11 @@ FOOTER_BROWSER_CACHE_MAX_AGE = ENV_TOKENS.get('FOOTER_BROWSER_CACHE_MAX_AGE', FO
 ############# CORS headers for cross-domain requests #################
 
 if FEATURES.get('ENABLE_CORS_HEADERS') or FEATURES.get('ENABLE_CROSS_DOMAIN_CSRF_COOKIE'):
+    INSTALLED_APPS += ('corsheaders', 'cors_csrf')
+    MIDDLEWARE_CLASSES = (
+        'corsheaders.middleware.CorsMiddleware',
+        'cors_csrf.middleware.CorsCSRFMiddleware',
+    ) + MIDDLEWARE_CLASSES
     CORS_ALLOW_CREDENTIALS = True
     CORS_ORIGIN_WHITELIST = ENV_TOKENS.get('CORS_ORIGIN_WHITELIST', ())
     CORS_ORIGIN_ALLOW_ALL = ENV_TOKENS.get('CORS_ORIGIN_ALLOW_ALL', False)
@@ -480,6 +488,9 @@ BROKER_URL = "{0}://{1}:{2}@{3}/{4}".format(CELERY_BROKER_TRANSPORT,
 # upload limits
 STUDENT_FILEUPLOAD_MAX_SIZE = ENV_TOKENS.get("STUDENT_FILEUPLOAD_MAX_SIZE", STUDENT_FILEUPLOAD_MAX_SIZE)
 
+# Modules having these categories would be excluded from progress calculations
+PROGRESS_DETACHED_CATEGORIES = ['discussion-course', 'group-project', 'discussion-forum']
+
 # Event tracking
 TRACKING_BACKENDS.update(AUTH_TOKENS.get("TRACKING_BACKENDS", {}))
 EVENT_TRACKING_BACKENDS['tracking_logs']['OPTIONS']['backends'].update(AUTH_TOKENS.get("EVENT_TRACKING_BACKENDS", {}))
@@ -521,9 +532,28 @@ MICROSITE_CONFIGURATION = ENV_TOKENS.get('MICROSITE_CONFIGURATION', {})
 MICROSITE_ROOT_DIR = path(ENV_TOKENS.get('MICROSITE_ROOT_DIR', ''))
 
 #### PASSWORD POLICY SETTINGS #####
+# Minimum number of characters a password should have
+# e.g PASSWORD_MIN_LENGTH = 8
 PASSWORD_MIN_LENGTH = ENV_TOKENS.get("PASSWORD_MIN_LENGTH")
+# Maximum number of characters a password should have
+# e.g PASSWORD_MAX_LENGTH = None
 PASSWORD_MAX_LENGTH = ENV_TOKENS.get("PASSWORD_MAX_LENGTH")
+# Password complexity should be a dict of complexity levels and their corresponding score
+# e.g.
+# { 'UPPER': 2, 'LOWER': 2, 'PUNCTUATION': 2, 'DIGITS': 2,
+#  'UPPER_SCORE': 1, 'LOWER_SCORE': 1, 'PUNCTUATION_SCORE': 2, 'DIGITS_SCORE': 2 }
+# if score is not specified for any of complexity level its default value will be used
+# UPPER_SCORE has a default value of 1
+# LOWER_SCORE has a default value of 1
+# PUNCTUATION_SCORE has a default value of 2
+# DIGITS_SCORE has a default value of 2
+# NON_ASCII_SCORE has a default value of 2
+# WORDS_SCORE has a default value of 2
+# Default scores are only applicable if relevant complexity level is specified
 PASSWORD_COMPLEXITY = ENV_TOKENS.get("PASSWORD_COMPLEXITY", {})
+# Minimum score required to fulfill password complexity criteria. defaults to zero
+# which means a password should fulfill all levels specified in PASSWORD_COMPLEXITY
+MINIMUM_PASSWORD_COMPLEXITY_SCORE = ENV_TOKENS.get('MINIMUM_PASSWORD_COMPLEXITY_SCORE', 0)
 PASSWORD_DICTIONARY_EDIT_DISTANCE_THRESHOLD = ENV_TOKENS.get("PASSWORD_DICTIONARY_EDIT_DISTANCE_THRESHOLD")
 PASSWORD_DICTIONARY = ENV_TOKENS.get("PASSWORD_DICTIONARY", [])
 
@@ -568,6 +598,9 @@ if FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
 
 ##### ADVANCED_SECURITY_CONFIG #####
 ADVANCED_SECURITY_CONFIG = ENV_TOKENS.get('ADVANCED_SECURITY_CONFIG', {})
+
+##### SET THE LIST OF ALLOWED IP ADDRESSES FOR THE API ######
+API_ALLOWED_IP_ADDRESSES = ENV_TOKENS.get('API_ALLOWED_IP_ADDRESSES')
 
 ##### GOOGLE ANALYTICS IDS #####
 GOOGLE_ANALYTICS_ACCOUNT = AUTH_TOKENS.get('GOOGLE_ANALYTICS_ACCOUNT')
@@ -676,3 +709,77 @@ ENV_TOKENS.get('CERTIFICATES_STATIC_VERIFY_URL', CERTIFICATES_STATIC_VERIFY_URL)
 if FEATURES.get('ENABLE_LTI_PROVIDER'):
     INSTALLED_APPS += ('lti_provider',)
     AUTHENTICATION_BACKENDS += ('lti_provider.users.LtiBackend', )
+
+############# Student Gradebook #################
+if FEATURES.get('STUDENT_GRADEBOOK') and "'gradebook'" not in INSTALLED_APPS:
+    INSTALLED_APPS += ('gradebook',)
+
+############# Student Progress #################
+if FEATURES.get('STUDENT_PROGRESS') and "progress" not in INSTALLED_APPS:
+    INSTALLED_APPS += ('progress',)
+
+############# Projects App #################
+if FEATURES.get('PROJECTS_APP') and "projects" not in INSTALLED_APPS:
+    INSTALLED_APPS += ('projects',)
+
+############# Organizations App #################
+if FEATURES.get('ORGANIZATIONS_APP') and "organizations" not in INSTALLED_APPS:
+    INSTALLED_APPS += ('organizations',)
+
+##### SET THE LIST OF ALLOWED IP ADDRESSES FOR THE API ######
+API_ALLOWED_IP_ADDRESSES = ENV_TOKENS.get('API_ALLOWED_IP_ADDRESSES')
+
+EXCLUDE_MIDDLEWARE_CLASSES = ENV_TOKENS.get('EXCLUDE_MIDDLEWARE_CLASSES', [])
+
+MIDDLEWARE_CLASSES = tuple(_class for _class in MIDDLEWARE_CLASSES if _class not in EXCLUDE_MIDDLEWARE_CLASSES)
+
+
+##### EDX-NOTIFICATIONS ######
+NOTIFICATION_CLICK_LINK_URL_MAPS = ENV_TOKENS.get(
+    'NOTIFICATION_CLICK_LINK_URL_MAPS',
+    NOTIFICATION_CLICK_LINK_URL_MAPS
+)
+NOTIFICATION_STORE_PROVIDER = ENV_TOKENS.get(
+    'NOTIFICATION_STORE_PROVIDER',
+    NOTIFICATION_STORE_PROVIDER
+)
+NOTIFICATION_CHANNEL_PROVIDERS = ENV_TOKENS.get(
+    'NOTIFICATION_CHANNEL_PROVIDERS',
+    NOTIFICATION_CHANNEL_PROVIDERS
+)
+NOTIFICATION_CHANNEL_PROVIDER_TYPE_MAPS = ENV_TOKENS.get(
+    'NOTIFICATION_CHANNEL_PROVIDER_TYPE_MAPS',
+    NOTIFICATION_CHANNEL_PROVIDER_TYPE_MAPS
+)
+
+NOTIFICATION_MAX_LIST_SIZE = ENV_TOKENS.get(
+    'NOTIFICATION_MAX_LIST_SIZE',
+    NOTIFICATION_MAX_LIST_SIZE
+)
+
+NOTIFICATION_DAILY_DIGEST_SUBJECT = ENV_TOKENS.get(
+    'NOTIFICATION_DAILY_DIGEST_SUBJECT',
+    NOTIFICATION_DAILY_DIGEST_SUBJECT
+)
+NOTIFICATION_WEEKLY_DIGEST_SUBJECT = ENV_TOKENS.get(
+    'NOTIFICATION_WEEKLY_DIGEST_SUBJECT',
+    NOTIFICATION_WEEKLY_DIGEST_SUBJECT
+)
+NOTIFICATION_BRANDED_DEFAULT_LOGO = ENV_TOKENS.get(
+    'NOTIFICATION_BRANDED_DEFAULT_LOGO',
+    NOTIFICATION_BRANDED_DEFAULT_LOGO
+)
+NOTIFICATION_EMAIL_FROM_ADDRESS = ENV_TOKENS.get(
+    'NOTIFICATION_EMAIL_FROM_ADDRESS',
+    NOTIFICATION_EMAIL_FROM_ADDRESS
+)
+NOTIFICATION_EMAIL_CLICK_LINK_ROOT = ENV_TOKENS.get(
+    'NOTIFICATION_EMAIL_CLICK_LINK_ROOT',
+    NOTIFICATION_EMAIL_CLICK_LINK_ROOT
+)
+NOTIFICATION_DIGEST_SEND_TIMEFILTERED = ENV_TOKENS.get(
+    'NOTIFICATION_DIGEST_SEND_TIMEFILTERED',
+    NOTIFICATION_DIGEST_SEND_TIMEFILTERED
+)
+
+XBLOCK_SETTINGS = ENV_TOKENS.get('XBLOCK_SETTINGS', {})

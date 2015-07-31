@@ -43,6 +43,7 @@ CSRF cookie.
 """
 
 import logging
+import urlparse
 
 from django.conf import settings
 from django.middleware.csrf import CsrfViewMiddleware
@@ -70,6 +71,36 @@ class CorsCSRFMiddleware(CsrfViewMiddleware):
 
         with skip_cross_domain_referer_check(request):
             return super(CorsCSRFMiddleware, self).process_view(request, callback, callback_args, callback_kwargs)
+
+    def is_enabled(self, request):
+        if not settings.FEATURES.get('ENABLE_CORS_HEADERS'):
+            return False
+
+        referer = request.META.get('HTTP_REFERER')
+        if referer is None or referer == '':
+            return False
+        referer_parts = urlparse.urlparse(referer)
+
+        if referer_parts.hostname not in getattr(settings, 'CORS_ORIGIN_WHITELIST', []):
+            return False
+        if not request.is_secure() or referer_parts.scheme != 'https':
+            return False
+
+        return True
+
+    def process_view(self, request, callback, callback_args, callback_kwargs):
+        if not self.is_enabled(request):
+            return
+
+        is_secure_default = request.is_secure
+
+        def is_secure_patched():
+            return False
+        request.is_secure = is_secure_patched
+
+        res = super(CorsCSRFMiddleware, self).process_view(request, callback, callback_args, callback_kwargs)
+        request.is_secure = is_secure_default
+        return res
 
 
 class CsrfCrossDomainCookieMiddleware(object):

@@ -19,7 +19,6 @@ from mock import MagicMock, patch, Mock
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from pyquery import PyQuery
-from courseware.module_render import hash_resource
 from xblock.field_data import FieldData
 from xblock.runtime import Runtime
 from xblock.fields import ScopeIds
@@ -531,6 +530,28 @@ class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
                 'bad_handler',
                 'bad_dispatch',
             )
+
+    def test_xblock_view_handler(self):
+        args=[
+            'edX/toy/2012_Fall',
+            quote_slashes('i4x://edX/toy/videosequence/Toy_Videos'),
+            'student_view'
+        ]
+        xblock_view_url = reverse(
+            'xblock_view',
+            args=args
+        )
+
+        request = self.request_factory.get(xblock_view_url)
+        request.user = self.mock_user
+        response = render.xblock_view(request, *args)
+        self.assertEquals(200, response.status_code)
+
+        expected = ['csrf_token',  'html', 'resources']
+        content = json.loads(response.content)
+        for section in expected:
+            self.assertIn(section, content)
+        self.assertIn('<div class="xblock xblock-student_view xmodule_display', content['html'])
 
     @XBlock.register_temp_plugin(GradedStatelessXBlock, identifier='stateless_scorer')
     def test_score_without_student_state(self):
@@ -1230,6 +1251,7 @@ class TestModuleTrackingContext(ModuleStoreTestCase):
         )
 
     def test_context_contains_display_name(self, mock_tracker):
+        mock_tracker.reset_mock()
         problem_display_name = u'Option Response Problem'
         module_info = self.handle_callback_and_get_module_info(mock_tracker, problem_display_name)
         self.assertEquals(problem_display_name, module_info['display_name'])
@@ -1256,12 +1278,15 @@ class TestModuleTrackingContext(ModuleStoreTestCase):
             'problem_check',
         )
 
-        self.assertEquals(len(mock_tracker.send.mock_calls), 1)
-        mock_call = mock_tracker.send.mock_calls[0]
-        event = mock_call[1][0]
+        mock_calls = mock_tracker.send.mock_calls
+        for call in mock_calls:
+            call_data = call[1][0]
+            event_type = call_data.get('event_type')
+            if event_type == 'problem_check':
+                break
+            self.fail('Event type "problem_check" not found in call list.')
 
-        self.assertEquals(event['event_type'], 'problem_check')
-        return event['context']['module']
+        return call_data['context']['module']['display_name']
 
     def test_missing_display_name(self, mock_tracker):
         actual_display_name = self.handle_callback_and_get_module_info(mock_tracker)['display_name']

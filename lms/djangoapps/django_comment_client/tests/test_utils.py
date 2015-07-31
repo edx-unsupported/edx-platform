@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-import datetime
 import json
 import mock
 from nose.plugins.attrib import attr
+import ddt
 from pytz import UTC
 from django.utils.timezone import UTC as django_utc
 
@@ -722,7 +722,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         )
 
     def test_ids_empty(self):
-        self.assertEqual(utils.get_discussion_categories_ids(self.course, self.user), [])
+        self.assertEqual(utils.get_discussion_categories_ids(self.course), [])
 
     def test_ids_configured_topics(self):
         self.course.discussion_topics = {
@@ -731,7 +731,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
             "Topic C": {"id": "Topic_C"}
         }
         self.assertItemsEqual(
-            utils.get_discussion_categories_ids(self.course, self.user),
+            utils.get_discussion_categories_ids(self.course),
             ["Topic_A", "Topic_B", "Topic_C"]
         )
 
@@ -743,7 +743,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         self.create_discussion("Chapter 2 / Section 1 / Subsection 2", "Discussion")
         self.create_discussion("Chapter 3 / Section 1", "Discussion")
         self.assertItemsEqual(
-            utils.get_discussion_categories_ids(self.course, self.user),
+            utils.get_discussion_categories_ids(self.course),
             ["discussion1", "discussion2", "discussion3", "discussion4", "discussion5", "discussion6"]
         )
 
@@ -757,7 +757,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         self.create_discussion("Chapter 2", "Discussion")
         self.create_discussion("Chapter 2 / Section 1 / Subsection 1", "Discussion")
         self.assertItemsEqual(
-            utils.get_discussion_categories_ids(self.course, self.user),
+            utils.get_discussion_categories_ids(self.course),
             ["Topic_A", "Topic_B", "Topic_C", "discussion1", "discussion2", "discussion3"]
         )
 
@@ -983,3 +983,20 @@ class DiscussionTabTestCase(ModuleStoreTestCase):
 
         with self.settings(FEATURES={'CUSTOM_COURSES_EDX': True}):
             self.assertFalse(self.discussion_tab_present(self.enrolled_user))
+
+
+@ddt.ddt
+class FormatFilenameTests(TestCase):
+    """ Tests format filename utility function """
+    @ddt.unpack
+    @ddt.data(
+        ("normal.txt", "normal.txt"),
+        ("normal_with_alnum.csv", "normal_with_alnum.csv"),
+        ("normal_with_multiple_extensions.dot.csv", "normal_with_multiple_extensions.dot.csv"),
+        ("contains/slashes.html", "containsslashes.html"),
+        (r"contains_symbols!@#$%^&*+=\|,.html", "contains_symbols.html"),
+        ("contains spaces.org", "contains_spaces.org"),
+    )
+    def test_format_filename(self, raw_filename, expected_output):
+        """ Tests that format_filename produces expected output for certain inputs """
+        self.assertEqual(utils.format_filename(raw_filename), expected_output)

@@ -183,12 +183,8 @@ span.edx {
 }
 
 .loading-animation {
-  position: absolute;
-  left: 50%;
-  width: 20px;
-  height: 20px;
+  @extend %loading-animation;
   margin-left: -($baseline/2);
-  background: url(../images/spinner.gif) no-repeat;
 }
 
 mark {

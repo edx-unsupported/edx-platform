@@ -8,6 +8,7 @@ from abc import ABCMeta, abstractmethod
 from django.contrib.auth.models import User
 import logging
 
+from django.conf import settings
 from student.models import CourseAccessRole
 from xmodule_django.models import CourseKeyField
 
@@ -247,12 +248,38 @@ class CourseSalesAdminRole(CourseRole):
 
 
 @register_access_role
+class CourseObserverRole(CourseRole):
+    """A course Observer"""
+    ROLE = 'observer'
+
+    def __init__(self, *args, **kwargs):
+        super(CourseObserverRole, self).__init__(self.ROLE, *args, **kwargs)
+
+
+@register_access_role
+
+class CourseObserverRole(CourseRole):
+    """A course Observer"""
+    ROLE = 'observer'
+
+    def __init__(self, *args, **kwargs):
+        super(CourseObserverRole, self).__init__(self.ROLE, *args, **kwargs)
+
+
 class CourseBetaTesterRole(CourseRole):
     """A course Beta Tester"""
     ROLE = 'beta_testers'
 
     def __init__(self, *args, **kwargs):
         super(CourseBetaTesterRole, self).__init__(self.ROLE, *args, **kwargs)
+
+
+class CourseAssistantRole(CourseRole):
+    """A course assistant"""
+    ROLE = 'assistant'
+
+    def __init__(self, *args, **kwargs):
+        super(CourseAssistantRole, self).__init__(self.ROLE, *args, **kwargs)
 
 
 @register_access_role
@@ -366,3 +393,24 @@ class UserBasedRole(object):
         * role (will be self.role--thus uninteresting)
         """
         return CourseAccessRole.objects.filter(role=self.role, user=self.user)
+
+
+def get_aggregate_exclusion_user_ids(course_key):
+    """
+    This helper method will return the list of user ids that are marked in roles
+    that can be excluded from certain aggregate queries. The list of roles to exclude
+    can be defined in a AGGREGATION_EXCLUDE_ROLES settings variable
+    """
+
+    exclude_user_ids = set()
+    exclude_role_list = getattr(settings, 'AGGREGATION_EXCLUDE_ROLES', [CourseObserverRole.ROLE])
+
+    for role in exclude_role_list:
+        users = CourseRole(role, course_key).users_with_role()
+        user_ids = set()
+        for user in users:
+            user_ids.add(user.id)
+
+        exclude_user_ids = exclude_user_ids.union(user_ids)
+
+    return exclude_user_ids

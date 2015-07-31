@@ -122,6 +122,12 @@ if settings.FEATURES["ENABLE_MOBILE_REST_API"]:
         url(r'^api/mobile/v0.5/', include('mobile_api.urls')),
     )
 
+# OPEN EDX API
+if settings.FEATURES["API"]:
+    urlpatterns += (
+        url(r'^api/server/', include('api_manager.urls')),
+    )
+
 # if settings.FEATURES.get("MULTIPLE_ENROLLMENT_ROLES"):
 urlpatterns += (
     # TODO Namespace these!
@@ -264,8 +270,8 @@ if settings.COURSEWARE_ENABLED:
             'courseware.module_render.handle_xblock_callback',
             name='xblock_handler'),
         url(r'^courses/{course_key}/xblock/{usage_key}/view/(?P<view_name>[^/]*)$'.format(
-            course_key=settings.COURSE_ID_PATTERN,
-            usage_key=settings.USAGE_ID_PATTERN),
+                course_key=settings.COURSE_ID_PATTERN,
+                usage_key=settings.USAGE_ID_PATTERN),
             'courseware.module_render.xblock_view',
             name='xblock_view'),
         url(r'^courses/{course_key}/xblock/{usage_key}/handler_noauth/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$'.format(course_key=settings.COURSE_ID_PATTERN, usage_key=settings.USAGE_ID_PATTERN),
@@ -718,3 +724,9 @@ urlpatterns += (
     url(r'^404$', handler404),
     url(r'^500$', handler500),
 )
+
+if settings.FEATURES.get('ENABLE_NOTIFICATIONS'):
+    # include into our URL patterns the HTTP RESTfule API that comes with edx-notifications
+    urlpatterns += (
+        url(r'^api/', include('edx_notifications.server.api.urls')),
+    )

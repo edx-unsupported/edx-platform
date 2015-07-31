@@ -8,6 +8,31 @@
   width: 31%;
   border: 1px solid #aaa;
   border-radius: 3px;
+div.discussion-course, div.content-wrapper {
+  section.discussion {
+    div.forum-nav {
+      @include box-sizing(border-box);
+      float: left;
+      position: relative;
+      width: 31%;
+      border: 1px solid #aaa;
+      border-radius: 3px;
+
+      ul, ol {
+        list-style: none;
+        padding-left: 0;
+
+        li.forum-nav-thread {
+          margin-bottom: 0;
+        }
+
+        &.forum-nav-browse-submenu {
+          padding-left: $baseline;
+          list-style: none;
+        }
+      }
+    }
+  }
 }
 
 // ------
@@ -60,7 +85,11 @@
   position: absolute;
   margin-top: -6px;
   top: 50%;
+<<<<<<< HEAD
   @include right($baseline/4 + 1px + $baseline / 4); // Wrapper padding + border + input padding
+=======
+  right: ($baseline/4 + 1px + $baseline / 4); // Wrapper padding + border + input padding
+>>>>>>> 62f722e... changes to make things work as expected
 }
 
 .forum-nav-search-input {
@@ -99,10 +128,7 @@
   list-style: none;
 }
 
-.forum-nav-browse-submenu {
-  padding-left: $baseline;
-  list-style: none;
-}
+
 
 .forum-nav-browse-title {
   display: block;
@@ -135,14 +161,22 @@
   @include box-sizing(border-box);
   display: inline-block;
   width: 50%;
+<<<<<<< HEAD
   @include text-align(left);
+=======
+  text-align: left;
+>>>>>>> 62f722e... changes to make things work as expected
 }
 
 .forum-nav-filter-cohort, .forum-nav-sort {
   @include box-sizing(border-box);
   display: inline-block;
   width: 50%;
+<<<<<<< HEAD
   @include text-align(right);
+=======
+  text-align: right;
+>>>>>>> 62f722e... changes to make things work as expected
 }
 
 %forum-nav-select {
@@ -202,7 +236,10 @@
     @include font-size(14);
 
     &:before {
+<<<<<<< HEAD
 
+=======
+>>>>>>> 62f722e... changes to make things work as expected
       @include rtl {
         @include transform(scale(-1, 1)); // RTL for font awesome question mark
       }
@@ -230,7 +267,11 @@
 .forum-nav-thread-wrapper-2 {
   @extend %forum-nav-thread-wrapper;
   width: 13%;
+<<<<<<< HEAD
   @include text-align(right);
+=======
+  text-align: right;
+>>>>>>> 62f722e... changes to make things work as expected
 }
 
 .forum-nav-thread-title {
@@ -271,12 +312,22 @@
     display: block;
     position: absolute;
     bottom: (-$baseline/4);
+<<<<<<< HEAD
     @include right($baseline/4);
     width: 0;
     height: 0;
     border-style: solid;
     @include border-width(0, ($baseline/4), ($baseline/4), 0);
     @include border-color(transparent, $gray-l3, transparent, transparent);
+=======
+    right: ($baseline/4);
+    width: 0;
+    height: 0;
+    border-style: solid;
+
+    border-width: 0 ($baseline/4) ($baseline/4) 0;
+    border-color: transparent $gray-l3 transparent transparent;
+>>>>>>> 62f722e... changes to make things work as expected
   }
 
   &.is-unread {

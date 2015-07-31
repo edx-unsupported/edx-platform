@@ -14,6 +14,7 @@ NPM_REGISTRY = "http://registry.npmjs.org/"
 PYTHON_REQ_FILES = [
     'requirements/edx/pre.txt',
     'requirements/edx/github.txt',
+    'requirements/edx/custom.txt',
     'requirements/edx/local.txt',
     'requirements/edx/base.txt',
     'requirements/edx/post.txt',
@@ -134,6 +135,7 @@ def python_prereqs_installation():
     Installs Python prerequisites
     """
     for req_file in PYTHON_REQ_FILES:
+        sh("rm -rf /edx/app/edxapp/venvs/edxapp/build/*")
         sh("pip install -q --exists-action w -r {req_file}".format(req_file=req_file))
 
 

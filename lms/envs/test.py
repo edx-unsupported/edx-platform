@@ -53,6 +53,8 @@ FEATURES['DISABLE_START_DATES'] = True
 # the one in cms/envs/test.py
 FEATURES['ENABLE_DISCUSSION_SERVICE'] = False
 
+FEATURES['ENABLE_DISCUSSION_EMAIL_DIGEST'] = True
+
 FEATURES['ENABLE_SERVICE_STATUS'] = True
 
 FEATURES['ENABLE_HINTER_INSTRUCTOR_VIEW'] = True
@@ -70,7 +72,14 @@ FEATURES['ALLOW_COURSE_STAFF_GRADE_DOWNLOADS'] = True
 # Toggles embargo on for testing
 FEATURES['EMBARGO'] = True
 
+# Toggles API on for testing
+FEATURES['API'] = True
+FEATURES['ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE'] = False
+
 FEATURES['ENABLE_COMBINED_LOGIN_REGISTRATION'] = True
+
+# Toggles API on for testing
+FEATURES['API'] = True
 
 # Need wiki for courseware views to work. TODO (vshnayder): shouldn't need it.
 WIKI_ENABLED = True
@@ -494,3 +503,40 @@ PROFILE_IMAGE_MIN_BYTES = 100
 FEATURES['ENABLE_LTI_PROVIDER'] = True
 INSTALLED_APPS += ('lti_provider',)
 AUTHENTICATION_BACKENDS += ('lti_provider.users.LtiBackend',)
+
+############# Performance Profiler #################
+# Note: We've added profiler support to this configuration in order
+# to enable analysis when running unit tests.  (outputs to console)
+FEATURES['PROFILER'] = False
+if FEATURES.get('PROFILER'):
+    INSTALLED_APPS += ('profiler',)
+    MIDDLEWARE_CLASSES += (
+        'profiler.middleware.HotshotProfilerMiddleware',
+        'profiler.middleware.CProfileProfilerMiddleware',
+    )
+
+############# Student Module #################
+FEATURES['SIGNAL_ON_SCORE_CHANGED'] = True
+
+
+############# Student Gradebook #################
+FEATURES['STUDENT_GRADEBOOK'] = True
+if FEATURES.get('STUDENT_GRADEBOOK', False) and "'gradebook'" not in INSTALLED_APPS:
+    INSTALLED_APPS += ('gradebook',)
+
+
+############# Student Progress #################
+FEATURES['STUDENT_PROGRESS'] = True
+if FEATURES.get('STUDENT_PROGRESS', False) and "'progress'" not in INSTALLED_APPS:
+    INSTALLED_APPS += ('progress',)
+
+############# Projects App #################
+FEATURES['PROJECTS_APP'] = True
+if FEATURES.get('PROJECTS_APP') and "projects" not in INSTALLED_APPS:
+    INSTALLED_APPS += ('projects',)
+
+############# Organizations App #################
+FEATURES['ORGANIZATIONS_APP'] = True
+if FEATURES.get('ORGANIZATIONS_APP') and "organizations" not in INSTALLED_APPS:
+    INSTALLED_APPS += ('organizations',)
+
