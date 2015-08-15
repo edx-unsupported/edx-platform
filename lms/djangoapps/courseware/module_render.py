@@ -520,7 +520,8 @@ def get_module_system_for_user(user, field_data_cache,
         CourseModuleCompletion.objects.get_or_create(
             user_id=user_id,
             course_id=course_id,
-            content_id=unicode(descriptor.location)
+            content_id=unicode(descriptor.location),
+            stage=None
         )
 
     def publish(block, event_type, event):
