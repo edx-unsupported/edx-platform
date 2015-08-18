@@ -26,7 +26,7 @@ from openedx.core.djangoapps.course_groups.cohorts import (
     add_user_to_cohort,
     remove_user_from_cohort
 )
-from django_comment_common.models import Role, FORUM_ROLE_MODERATOR
+from django_comment_common.models import Role, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA
 from gradebook.models import StudentGradebook
 from instructor.access import revoke_access, update_forum_role
 from lang_pref import LANGUAGE_KEY
@@ -62,6 +62,11 @@ from edx_notifications.lib.consumer import mark_notification_read
 
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
+
+role_translations = {
+    # Internal admins should have the instructor course role.
+    'internal_admin': 'instructor'
+}
 
 
 def _serialize_user_profile(response_data, user_profile):
@@ -144,29 +149,40 @@ def _manage_role(course_descriptor, user, role, action):
     """
     Helper method for managing course/forum roles
     """
-    supported_roles = ('instructor', 'staff', 'observer', 'assistant')
-    forum_moderator_roles = ('instructor', 'staff', 'assistant')
+    supported_roles = ('instructor', 'staff', 'observer', 'assistant', 'internal_admin')
+    role_perm_map = {
+        # I'm so sorry. This is a temporary arrangement. If and when this ends up upstream,
+        # we will need to make two API endpoints-- one for course roles, and one for forum.
+        'internal_admin': FORUM_ROLE_MODERATOR,
+        CourseAssistantRole.ROLE: FORUM_ROLE_COMMUNITY_TA,
+        CourseInstructorRole.ROLE: FORUM_ROLE_COMMUNITY_TA,
+        CourseStaffRole.ROLE: FORUM_ROLE_COMMUNITY_TA,
+    }
     if role not in supported_roles:
         raise ValueError
+    course_role = role_translations.get(role, role)
+
     if action is 'allow':
-        existing_role = CourseAccessRole.objects.filter(user=user, role=role, course_id=course_descriptor.id, org=course_descriptor.org)
+        existing_role = CourseAccessRole.objects.filter(user=user, role=course_role, course_id=course_descriptor.id, org=course_descriptor.org)
         if not existing_role:
-            new_role = CourseAccessRole(user=user, role=role, course_id=course_descriptor.id, org=course_descriptor.org)
+            new_role = CourseAccessRole(user=user, role=course_role, course_id=course_descriptor.id, org=course_descriptor.org)
             new_role.save()
-        if role in forum_moderator_roles:
+        if role in role_perm_map:
+            perm = role_perm_map[role]
             try:
                 dep_string = course_descriptor.id.to_deprecated_string()
                 ssck = SlashSeparatedCourseKey.from_deprecated_string(dep_string)
-                update_forum_role(ssck, user, FORUM_ROLE_MODERATOR, 'allow')
+                update_forum_role(ssck, user, perm, 'allow')
             except Role.DoesNotExist:
                 try:
-                    update_forum_role(course_descriptor.id, user, FORUM_ROLE_MODERATOR, 'allow')
+                    update_forum_role(course_descriptor.id, user, perm, 'allow')
                 except Role.DoesNotExist:
                     pass
 
     elif action is 'revoke':
         revoke_access(course_descriptor, user, role)
-        if role in forum_moderator_roles:
+        if role in role_perm_map:
+            perm = role_perm_map[role]
             # There's a possibilty that the user may play more than one role in a course
             # And that more than one of these roles allow for forum moderation
             # So we need to confirm the removed role was the only role for this user for this course
@@ -180,10 +196,10 @@ def _manage_role(course_descriptor, user, role, action):
                 try:
                     dep_string = course_descriptor.id.to_deprecated_string()
                     ssck = SlashSeparatedCourseKey.from_deprecated_string(dep_string)
-                    update_forum_role(ssck, user, FORUM_ROLE_MODERATOR, 'revoke')
+                    update_forum_role(ssck, user, perm, 'revoke')
                 except Role.DoesNotExist:
                     try:
-                        update_forum_role(course_descriptor.id, user, FORUM_ROLE_MODERATOR, 'revoke')
+                        update_forum_role(course_descriptor.id, user, perm, 'revoke')
                     except Role.DoesNotExist:
                         pass
 
