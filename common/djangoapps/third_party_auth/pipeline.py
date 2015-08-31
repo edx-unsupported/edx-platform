@@ -72,16 +72,15 @@ from django.utils.translation import ugettext as _
 from social.apps.django_app.default import models
 from social.exceptions import AuthException
 from social.pipeline import partial
+from social.pipeline.partial import save_status_to_session
 from social.pipeline.social_auth import associate_by_email
+from social.pipeline.user import USER_FIELDS
 
 import student
 
 from logging import getLogger
 
 from . import provider
-
-# Note that this lives in openedx, so this dependency should be refactored.
-from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 
 
 # These are the query string params you can pass
@@ -503,18 +502,33 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
         """Redirects to the registration page."""
         return redirect(AUTH_DISPATCH_URLS[AUTH_ENTRY_REGISTER])
 
-    def should_force_account_creation():
-        """ For some third party providers, we auto-create user accounts """
-        current_provider = provider.Registry.get_from_pipeline({'backend': backend.name, 'kwargs': kwargs})
+    def get_provider():
+        """
+        Get's third-party provider for request
+        """
+        return provider.Registry.get_from_pipeline({'backend': backend.name, 'kwargs': kwargs})
+
+    def should_autoprovision_account():
+        current_provider = get_provider()
+        return current_provider and current_provider.autoprovision_account
+
+    def autosubmit_registration_form():
+        """ For some third party providers, we auto-submit registration forms """
+        current_provider = get_provider()
         return current_provider and current_provider.skip_email_verification
 
     if not user:
         if auth_entry in [AUTH_ENTRY_LOGIN_API, AUTH_ENTRY_REGISTER_API]:
             return HttpResponseBadRequest()
         elif auth_entry in [AUTH_ENTRY_LOGIN, AUTH_ENTRY_LOGIN_2]:
+            if should_autoprovision_account():
+                # User has authenticated with the third party provider and provider is configured
+                # to automatically provision edX account, which is done via strategy.create_user in next pipeline step
+                return {'autoprovision': True}
+
             # User has authenticated with the third party provider but we don't know which edX
             # account corresponds to them yet, if any.
-            if should_force_account_creation():
+            if autosubmit_registration_form():
                 return dispatch_to_register()
             return dispatch_to_login()
         elif auth_entry in [AUTH_ENTRY_REGISTER, AUTH_ENTRY_REGISTER_2]:

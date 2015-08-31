@@ -97,8 +97,9 @@ class ProviderConfig(ConfigurationModel):
         default=False,
         help_text=_(
             "If this option is selected, users will not be required to confirm their details even if "
-            "some required data is missing or fails validation (e.g. duplicate username). Instead, fake or generated "
-            "values will be used."
+            "some required data is missing or fails validation (e.g. duplicate email). Instead, fake or generated "
+            "values will be used. This setting forces skipping email verification, so 'Skip email verification' "
+            "setting have no effect."
         )
     )
     prefix = None  # used for provider_id. Set to a string value in subclass

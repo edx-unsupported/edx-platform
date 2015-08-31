@@ -9,7 +9,6 @@ If true, it:
     a) loads this module.
     b) calls apply_settings(), passing in the Django settings
 """
-
 _FIELDS_STORED_IN_SESSION = ['auth_entry', 'next']
 _MIDDLEWARE_CLASSES = (
     'third_party_auth.middleware.ExceptionMiddleware',
@@ -85,3 +84,8 @@ def apply_settings(django_settings):
         'social.apps.django_app.context_processors.backends',
         'social.apps.django_app.context_processors.login_redirect',
     )
+
+    if not hasattr(django_settings, 'USER_FIELDS'):
+        django_settings.USER_FIELDS = ['username', 'email']
+
+    django_settings.USER_FIELDS += ['first_name', 'last_name', 'fullname']

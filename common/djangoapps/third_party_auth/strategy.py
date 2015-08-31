@@ -32,3 +32,22 @@ class ConfigurationModelStrategy(DjangoStrategy):
         # At this point, we know 'name' is not set in a [OAuth2|SAML]ProviderConfig row.
         # It's probably a global Django setting like 'FIELDS_STORED_IN_SESSION':
         return super(ConfigurationModelStrategy, self).setting(name, default, backend)
+
+    def create_user(self, *args, **kwargs):
+        """
+        # Creates user using information provided by pipeline. This method is called in create_user pipeline step.
+        # Unless the workflow is changed, create_user immediately terminates if the user already found/
+        # So far, user is either created in ensure_user_information via registration form or account needs to be
+        # autoprovisioned. So, this method is only called when autoprovisioning account.
+        """
+        from student.views import create_account_with_params
+        from .pipeline import make_random_password
+
+        user_fields = dict(kwargs)
+        user_fields['name'] = user_fields.get('fullname', "Unknown")  # needs to be >2 chars to pass validation
+        user_fields['honor_code'] = True
+        user_fields['terms_of_service'] = True
+        user_fields['password'] = make_random_password()
+
+        # when autoprovisioning we need to skip email activation, hence skip_email is True
+        return create_account_with_params(self.request, user_fields, skip_email=True)
