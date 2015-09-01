@@ -200,6 +200,37 @@ class UsersApiTests(ModuleStoreTestCase):
         user_id = response.data['id']
         return user_id
 
+    def test_user_is_staff(self):
+        """
+        Test if a user is a staff member
+        """
+        test_uri = self.users_base_uri
+        for i in xrange(1, 7):
+            data = {
+                    'email': 'test{}@example.com'.format(i),
+                    'username': 'test_user{}'.format(i),
+                    'password': 'PassWord1',
+                    'first_name': 'John',
+                    'last_name': 'Doe',
+                    'city': 'Boston',
+            }
+            data['is_staff'] = True if i % 2 == 0 else False
+
+            response = self.do_post(test_uri, data)
+            self.assertEqual(response.status_code, 201)
+
+        # Test for Robot user with ID 1
+        response = self.do_get('{}?ids={}'.format(test_uri, '1,2,3,4,5,6,7'))
+        self.assertEqual(response.status_code, 200)
+
+        # ID 1 is a Robot Test (results[0]) so the users list starts with ID 2 (results[1])
+        self.assertEqual(response.data['results'][1]['is_staff'], False)
+        self.assertEqual(response.data['results'][3]['is_staff'], False)
+        self.assertEqual(response.data['results'][5]['is_staff'], False)
+        self.assertTrue(response.data['results'][2]['is_staff'])
+        self.assertTrue(response.data['results'][4]['is_staff'])
+        self.assertTrue(response.data['results'][6]['is_staff'])
+
     def test_user_list_get(self):
         test_uri = self.users_base_uri
         users = []
@@ -516,6 +547,13 @@ class UsersApiTests(ModuleStoreTestCase):
 
         # Testing profile updating scenario.
         # Must be updated
+
+        data['first_name'] = "First Name"
+        data['last_name'] = "Surname"
+        response = self.do_post(test_uri, data)
+        self.assertEqual(response.status_code, 200)
+        response = self.do_get(test_uri)
+        self.is_user_profile_created_updated(response, data)
 
         data["country"] = "US"
         data["year_of_birth"] = "1990"
@@ -1416,6 +1454,12 @@ class UsersApiTests(ModuleStoreTestCase):
             metadata={'rerandomize': 'always', 'graded': True, 'format': "Homework"},
             due=self.course_end_date.replace(tzinfo=timezone.utc)
         )
+        points_scored = 5
+        points_possible = 10
+        user = self.user
+        module = self.get_module_for_user(user, course, item5)
+        grade_dict = {'value': points_scored, 'max_value': points_possible, 'user_id': user.id}
+        module.system.publish(module, 'grade', grade_dict)
 
         test_uri = '{}/{}/courses/{}/grades'.format(self.users_base_uri, user_id, unicode(course.id))
 
@@ -1443,22 +1487,24 @@ class UsersApiTests(ModuleStoreTestCase):
         self.assertGreater(len(grading_policy['GRADER']), 0)
         self.assertIsNotNone(grading_policy['GRADE_CUTOFFS'])
 
-        self.assertEqual(response.data['current_grade'], 0.73)
-        self.assertEqual(response.data['proforma_grade'], 0.9375)
+        self.assertEqual(response.data['current_grade'], 0.74)
+        self.assertEqual(response.data['proforma_grade'], 0.9174999999999999)
 
         test_uri = '{}/{}/courses/grades'.format(self.users_base_uri, user_id)
 
         response = self.do_get(test_uri)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]['course_id'], unicode(course.id))
-        self.assertEqual(response.data[0]['current_grade'], 0.73)
-        self.assertEqual(response.data[0]['proforma_grade'], 0.9375)
+        self.assertEqual(response.data[0]['current_grade'], 0.74)
+        self.assertEqual(response.data[0]['proforma_grade'], 0.9174999999999999)
         self.assertEqual(response.data[0]['complete_status'], False)
 
     def is_user_profile_created_updated(self, response, data):
         """This function compare response with user profile data """
 
-        fullname = '{} {}'.format(self.test_first_name, self.test_last_name)
+        first_name = data.get('first_name', self.test_first_name)
+        last_name = data.get('last_name', self.test_last_name)
+        fullname = '{} {}'.format(first_name, last_name)
         self.assertEqual(response.data['full_name'], fullname)
         self.assertEqual(response.data['city'], data["city"])
         self.assertEqual(response.data['country'], data["country"])

@@ -1,6 +1,7 @@
 """ API implementation for user-oriented interactions. """
 
 import logging
+import json
 from requests.exceptions import ConnectionError
 
 from django.contrib.auth.models import Group
@@ -89,6 +90,7 @@ def _serialize_user(response_data, user):
     response_data['id'] = user.id
     response_data['is_active'] = user.is_active
     response_data['created'] = user.date_joined
+    response_data['is_staff'] = user.is_staff
     return response_data
 
 
@@ -331,6 +333,7 @@ class UsersList(SecureListAPIView):
         profile.gender = gender
         profile.title = title
         profile.avatar_url = avatar_url
+        profile.is_staff = is_staff
 
         try:
             profile.year_of_birth = int(year_of_birth)
@@ -585,7 +588,7 @@ class UsersDetail(SecureAPIView):
             if gender:
                 existing_user_profile.gender = gender
             # Empty title is also allowed
-            title = request.DATA.get('title', None)
+            title = request.DATA.get('title', existing_user_profile.title)
             existing_user_profile.title = title
             avatar_url = request.DATA.get('avatar_url')
             if avatar_url:
@@ -999,19 +1002,21 @@ class UsersCoursesGradesDetail(SecureAPIView):
         if not course_descriptor:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
 
-        progress_summary = grades.progress_summary(student, request, course_descriptor)  # pylint: disable=W0612
-        grade_summary = grades.grade(student, request, course_descriptor)
-        grading_policy = course_descriptor.grading_policy
-
         queryset = StudentGradebook.objects.filter(
             user=student,
             course_id__exact=course_key,
         )
         current_grade = 0
         proforma_grade = 0
+        progress_summary = {}
+        grade_summary = {}
+        grading_policy = {}
         if len(queryset):
             current_grade = queryset[0].grade
             proforma_grade = queryset[0].proforma_grade
+            progress_summary = json.loads(queryset[0].progress_summary)
+            grade_summary = json.loads(queryset[0].grade_summary)
+            grading_policy = json.loads(queryset[0].grading_policy)
 
         response_data = {
             'courseware_summary': progress_summary,
