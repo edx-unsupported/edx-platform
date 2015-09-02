@@ -18,14 +18,12 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.BooleanField')(default=False),
                       keep_default=False)
 
-
     def backwards(self, orm):
         # Deleting field 'SAMLProviderConfig.autoprovision_account'
         db.delete_column('third_party_auth_samlproviderconfig', 'autoprovision_account')
 
         # Deleting field 'OAuth2ProviderConfig.autoprovision_account'
         db.delete_column('third_party_auth_oauth2providerconfig', 'autoprovision_account')
-
 
     models = {
         'auth.group': {

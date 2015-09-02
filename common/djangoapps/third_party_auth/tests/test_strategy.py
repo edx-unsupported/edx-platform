@@ -1,3 +1,5 @@
+""" unittests for strategy.py """
+import unittest
 import ddt
 import mock
 from unittest import TestCase
@@ -9,12 +11,15 @@ from third_party_auth.tests import testutil
 @mock.patch('student.views.create_account_with_params')
 @unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, 'third_party_auth not enabled')
 class TestStrategy(TestCase):
+    """ Unit tests for authentication strategy """
     def setUp(self):
+        super(TestStrategy, self).setUp()
         self.request_mock = mock.Mock()
         self.strategy = ConfigurationModelStrategy(mock.Mock(), request=self.request_mock)
 
     def _get_last_call_args(self, patched_create_account):
-        args, kwargs = patched_create_account.call_args
+        """ Helper to get last call arguments from a mock """
+        args, unused_kwargs = patched_create_account.call_args
         return args
 
     def test_create_user_sets_tos_and_honor_code(self, patched_create_account):

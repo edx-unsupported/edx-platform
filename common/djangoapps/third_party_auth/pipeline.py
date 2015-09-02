@@ -188,6 +188,7 @@ class NotActivatedException(AuthException):
 
 
 class EmailAlreadyInUseException(AuthException):
+    """ Raised when new user account is created with an email already used by another account """
     def __init__(self, backend, email):
         self.email = email
         super(EmailAlreadyInUseException, self).__init__(backend, email)
@@ -521,6 +522,7 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
         return provider.Registry.get_from_pipeline({'backend': backend.name, 'kwargs': kwargs})
 
     def should_autoprovision_account():
+        """ For some third party providers we trust the provider so much that we automatically provision the account """
         current_provider = get_provider()
         return current_provider and current_provider.autoprovision_account
 

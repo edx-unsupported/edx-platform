@@ -264,12 +264,14 @@ class TestShibIntegrationTest(testutil.SAMLTestCase):
         user.save()
 
     def _assert_user_does_not_exist(self, username):
+        """ Asserts that user with specified username does not exist """
         with self.assertRaises(User.DoesNotExist):
-            user = User.objects.get(username=username)
+            User.objects.get(username=username)
 
     def _assert_account_created(self, username, email, full_name):
+        """ Asserts that user with specified username exists, activated and have specified full name and email """
         user = User.objects.get(username=username)
         self.assertIsNotNone(user.profile)
-        self.assertEqual(user.username, username)
+        self.assertEqual(user.email, email)
         self.assertEqual(user.profile.name, full_name)
         self.assertTrue(user.is_active)

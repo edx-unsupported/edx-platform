@@ -49,20 +49,29 @@ class ProviderUserStateTestCase(testutil.TestCase):
 
 @unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, 'third_party_auth not enabled')
 class TestCreateUser(testutil.TestCase):
+    """
+    Tests for custom create_user step
+    """
     def _raise_email_in_use_exception(self, *unused_args, **unused_kwargs):
+        """ Helper to raise AccountEmailAlreadyExistsValidationError """
         raise AccountEmailAlreadyExistsValidationError(mock.Mock(), mock.Mock())
 
     def test_create_user_normal_scenario(self):
+        """  Tests happy path - user is created and results are returned intact """
         retval = mock.Mock()
         with mock.patch("third_party_auth.pipeline.social_create_user") as patched_social_create_user:
             patched_social_create_user.return_value = retval
             strategy, details, user, idx = mock.Mock(), {'email': 'qwe@asd.com'}, mock.Mock(), 1
 
+            # pylint: disable=redundant-keyword-arg
             result = pipeline.create_user(strategy, idx, details=details, user=user)
 
             self.assertEqual(result, retval)
 
     def test_create_user_exception_scenario(self):
+        """
+        Tests sad path - expected exception is thrown, captured and transformed into AuthException subclass instance
+        """
         with mock.patch("third_party_auth.pipeline.social_create_user") as patched_social_create_user:
             patched_social_create_user.side_effect = self._raise_email_in_use_exception
 
