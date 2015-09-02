@@ -56,12 +56,12 @@ rather than spreading them across two functions in the pipeline.
 
 See http://psa.matiasaguirre.net/docs/pipeline.html for more docs.
 """
-
 import random
 import string  # pylint: disable-msg=deprecated-module
 from collections import OrderedDict
 import urllib
 import analytics
+from django.conf import settings
 from eventtracking import tracker
 
 from django.contrib.auth.models import User
@@ -72,9 +72,8 @@ from django.utils.translation import ugettext as _
 from social.apps.django_app.default import models
 from social.exceptions import AuthException
 from social.pipeline import partial
-from social.pipeline.partial import save_status_to_session
 from social.pipeline.social_auth import associate_by_email
-from social.pipeline.user import USER_FIELDS
+from social.pipeline.user import create_user as social_create_user
 
 import student
 
@@ -185,6 +184,19 @@ class NotActivatedException(AuthException):
         return (
             _('This account has not yet been activated. An activation email has been re-sent to {email_address}.')
             .format(email_address=self.email)
+        )
+
+
+class EmailAlreadyInUseException(AuthException):
+    def __init__(self, backend, email):
+        self.email = email
+        super(EmailAlreadyInUseException, self).__init__(backend, email)
+
+    def __str__(self):
+        return (
+            _('Email {email_address} is already used in our system. To link your accounts, '
+              'sign in now using your {platform_name} password.')
+            .format(email_address=self.email, platform_name=settings.PLATFORM_NAME)
         )
 
 
@@ -566,6 +578,19 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
             raise NotActivatedException(backend, user.email)
         # else: The user must have just successfully registered their account, so we proceed.
         # We know they did not just login, because the login process rejects unverified users.
+
+
+@partial.partial
+def create_user(strategy, details, user=None, *args, **kwargs):
+    """
+    Substitution method for stock social create_user that catches email validation error and redirects to login
+    """
+    from student.views import AccountEmailAlreadyExistsValidationError
+    try:
+        return social_create_user(strategy, details, user, *args, **kwargs)
+    except AccountEmailAlreadyExistsValidationError as exc:
+        logger.exception(exc.message)
+        raise EmailAlreadyInUseException(exc.message, details['email'])
 
 
 @partial.partial

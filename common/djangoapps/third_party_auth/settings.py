@@ -52,7 +52,7 @@ def apply_settings(django_settings):
         'social.pipeline.user.get_username',
         'third_party_auth.pipeline.set_pipeline_timeout',
         'third_party_auth.pipeline.ensure_user_information',
-        'social.pipeline.user.create_user',
+        'third_party_auth.pipeline.create_user',
         'social.pipeline.social_auth.associate_user',
         'social.pipeline.social_auth.load_extra_data',
         'social.pipeline.user.user_details',
@@ -89,3 +89,5 @@ def apply_settings(django_settings):
         django_settings.USER_FIELDS = ['username', 'email']
 
     django_settings.USER_FIELDS += ['first_name', 'last_name', 'fullname']
+
+    django_settings.FAKE_EMAIL_DOMAIN = 'fake-email-domain.foo'

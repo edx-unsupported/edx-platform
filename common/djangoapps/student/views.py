@@ -1362,6 +1362,14 @@ class AccountValidationError(Exception):
         self.field = field
 
 
+class AccountUserNameValidationError(AccountValidationError):
+    pass
+
+
+class AccountEmailAlreadyExistsValidationError(AccountValidationError):
+    pass
+
+
 @receiver(post_save, sender=User)
 def user_signup_handler(sender, **kwargs):  # pylint: disable=unused-argument
     """
@@ -1403,12 +1411,12 @@ def _do_create_account(form):
     except IntegrityError:
         # Figure out the cause of the integrity error
         if len(User.objects.filter(username=user.username)) > 0:
-            raise AccountValidationError(
+            raise AccountUserNameValidationError(
                 _("An account with the Public Username '{username}' already exists.").format(username=user.username),
                 field="username"
             )
         elif len(User.objects.filter(email=user.email)) > 0:
-            raise AccountValidationError(
+            raise AccountEmailAlreadyExistsValidationError(
                 _("An account with the Email '{email}' already exists.").format(email=user.email),
                 field="email"
             )

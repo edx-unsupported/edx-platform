@@ -2,9 +2,14 @@
 A custom Strategy for python-social-auth that allows us to fetch configuration from
 ConfigurationModels rather than django.settings
 """
+import logging
+from django.conf import settings
 from .models import OAuth2ProviderConfig
 from social.backends.oauth import BaseOAuth2
 from social.strategies.django_strategy import DjangoStrategy
+
+
+log = logging.getLogger(__name__)
 
 
 class ConfigurationModelStrategy(DjangoStrategy):
@@ -48,6 +53,11 @@ class ConfigurationModelStrategy(DjangoStrategy):
         user_fields['honor_code'] = True
         user_fields['terms_of_service'] = True
         user_fields['password'] = make_random_password()
+
+        if not user_fields.get('email'):
+            user_fields['email'] = "{username}@{domain}".format(
+                username=user_fields['username'], domain=settings.FAKE_EMAIL_DOMAIN
+            )
 
         # when autoprovisioning we need to skip email activation, hence skip_email is True
         return create_account_with_params(self.request, user_fields, skip_email=True)
