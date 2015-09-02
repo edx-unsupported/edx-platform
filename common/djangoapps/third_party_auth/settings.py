@@ -91,3 +91,4 @@ def apply_settings(django_settings):
     django_settings.USER_FIELDS += ['first_name', 'last_name', 'fullname']
 
     django_settings.FAKE_EMAIL_DOMAIN = 'fake-email-domain.foo'
+    django_settings.THIRD_PARTY_AUTH_FALLBACK_FULL_NAME = "Unknown"

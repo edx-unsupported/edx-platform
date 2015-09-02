@@ -3,7 +3,6 @@ A custom Strategy for python-social-auth that allows us to fetch configuration f
 ConfigurationModels rather than django.settings
 """
 import logging
-from django.conf import settings
 from .models import OAuth2ProviderConfig
 from social.backends.oauth import BaseOAuth2
 from social.strategies.django_strategy import DjangoStrategy
@@ -38,6 +37,17 @@ class ConfigurationModelStrategy(DjangoStrategy):
         # It's probably a global Django setting like 'FIELDS_STORED_IN_SESSION':
         return super(ConfigurationModelStrategy, self).setting(name, default, backend)
 
+    def _ensure_passes_length_check(self, user_data, key, fallback, min_length=2):
+        """
+        Ensures that value we get from user_data is meets length requirements. IF it is shorter than required, fallback
+        is used
+        """
+        assert len(fallback) >= min_length
+        value = user_data.get(key)
+        if value and len(value) >= min_length:
+            return value
+        return fallback
+
     def create_user(self, *args, **kwargs):
         """
         # Creates user using information provided by pipeline. This method is called in create_user pipeline step.
@@ -49,14 +59,20 @@ class ConfigurationModelStrategy(DjangoStrategy):
         from .pipeline import make_random_password
 
         user_fields = dict(kwargs)
-        user_fields['name'] = user_fields.get('fullname', "Unknown")  # needs to be >2 chars to pass validation
+        # needs to be >2 chars to pass validation
+        name = self._ensure_passes_length_check(
+            user_fields, 'fullname', self.setting("THIRD_PARTY_AUTH_FALLBACK_FULL_NAME")
+        )
+        password = self._ensure_passes_length_check(user_fields, 'password', make_random_password())
+
+        user_fields['name'] = name
+        user_fields['password'] = password
         user_fields['honor_code'] = True
         user_fields['terms_of_service'] = True
-        user_fields['password'] = make_random_password()
 
         if not user_fields.get('email'):
             user_fields['email'] = "{username}@{domain}".format(
-                username=user_fields['username'], domain=settings.FAKE_EMAIL_DOMAIN
+                username=user_fields['username'], domain=self.setting("FAKE_EMAIL_DOMAIN")
             )
 
         # when autoprovisioning we need to skip email activation, hence skip_email is True

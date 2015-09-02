@@ -1,7 +1,9 @@
 """Unit tests for third_party_auth/pipeline.py."""
 
 import random
+import mock
 
+from student.views import AccountEmailAlreadyExistsValidationError
 from third_party_auth import pipeline, provider
 from third_party_auth.tests import testutil
 import unittest
@@ -43,3 +45,28 @@ class ProviderUserStateTestCase(testutil.TestCase):
         google_provider = self.configure_google_provider(enabled=True)
         state = pipeline.ProviderUserState(google_provider, object(), 1000)
         self.assertEqual(google_provider.provider_id + '_unlink_form', state.get_unlink_form_name())
+
+
+@unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, 'third_party_auth not enabled')
+class TestCreateUser(testutil.TestCase):
+    def _raise_email_in_use_exception(self, *unused_args, **unused_kwargs):
+        raise AccountEmailAlreadyExistsValidationError(mock.Mock(), mock.Mock())
+
+    def test_create_user_normal_scenario(self):
+        retval = mock.Mock()
+        with mock.patch("third_party_auth.pipeline.social_create_user") as patched_social_create_user:
+            patched_social_create_user.return_value = retval
+            strategy, details, user, idx = mock.Mock(), {'email': 'qwe@asd.com'}, mock.Mock(), 1
+
+            result = pipeline.create_user(strategy, idx, details=details, user=user)
+
+            self.assertEqual(result, retval)
+
+    def test_create_user_exception_scenario(self):
+        with mock.patch("third_party_auth.pipeline.social_create_user") as patched_social_create_user:
+            patched_social_create_user.side_effect = self._raise_email_in_use_exception
+
+            strategy, details, user = mock.Mock(), {'email': 'qwe@asd.com'}, mock.Mock()
+
+            with self.assertRaises(pipeline.EmailAlreadyInUseException):
+                pipeline.create_user(strategy, 1, details=details, user=user)
