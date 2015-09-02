@@ -1,30 +1,33 @@
+""" Utility functions for django_comment_client """
 from collections import defaultdict
 from datetime import datetime
-import json
 import logging
+import string
 
 import pytz
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db import connection
 from django.http import HttpResponse
-from django.utils.timezone import UTC
 import pystache_custom as pystache
-from opaque_keys.edx.locations import i4xEncoder
-from opaque_keys.edx.keys import CourseKey
-from xmodule.modulestore.django import modulestore
+from courseware.access import has_access
 
 from django_comment_common.models import Role, FORUM_ROLE_STUDENT
 from django_comment_client.permissions import check_permissions_by_view, has_permission
 from django_comment_client.settings import MAX_COMMENT_DEPTH
 from edxmako import lookup_template
 
-from courseware.access import has_access
 from openedx.core.djangoapps.course_groups.cohorts import (
     get_course_cohort_settings, get_cohort_by_id, get_cohort_id, is_commentable_cohorted, is_course_cohorted
 )
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 
+
+from xmodule.modulestore.django import modulestore
+from django.utils.timezone import UTC
+from opaque_keys.edx.locations import i4xEncoder
+from opaque_keys.edx.keys import CourseKey
+import json
 
 log = logging.getLogger(__name__)
 
@@ -67,7 +70,9 @@ def get_accessible_discussion_modules(course, user, include_all=False):  # pylin
     Return a list of all valid discussion modules in this course that
     are accessible to the given user.
     """
-    all_modules = modulestore().get_items(course.id, qualifiers={'category': 'discussion'})
+    discussion_modules = modulestore().get_items(course.id, qualifiers={'category': 'discussion'})
+    discussion_xblocks = modulestore().get_items(course.id, qualifiers={'category': 'discussion-forum'})
+    all_modules = discussion_modules + discussion_xblocks
 
     def has_required_keys(module):
         for key in ('discussion_id', 'discussion_category', 'discussion_target'):
@@ -75,7 +80,6 @@ def get_accessible_discussion_modules(course, user, include_all=False):  # pylin
                 log.warning("Required key '%s' not in discussion %s, leaving out of category map" % (key, module.location))
                 return False
         return True
-
     return [
         module for module in all_modules
         if has_required_keys(module) and (include_all or has_access(user, 'load', module, course.id))
@@ -549,10 +553,10 @@ def get_group_id_for_comments_service(request, course_key, commentable_id=None):
         ValueError if the requested group_id is invalid
     """
     if commentable_id is None or is_commentable_cohorted(course_key, commentable_id):
-        if request.method == "GET":
-            requested_group_id = request.GET.get('group_id')
-        elif request.method == "POST":
+        if request.method == "POST":
             requested_group_id = request.POST.get('group_id')
+        else:
+            requested_group_id = request.GET.get('group_id')
         if has_permission(request.user, "see_all_cohorts", course_key):
             if not requested_group_id:
                 return None
@@ -569,6 +573,32 @@ def get_group_id_for_comments_service(request, course_key, commentable_id=None):
         # Never pass a group_id to the comments service for a non-cohorted
         # commentable
         return None
+
+
+def add_thread_group_name(thread_info, course_key):
+    """
+    Augment the specified thread info to include the group name if a group id is present.
+    """
+    if thread_info.get('group_id') is not None:
+        thread_info['group_name'] = get_cohort_by_id(course_key, thread_info.get('group_id')).name
+
+
+def format_filename(filename):
+    """Take a string and return a valid filename constructed from the string.
+    Uses a whitelist approach: any characters not present in valid_chars are
+    removed. Also spaces are replaced with underscores.
+
+    Note: this method may produce invalid filenames such as ``, `.` or `..`
+    When I use this method I prepend a date string like '2009_01_15_19_46_32_'
+    and append a file extension like '.txt', so I avoid the potential of using
+    an invalid filename.
+
+    https://gist.github.com/seanh/93666
+    """
+    valid_chars = "-_.() %s%s" % (string.ascii_letters, string.digits)
+    filename = ''.join(c for c in filename if c in valid_chars)
+    filename = filename.replace(' ', '_')
+    return filename
 
 
 def is_comment_too_deep(parent):

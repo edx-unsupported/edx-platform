@@ -19,25 +19,26 @@ import newrelic.agent
 
 from edxmako.shortcuts import render_to_response
 from courseware.courses import get_course_with_access
+from courseware.tabs import EnrolledTab
 from openedx.core.djangoapps.course_groups.cohorts import (
     is_course_cohorted,
     get_cohort_id,
     get_course_cohorts,
-    is_commentable_cohorted
+    is_commentable_cohorted,
+    get_cohorted_commentables,
+    get_cohort_by_id
 )
-from courseware.tabs import EnrolledTab
+from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from courseware.access import has_access
 from xmodule.modulestore.django import modulestore
 from ccx.overrides import get_current_ccx
 
 from django_comment_client.permissions import has_permission
 from django_comment_client.utils import (
-    merge_dict,
-    extract,
-    strip_none,
-    add_courseware_context,
     get_group_id_for_comments_service
 )
+
+from django_comment_client.utils import (merge_dict, extract, strip_none, add_courseware_context, add_thread_group_name)
 import django_comment_client.utils as utils
 import lms.lib.comment_client as cc
 
@@ -101,7 +102,7 @@ def make_course_settings(course, user):
 def get_threads(request, course, discussion_id=None, per_page=THREADS_PER_PAGE):
     """
     This may raise an appropriate subclass of cc.utils.CommentClientError
-    if something goes wrong, or ValueError if the group_id is invalid.
+    if something goes wrong. It may also raise ValueError if the group_id is invalid.
     """
     default_query_params = {
         'page': 1,
@@ -110,6 +111,7 @@ def get_threads(request, course, discussion_id=None, per_page=THREADS_PER_PAGE):
         'sort_order': 'desc',
         'text': '',
         'course_id': unicode(course.id),
+        'commentable_id': discussion_id,
         'user_id': request.user.id,
         'group_id': get_group_id_for_comments_service(request, course.id, discussion_id),  # may raise ValueError
     }
@@ -135,6 +137,32 @@ def get_threads(request, course, discussion_id=None, per_page=THREADS_PER_PAGE):
     #is user a moderator
     #did the user request a group
 
+    #if the user requested a group explicitly, give them that group, otherwise, if mod, show all, else if student, use cohort
+
+    is_cohorted = is_commentable_cohorted(course.id, discussion_id)
+
+    if has_permission(request.user, "see_all_cohorts", course.id):
+        group_id = request.GET.get('group_id')
+        if group_id in ("all", "None"):
+            group_id = None
+    else:
+        group_id = get_cohort_id(request.user, course.id)
+        if not group_id:
+            default_query_params['exclude_groups'] = True
+
+    if group_id:
+        group_id = int(group_id)
+        try:
+            CourseUserGroup.objects.get(course_id=course.id, id=group_id)
+        except CourseUserGroup.DoesNotExist:
+            if not is_cohorted:
+                group_id = None
+            else:
+                raise ValueError("Invalid Group ID")
+        default_query_params["group_id"] = group_id
+
+    #so by default, a moderator sees all items, and a student sees his cohort
+
     query_params = merge_dict(
         default_query_params,
         strip_none(
@@ -154,27 +182,35 @@ def get_threads(request, course, discussion_id=None, per_page=THREADS_PER_PAGE):
         )
     )
 
+    if not is_cohorted:
+        query_params.pop('group_id', None)
+
     threads, page, num_pages, corrected_text = cc.Thread.search(query_params)
-
-    # If not provided with a discussion id, filter threads by commentable ids
-    # which are accessible to the current user.
-    if discussion_id is None:
-        discussion_category_ids = set(utils.get_discussion_categories_ids(course, request.user))
-        threads = [
-            thread for thread in threads
-            if thread.get('commentable_id') in discussion_category_ids
-        ]
-
-    for thread in threads:
-        # patch for backward compatibility to comments service
-        if 'pinned' not in thread:
-            thread['pinned'] = False
+    threads = _set_group_names(course.id, threads)
 
     query_params['page'] = page
     query_params['num_pages'] = num_pages
     query_params['corrected_text'] = corrected_text
 
     return threads, query_params
+
+
+def _set_group_names(course_id, threads):
+    """ Adds group name if the thread has a group id"""
+
+    for thread in threads:
+        if thread.get('group_id') and is_course_cohorted(course_id):
+            thread['group_name'] = get_cohort_by_id(course_id, thread.get('group_id')).name
+            thread['group_string'] = "This post visible only to Group %s." % (thread['group_name'])
+        else:
+            thread['group_name'] = ""
+            thread['group_string'] = "This post visible to everyone."
+
+        #patch for backward compatibility to comments service
+        if 'pinned' not in thread:
+            thread['pinned'] = False
+
+    return threads
 
 
 def use_bulk_ops(view_func):
@@ -205,7 +241,7 @@ def inline_discussion(request, course_key, discussion_id):
 
     try:
         threads, query_params = get_threads(request, course, discussion_id, per_page=INLINE_THREADS_PER_PAGE)
-    except ValueError:
+    except (ValueError, CourseUserGroup.DoesNotExist):
         return HttpResponseBadRequest("Invalid group_id")
 
     with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
@@ -247,7 +283,7 @@ def forum_form_discussion(request, course_key):
     except cc.utils.CommentClientMaintenanceError:
         log.warning("Forum is in maintenance mode")
         return render_to_response('discussion/maintenance.html', {})
-    except ValueError:
+    except (ValueError, CourseUserGroup.DoesNotExist):
         return HttpResponseBadRequest("Invalid group_id")
 
     with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
@@ -285,8 +321,9 @@ def forum_form_discussion(request, course_key):
             'roles': _attr_safe_json(utils.get_role_ids(course_key)),
             'is_moderator': has_permission(request.user, "see_all_cohorts", course_key),
             'cohorts': course_settings["cohorts"],  # still needed to render _thread_list_template
-            'user_cohort': user_cohort_id,  # read from container in NewPostView
             'is_course_cohorted': is_course_cohorted(course_key),  # still needed to render _thread_list_template
+            'user_cohort': user_cohort_id,  # read from container in NewPostView
+            'cohorted_commentables': (get_cohorted_commentables(course_key)),
             'sort_preference': user.default_sort_key,
             'category_map': course_settings["category_map"],
             'course_settings': _attr_safe_json(course_settings)
@@ -306,6 +343,7 @@ def single_thread(request, course_key, discussion_id, thread_id):
 
     course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
     course_settings = make_course_settings(course, request.user)
+
     cc_user = cc.User.from_django_user(request.user)
     user_info = cc_user.to_dict()
     is_moderator = has_permission(request.user, "see_all_cohorts", course_key)
@@ -338,10 +376,11 @@ def single_thread(request, course_key, discussion_id, thread_id):
     is_staff = has_permission(request.user, 'openclose_thread', course.id)
     if request.is_ajax():
         with newrelic.agent.FunctionTrace(nr_transaction, "get_annotated_content_infos"):
-            annotated_content_info = utils.get_annotated_content_infos(course_key, thread, request.user, user_info=user_info)
+            annotated_content_info = utils.get_annotated_content_infos(
+                course_key, thread, request.user, user_info=user_info
+            )
         content = utils.prepare_content(thread.to_dict(), course_key, is_staff)
-        with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
-            add_courseware_context([content], course, request.user)
+        add_thread_group_name(content, course_key)
         return utils.JsonResponse({
             'content': content,
             'annotated_content_info': annotated_content_info,
@@ -393,7 +432,12 @@ def single_thread(request, course_key, discussion_id, thread_id):
             'user_cohort': user_cohort,
             'sort_preference': cc_user.default_sort_key,
             'category_map': course_settings["category_map"],
-            'course_settings': _attr_safe_json(course_settings)
+            'course_settings': _attr_safe_json(course_settings),
+            'cohorted_commentables': (get_cohorted_commentables(course.id)),
+            'has_permission_to_create_thread': has_permission(request.user, "create_thread", course.id),
+            'has_permission_to_create_comment': has_permission(request.user, "create_comment", course.id),
+            'has_permission_to_create_subcomment': has_permission(request.user, "create_subcomment", course.id),
+            'has_permission_to_openclose_thread': has_permission(request.user, "openclose_thread", course.id)
         }
         return render_to_response('discussion/index.html', context)
 
@@ -428,6 +472,7 @@ def user_profile(request, course_key, user_id):
             profiled_user = cc.User(id=user_id, course_id=course_key)
 
         threads, page, num_pages = profiled_user.active_threads(query_params)
+        threads = _set_group_names(course.id, threads)
         query_params['page'] = page
         query_params['num_pages'] = num_pages
         user_info = cc.User.from_django_user(request.user).to_dict()
@@ -509,6 +554,7 @@ def followed_threads(request, course_key, user_id):
             query_params['group_id'] = group_id
 
         threads, page, num_pages = profiled_user.subscribed_threads(query_params)
+        threads = _set_group_names(course.id, threads)
         query_params['page'] = page
         query_params['num_pages'] = num_pages
         user_info = cc.User.from_django_user(request.user).to_dict()

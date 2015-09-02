@@ -151,9 +151,6 @@ FEATURES = {
     # See jquey-xblock: https://github.com/edx-solutions/jquery-xblock
     'ENABLE_XBLOCK_VIEW_ENDPOINT': False,
 
-    # Allows to configure the LMS to provide CORS headers to serve requests from other domains
-    'ENABLE_CORS_HEADERS': False,
-
     # Can be turned off if course lists need to be hidden. Effects views and templates.
     'COURSES_ARE_BROWSABLE': True,
 
@@ -307,6 +304,23 @@ FEATURES = {
     # Turn on Advanced Security by default
     'ADVANCED_SECURITY': True,
 
+    # Show a "Download your certificate" on the Progress page if the lowest
+    # nonzero grade cutoff is met
+    'SHOW_PROGRESS_SUCCESS_BUTTON': False,
+
+    # Analytics Data API (for active student count)
+    # Default to false here b/c dev environments won't have the api, will override in aws.py
+    'ENABLE_ANALYTICS_ACTIVE_COUNT': False,
+
+    # TODO: ECOM-136 remove this feature flag when new styles are available on main site.for
+    # Enable the new edX footer to be rendered. Defaults to false.
+    'ENABLE_NEW_EDX_FOOTER': False,
+
+    # TODO: ECOM-136
+    # Enables the new navigation template and styles. This should be enabled
+    # when the styles appropriately match the edX.org website.
+    'ENABLE_NEW_EDX_HEADER': False,
+
     # When a logged in user goes to the homepage ('/') should the user be
     # redirected to the dashboard - this is default Open edX behavior. Set to
     # False to not redirect the user
@@ -416,6 +430,38 @@ FEATURES = {
 
     # The block types to disable need to be specified in "x block disable config" in django admin.
     'ENABLE_DISABLING_XBLOCK_TYPES': True,
+
+    # Whether an xBlock publishing a 'grade' event should be considered a 'progress' event as well
+    'MARK_PROGRESS_ON_GRADING_EVENT': False,
+
+    # Broadcast score changes to the rest of the system
+    'SIGNAL_ON_SCORE_CHANGED': False,
+
+    # Enable the Student Gradebook, which is essentially a cache of calculated grades
+    # In order to use the gradebook, you must add it to the list of INSTALLED_APPS in
+    # addition to setting the flag to True here.  A reference is available in aws.py
+    'STUDENT_GRADEBOOK': False,
+
+    # Enable the Student Progress, which is essentially a cache of module completions
+    # In order to use the "progress", you must add it to the list of INSTALLED_APPS in
+    # addition to setting the flag to True here.  A reference is available in aws.py
+    'STUDENT_PROGRESS': False,
+
+    # Enable the projects,
+    'PROJECTS_APP': False,
+
+    # Enable the Organizations,
+    'ORGANIZATIONS_APP': False,
+
+    # Enable the edx-notifications subssytem
+    'ENABLE_NOTIFICATIONS': False,
+
+    # Whether edx-notifications should use Celery for bulk operations
+    'ENABLE_NOTIFICATIONS_CELERY': False,
+
+    # whether to turn on Social Engagment scoring
+    # driven through the comment service
+    'ENABLE_SOCIAL_ENGAGEMENT': False,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -596,7 +642,8 @@ USAGE_KEY_PATTERN = r'(?P<usage_key_string>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@
 ASSET_KEY_PATTERN = r'(?P<asset_key_string>(?:/?c4x(:/)?/[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
 USAGE_ID_PATTERN = r'(?P<usage_id>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
 
-
+# Modules having these categories would be excluded from progress calculations
+PROGRESS_DETACHED_CATEGORIES = ['discussion-course', 'group-project', 'discussion-forum']
 ############################## EVENT TRACKING #################################
 
 # FIXME: Should we be doing this truncation?
@@ -699,11 +746,12 @@ VIRTUAL_UNIVERSITIES = []
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore import prefer_xmodules
 from xmodule.x_module import XModuleMixin
+from xmodule.modulestore.edit_info import EditInfoMixin
 
 # These are the Mixins that should be added to every XBlock.
 # This should be moved into an XBlock Runtime/Application object
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
-XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin)
+XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin, EditInfoMixin)
 
 # Allow any XBlock in the LMS
 XBLOCK_SELECT_FUNCTION = prefer_xmodules
@@ -1234,20 +1282,24 @@ base_vendor_js = [
 ]
 
 main_vendor_js = base_vendor_js + [
+    # Use the RequireJS-namespace.js rather than the 'undefine' version of it
+    # because otherwise our use of a 'text' plugin for RequireJS will fail
+    # 'js/RequireJS-namespace-undefine.js',
+    'js/RequireJS-namespace.js',
     'js/vendor/json2.js',
     'js/vendor/jquery-ui.min.js',
     'js/vendor/jquery.qtip.min.js',
     'js/vendor/swfobject/swfobject.js',
     'js/vendor/jquery.ba-bbq.min.js',
     'js/vendor/URI.min.js',
+    'js/vendor/underscore-min.js',
+    'js/vendor/backbone-min.js',
 ]
 
-dashboard_js = (
-    sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/dashboard/**/*.js'))
-)
 dashboard_search_js = ['js/search/dashboard/main.js']
-discussion_js = sorted(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
 rwd_header_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/utils/rwd_header.js'))
+dashboard_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/dashboard/**/*.js'))
+discussion_js = sorted(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
 staff_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/staff_grading/**/*.js'))
 open_ended_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/open_ended/**/*.js'))
 notes_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/notes/**/*.js'))
@@ -1472,6 +1524,10 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/certificates-style-rtl.css'
     },
+    'discussion': {
+        'source_filenames': ['sass/discussion-forum.css'],
+        'output_filename': 'css/lms-style-discussion-forum.css'
+    }
 }
 
 
@@ -1923,6 +1979,12 @@ INSTALLED_APPS = (
     'teams',
 
     'xblock_django',
+
+    # EDX API application
+    'api_manager',
+
+    # Social Engagement
+    'social_engagement',
 )
 
 ######################### CSRF #########################################
@@ -2074,17 +2136,23 @@ if FEATURES.get('AUTH_USE_CAS'):
     INSTALLED_APPS += ('django_cas',)
     MIDDLEWARE_CLASSES += ('django_cas.middleware.CASMiddleware',)
 
-############# Cross-domain requests #################
-
-if FEATURES.get('ENABLE_CORS_HEADERS'):
-    CORS_ALLOW_CREDENTIALS = True
-    CORS_ORIGIN_WHITELIST = ()
-    CORS_ORIGIN_ALLOW_ALL = False
-
 # Default cache expiration for the cross-domain proxy HTML page.
 # This is a static page that can be iframed into an external page
 # to simulate cross-domain requests.
 XDOMAIN_PROXY_CACHE_TIMEOUT = 60 * 15
+
+############# CORS headers for cross-domain requests #################
+
+if FEATURES.get('ENABLE_CORS_HEADERS'):
+    CORS_ORIGIN_ALLOW_ALL = False
+    INSTALLED_APPS += ('corsheaders', 'cors_csrf')
+    MIDDLEWARE_CLASSES = (
+        'corsheaders.middleware.CorsMiddleware',
+        'cors_csrf.middleware.CorsCSRFMiddleware',
+    ) + MIDDLEWARE_CLASSES
+    CORS_ALLOW_CREDENTIALS = True
+    CORS_ORIGIN_WHITELIST = ()
+    CORS_ORIGIN_ALLOW_ALL = False
 
 ###################### Registration ##################################
 
@@ -2377,6 +2445,12 @@ OPTIONAL_APPS = (
 
     # milestones
     'milestones',
+
+    # mckinsey apps
+    'gradebook',
+
+    'projects',
+    'organizations',
 )
 
 for app_name in OPTIONAL_APPS:
@@ -2560,3 +2634,106 @@ CREDIT_PROVIDER_TIMESTAMP_EXPIRATION = 15 * 60
 # not expected to be active; this setting simply allows administrators to
 # route any messages intended for LTI users to a common domain.
 LTI_USER_EMAIL_DOMAIN = 'lti.example.com'
+
+# TODO (ECOM-16): Remove once the A/B test of auto-registration completes
+AUTO_REGISTRATION_AB_TEST_EXCLUDE_COURSES = set([
+    "HarvardX/SW12.2x/1T2014",
+    "HarvardX/SW12.3x/1T2014",
+    "HarvardX/SW12.4x/1T2014",
+    "HarvardX/SW12.5x/2T2014",
+    "HarvardX/SW12.6x/2T2014",
+    "HarvardX/HUM2.1x/3T2014",
+    "HarvardX/SW12x/2013_SOND",
+    "LinuxFoundationX/LFS101x/2T2014",
+    "HarvardX/CS50x/2014_T1",
+    "HarvardX/AmPoX.1/2014_T3",
+    "HarvardX/SW12.7x/3T2014",
+    "HarvardX/SW12.10x/1T2015",
+    "HarvardX/SW12.9x/3T2014",
+    "HarvardX/SW12.8x/3T2014",
+])
+
+################################### EDX-NOTIFICATIONS SUBSYSTEM ######################################
+
+INSTALLED_APPS += (
+    'edx_notifications',
+    'edx_notifications.server.web',
+)
+
+TEMPLATE_LOADERS += (
+    'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader',
+)
+
+NOTIFICATION_STORE_PROVIDER = {
+    "class": "edx_notifications.stores.sql.store_provider.SQLNotificationStoreProvider",
+    "options": {
+    }
+}
+
+if 'SOUTH_MIGRATION_MODULES' not in vars() and 'SOUTH_MIGRATION_MODULES' not in globals():
+    SOUTH_MIGRATION_MODULES = {}
+
+SOUTH_MIGRATION_MODULES.update({
+    'edx_notifications': 'edx_notifications.stores.sql.migrations',
+})
+
+# to prevent run-away queries from happening
+NOTIFICATION_MAX_LIST_SIZE = 100
+
+#
+# Various mapping tables which is used by the MsgTypeToUrlLinkResolver
+# to map a notification type to a statically defined URL path
+#
+# NOTE: NOTIFICATION_CLICK_LINK_GROUP_URLS will usually get read in by the *.envs.json file
+#
+NOTIFICATION_CLICK_LINK_URL_MAPS = {
+    'open-edx.studio.announcements.*': '/courses/{course_id}/announcements',
+    'open-edx.lms.leaderboard.*': '/courses/{course_id}/cohort',
+    'open-edx.lms.discussions.*': '/courses/{course_id}/discussion/{commentable_id}/threads/{thread_id}',
+    'open-edx.xblock.group-project.*': '/courses/{course_id}/group_work?actid={activity_location}',
+}
+
+# list all known channel providers
+NOTIFICATION_CHANNEL_PROVIDERS = {
+    'durable': {
+        'class': 'edx_notifications.channels.durable.BaseDurableNotificationChannel',
+        'options': {
+            # list out all link resolvers
+            'link_resolvers': {
+                # right now the only defined resolver is 'type_to_url', which
+                # attempts to look up the msg type (key) via
+                # matching on the value
+                'msg_type_to_url': {
+                    'class': 'edx_notifications.channels.link_resolvers.MsgTypeToUrlLinkResolver',
+                    'config': {
+                        '_click_link': NOTIFICATION_CLICK_LINK_URL_MAPS,
+                    }
+                }
+            }
+        }
+    },
+    'null': {
+        'class': 'edx_notifications.channels.null.NullNotificationChannel',
+        'options': {}
+    }
+}
+
+# list all of the mappings of notification types to channel
+NOTIFICATION_CHANNEL_PROVIDER_TYPE_MAPS = {
+    '*': 'durable',  # default global mapping
+}
+
+NOTIFICATION_DAILY_DIGEST_SUBJECT = "Your unread notifications for '{display_name}'"
+NOTIFICATION_WEEKLY_DIGEST_SUBJECT = "Your unread notifications for '{display_name}'"
+NOTIFICATION_BRANDED_DEFAULT_LOGO = 'edx_notifications/img/edx-openedx-logo-tag.png'
+NOTIFICATION_EMAIL_FROM_ADDRESS = ''
+NOTIFICATION_EMAIL_CLICK_LINK_ROOT = 'http://localhost'
+NOTIFICATION_DIGEST_SEND_TIMEFILTERED = True
+
+#date format the api will be formatting the datetime values
+API_DATE_FORMAT = '%Y-%m-%d'
+
+# for Student Notes we would like to avoid too frequent token refreshes (default is 30 seconds)
+if FEATURES['ENABLE_EDXNOTES']:
+    OAUTH_ID_TOKEN_EXPIRATION = 60 * 60

@@ -22,17 +22,13 @@ if Backbone?
       if @mode not in ["tab", "inline"]
         throw new Error("invalid mode: " + @mode)
 
-      # Quick fix to have an actual model when we're receiving new models from
-      # the server.
-      @model.collection.on "reset", (collection) =>
-        id = @model.get("id")
-        @model = collection.get(id) if collection.get(id)
-
       @createShowView()
       @responses = new Comments()
       @loadedResponses = false
       if @isQuestion()
         @markedAnswers = new Comments()
+
+      @options = options
 
     rerender: () ->
       if @showView?
@@ -43,7 +39,7 @@ if Backbone?
         mode: @mode
         model: @model
         el: @el
-        course_settings: @course_settings
+        course_settings: @options.course_settings
         topicId: @topicId
       )
       @render()
@@ -265,7 +261,6 @@ if Backbone?
       comment = new Comment(body: body, created_at: (new Date()).toISOString(), username: window.user.get("username"), votes: { up_count: 0 }, abuse_flaggers:[], endorsed: false, user_id: window.user.get("id"))
       comment.set('thread', @model.get('thread'))
       @renderResponseToList(comment, ".js-response-list")
-      @renderAttrs()
       @model.addComment()
       @renderAddResponseButton()
 

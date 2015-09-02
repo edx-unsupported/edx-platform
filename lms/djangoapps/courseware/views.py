@@ -245,6 +245,7 @@ def save_child_position(seq_module, child_name):
     """
     child_name: url_name of the child
     """
+
     for position, c in enumerate(seq_module.get_display_items(), start=1):
         if c.location.name == child_name:
             # Only save if position changed
@@ -553,7 +554,8 @@ def _index_bulk_op(request, course_key, chapter, section, position):
 
             # Save where we are in the chapter
             save_child_position(chapter_module, section)
-            context['fragment'] = section_module.render(STUDENT_VIEW)
+            section_render_context = {'activate_block_id': request.GET.get('activate_block_id')}
+            context['fragment'] = section_module.render(STUDENT_VIEW, section_render_context)
             context['section_title'] = section_descriptor.display_name_with_default
         else:
             # section is none, so display a message
@@ -621,6 +623,23 @@ def _index_bulk_op(request, course_key, chapter, section, position):
     return result
 
 
+def item_finder(request, course_key, module_id):
+    items = modulestore().get_items(course_key, qualifiers={'name': module_id})
+
+    if len(items) == 0:
+        raise Http404(
+            u"Could not find id: {0} in course_id: {1}. Referer: {2}".format(
+                module_id, course_key, request.META.get("HTTP_REFERER", "")
+            ))
+    if len(items) > 1:
+        log.warning(
+            u"Multiple items found with id: {0} in course_id: {1}. Referer: {2}. Using first: {3}".format(
+                module_id, course_key, request.META.get("HTTP_REFERER", ""), items[0].location.to_deprecated_string()
+            ))
+
+    return items
+
+
 @ensure_csrf_cookie
 @ensure_valid_course_key
 def jump_to_id(request, course_id, module_id):
@@ -628,21 +647,10 @@ def jump_to_id(request, course_id, module_id):
     This entry point allows for a shorter version of a jump to where just the id of the element is
     passed in. This assumes that id is unique within the course_id namespace
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    items = modulestore().get_items(course_key, qualifiers={'name': module_id})
+    course_key = CourseKey.from_string(course_id)
+    items = item_finder(request, course_key, module_id)
 
-    if len(items) == 0:
-        raise Http404(
-            u"Could not find id: {0} in course_id: {1}. Referer: {2}".format(
-                module_id, course_id, request.META.get("HTTP_REFERER", "")
-            ))
-    if len(items) > 1:
-        log.warning(
-            u"Multiple items found with id: {0} in course_id: {1}. Referer: {2}. Using first: {3}".format(
-                module_id, course_id, request.META.get("HTTP_REFERER", ""), items[0].location.to_deprecated_string()
-            ))
-
-    return jump_to(request, course_id, items[0].location.to_deprecated_string())
+    return jump_to(request, course_id, unicode(items[0].location))
 
 
 @ensure_csrf_cookie
@@ -1221,7 +1229,7 @@ def notification_image_for_tab(course_tab, user, course):
     return None
 
 
-def get_static_tab_contents(request, course, tab):
+def get_static_tab_contents(request, course, tab, wrap_xmodule_display=True):
     """
     Returns the contents for the given static tab
     """
@@ -1233,7 +1241,8 @@ def get_static_tab_contents(request, course, tab):
         course.id, request.user, modulestore().get_item(loc), depth=0
     )
     tab_module = get_module(
-        request.user, request, loc, field_data_cache, static_asset_path=course.static_asset_path, course=course
+        request.user, request, loc, field_data_cache, static_asset_path=course.static_asset_path,
+        course=course, wrap_xmodule_display=wrap_xmodule_display,
     )
 
     logging.debug('course_module = {0}'.format(tab_module))

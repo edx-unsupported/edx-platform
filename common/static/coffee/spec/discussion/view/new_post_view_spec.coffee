@@ -92,6 +92,7 @@ describe "NewPostView", ->
             @view.$(".forum-new-post-form").submit()
             expect($.ajax).toHaveBeenCalled()
             $.ajax.reset()
+            @view.$(".forum-new-post-form").prop('disabled', false)
         )
 
     describe "always cohort inline discussions ", ->

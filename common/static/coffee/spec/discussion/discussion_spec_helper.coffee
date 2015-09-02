@@ -20,7 +20,9 @@ class @DiscussionSpecHelper
         )
 
     @makeEventSpy = () ->
-        jasmine.createSpyObj('event', ['preventDefault', 'target'])
+        obj = jasmine.createSpyObj('event', ['preventDefault'])
+        obj.target = document.createElement('div');
+        obj
 
     @makeCourseSettings = (is_cohorted=true) ->
         new DiscussionCourseSettings(
@@ -301,7 +303,7 @@ browser and pasting the output.  When that file changes, this one should be rege
 </script>
 
 <script aria-hidden="true" type="text/template" id="search-alert-template">
-    <div class="search-alert" id="search-alert-<%- cid %>">
+    <div class="search-alert <%= css_class %>" id="search-alert-<%- cid %>">
         <div class="search-alert-content">
           <p class="message"><%= message %></p>
         </div>
@@ -328,7 +330,7 @@ browser and pasting the output.  When that file changes, this one should be rege
                     <% }); %>
                  </select>
             </label><div class="field-help">
-                Discussion admins, moderators, and TAs can make their posts visible to all students or specify a single cohort.
+                Discussion admins, moderators, and TAs can make their posts visible to all students or specify a single cohort group.
             </div>
         </div>
         <% } %>
@@ -349,13 +351,13 @@ browser and pasting the output.  When that file changes, this one should be rege
             <% if (allow_anonymous) { %>
             <label class="post-option">
                 <input type="checkbox" name="anonymous" class="post-option-input js-anon">
-                post anonymously
+                <span class="js-anon-label">post anonymously</span>
             </label>
             <% } %>
             <% if (allow_anonymous_to_peers) { %>
             <label class="post-option">
                 <input type="checkbox" name="anonymous_to_peers" class="post-option-input js-anon-peers">
-                post anonymously to classmates
+                <span class="js-anon-peers-label">post anonymously to classmates</span>
             </label>
             <% } %>
         </div>
@@ -403,24 +405,26 @@ browser and pasting the output.  When that file changes, this one should be rege
 </script>
 
 <script aria-hidden="true" type="text/template" id="topic-template">
-    <div class="field-label">
-        <span class="field-label-text">Topic Area:</span><div class="field-input post-topic">
-            <a href="#" class="post-topic-button">
-                <span class="sr">Discussion topics; current selection is: </span>
-                <span class="js-selected-topic"></span>
-                <span class="drop-arrow" aria-hidden="true">▾</span>
-            </a>
-            <div class="topic-menu-wrapper">
-                <label class="topic-filter-label">
-                    <span class="sr">Filter topics</span>
-                    <input type="text" class="topic-filter-input" placeholder="Filter topics">
-                </label>
-                <ul class="topic-menu" role="menu"><%= topics_html %></ul>
-           </div>
-       </div>
-    </div><span class="field-help">
-        Add your post to a relevant topic to help others find it.
-    </span>
+    <div class="topic-wrapper">
+      <div class="field-label">
+          <span class="field-label-text">Topic Area:</span><div class="field-input post-topic">
+              <a href="#" class="post-topic-button">
+                  <span class="sr">Discussion topics; current selection is: </span>
+                  <span class="js-selected-topic"></span>
+                  <span class="drop-arrow" aria-hidden="true">▾</span>
+              </a>
+              <div class="topic-menu-wrapper">
+                  <label class="topic-filter-label">
+                      <span class="sr">Filter topics</span>
+                      <input type="text" class="topic-filter-input" placeholder="Filter topics">
+                  </label>
+                  <ul class="topic-menu" role="menu"><%= topics_html %></ul>
+             </div>
+         </div>
+      </div><span class="field-help">
+          Add your post to a relevant topic to help others find it.
+      </span>
+    </div>
 </script>
 
 
@@ -582,6 +586,7 @@ browser and pasting the output.  When that file changes, this one should be rege
 </script>
 
 <script aria-hidden="true" type="text/template" id="post-user-display-template">
+  <span class="username-wrapper">
     <% if (username) { %>
     <a href="<%- user_url %>" class="username"><%- username %></a>
         <% if (is_community_ta) { %>
@@ -592,5 +597,6 @@ browser and pasting the output.  When that file changes, this one should be rege
     <% } else { %>
     anonymous
     <% } %>
+  </span>
 </script>
 """)

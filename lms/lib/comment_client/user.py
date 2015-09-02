@@ -115,6 +115,14 @@ class User(models.Model):
         )
         return response.get('collection', []), response.get('page', 1), response.get('num_pages', 1)
 
+    def social_stats(self, end_date=None):
+        return get_user_social_stats(self.id, self.course_id, end_date=end_date)
+
+    @classmethod
+    def all_social_stats(cls, course_id, end_date=None, thread_type=None, thread_ids=None):
+        """ Get social stats for all users participating in a course """
+        return get_user_social_stats('*', course_id, end_date=end_date, thread_type=thread_type, thread_ids=thread_ids)
+
     def _retrieve(self, *args, **kwargs):
         url = self.url(action='get', params=self.attributes)
         retrieve_params = self.default_retrieve_params.copy()
@@ -148,6 +156,47 @@ class User(models.Model):
         self._update_from_response(response)
 
 
+def get_user_social_stats(user_id, course_id, end_date=None, thread_type=None, thread_ids=None):
+    """ Queries cs_comments_service for social_stats """
+    if not course_id:
+        raise CommentClientRequestError("Must provide course_id when retrieving social stats for the user")
+
+    url = _url_for_user_social_stats(user_id)
+    params = {'course_id': course_id}
+    if end_date:
+        params.update({'end_date': end_date.isoformat()})
+    if thread_type:
+        params.update({'thread_type': thread_type})
+    if thread_ids:
+        params.update({'thread_ids': ",".join(thread_ids)})
+
+    response = perform_request(
+        'get',
+        url,
+        params
+    )
+    return response
+
+
+def get_course_social_stats(course_id, end_date=None):
+    """
+    Helper method to get the social stats from the comment service
+    """
+    url = _url_for_course_social_stats(end_date=end_date)
+    params = {'course_id': course_id}
+    if end_date:
+        params.update({'end_date': end_date.isoformat()})
+
+    response = perform_request(
+        'get',
+        url,
+        params
+    )
+    return response
+
+
+# pylint: disable=missing-docstring
+
 def _url_for_vote_comment(comment_id):
     return "{prefix}/comments/{comment_id}/votes".format(prefix=settings.PREFIX, comment_id=comment_id)
 
@@ -166,3 +215,17 @@ def _url_for_user_active_threads(user_id):
 
 def _url_for_user_subscribed_threads(user_id):
     return "{prefix}/users/{user_id}/subscribed_threads".format(prefix=settings.PREFIX, user_id=user_id)
+
+
+def _url_for_user_stats(user_id, course_id):
+    return "{prefix}/users/{user_id}/stats?course_id={course_id}".format(
+        prefix=settings.PREFIX, user_id=user_id, course_id=course_id
+    )
+
+
+def _url_for_user_social_stats(user_id, end_date=None):
+    return "{prefix}/users/{user_id}/social_stats".format(prefix=settings.PREFIX, user_id=user_id)
+
+
+def _url_for_course_social_stats(end_date=None):
+    return "{prefix}/users/*/social_stats".format(prefix=settings.PREFIX)

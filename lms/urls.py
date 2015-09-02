@@ -60,10 +60,6 @@ urlpatterns = (
 
     url(r'^heartbeat$', include('heartbeat.urls')),
 
-    # Note: these are older versions of the User API that will eventually be
-    # subsumed by api/user listed below.
-    url(r'^user_api/', include('openedx.core.djangoapps.user_api.legacy_urls')),
-
     url(r'^notifier_api/', include('notifier_api.urls')),
 
     url(r'^i18n/', include('django.conf.urls.i18n')),
@@ -79,9 +75,6 @@ urlpatterns = (
 
     # Course content API
     url(r'^api/course_structure/', include('course_structure_api.urls', namespace='course_structure_api')),
-
-    # User API endpoints
-    url(r'^api/user/', include('openedx.core.djangoapps.user_api.urls')),
 
     # Profile Images API endpoints
     url(r'^api/profile_images/', include('openedx.core.djangoapps.profile_images.urls')),
@@ -121,6 +114,25 @@ if settings.FEATURES["ENABLE_MOBILE_REST_API"]:
     urlpatterns += (
         url(r'^api/mobile/v0.5/', include('mobile_api.urls')),
     )
+
+# OPEN EDX API
+if settings.FEATURES["API"]:
+    urlpatterns += (
+        url(r'^api/server/', include('api_manager.urls')),
+    )
+
+# OPEN EDX USER API
+# mattdrayer: Please note that the user_api declaration must follow
+# the server api declaration.  When declared ahead of the server api
+# the user_api will oddly begin to return server-oriented user URIs
+# At this time I'm not sure why this seems to be a one-way scenario.
+urlpatterns += (
+    url(r'^user_api/', include('openedx.core.djangoapps.user_api.legacy_urls')),
+)
+urlpatterns += (
+    # User API endpoints
+    url(r'^api/user/', include('openedx.core.djangoapps.user_api.urls')),
+)
 
 # if settings.FEATURES.get("MULTIPLE_ENROLLMENT_ROLES"):
 urlpatterns += (
@@ -263,9 +275,10 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/{course_key}/xblock/{usage_key}/handler/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$'.format(course_key=settings.COURSE_ID_PATTERN, usage_key=settings.USAGE_ID_PATTERN),
             'courseware.module_render.handle_xblock_callback',
             name='xblock_handler'),
-        url(r'^courses/{course_key}/xblock/{usage_key}/view/(?P<view_name>[^/]*)$'.format(
-            course_key=settings.COURSE_ID_PATTERN,
-            usage_key=settings.USAGE_ID_PATTERN),
+        url(r'^courses/{course_key}/xblock/{usage_key}/view/(?P<view_name>[^/]*)$'
+            .format(
+                course_key=settings.COURSE_ID_PATTERN,
+                usage_key=settings.USAGE_ID_PATTERN),
             'courseware.module_render.xblock_view',
             name='xblock_view'),
         url(r'^courses/{course_key}/xblock/{usage_key}/handler_noauth/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$'.format(course_key=settings.COURSE_ID_PATTERN, usage_key=settings.USAGE_ID_PATTERN),
@@ -718,3 +731,9 @@ urlpatterns += (
     url(r'^404$', handler404),
     url(r'^500$', handler500),
 )
+
+if settings.FEATURES.get('ENABLE_NOTIFICATIONS'):
+    # include into our URL patterns the HTTP RESTfule API that comes with edx-notifications
+    urlpatterns += (
+        url(r'^api/', include('edx_notifications.server.api.urls')),
+    )
