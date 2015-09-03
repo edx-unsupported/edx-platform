@@ -592,6 +592,9 @@ def create_user(strategy, details, user=None, *args, **kwargs):
         return social_create_user(strategy, details, user, *args, **kwargs)
     except AccountEmailAlreadyExistsValidationError as exc:
         logger.exception(exc.message)
+        # We're raising an exception that inherits from AuthException. Such exceptions are properly handled
+        # by social auth pipeline: their string representation (see __str__ method) is displayed to user on the page
+        # we're redirecting to.
         raise EmailAlreadyInUseException(exc.message, details['email'])
 
 
