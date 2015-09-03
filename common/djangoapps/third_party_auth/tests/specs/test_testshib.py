@@ -149,7 +149,7 @@ class TestShibIntegrationTest(testutil.SAMLTestCase):
         self.client.logout()
         self._test_return_login()
 
-    def test_autoprovision(self):
+    def test_autoprovision_from_login(self):
         self._configure_testshib_provider(autoprovision_account=True)
         self._freeze_time(timestamp=1434326820)  # This is the time when the saved request/response was recorded.
 
@@ -158,11 +158,27 @@ class TestShibIntegrationTest(testutil.SAMLTestCase):
 
         # The user goes to the register page, and sees a button to register with TestShib:
         self._check_login_page()
+
+        self._test_autoprovision(TPA_TESTSHIB_LOGIN_URL)
+
+    def test_autoprovision_from_register(self):
+        self._configure_testshib_provider(autoprovision_account=True)
+        self._freeze_time(timestamp=1434326820)  # This is the time when the saved request/response was recorded.
+
+        # check that we don't have a user we're autoprovisioning account for
+        self._assert_user_does_not_exist('myself')
+
+        # The user goes to the register page, and sees a button to register with TestShib:
+        self._check_register_page()
+
+        self._test_autoprovision(TPA_TESTSHIB_REGISTER_URL)
+
+    def _test_autoprovision(self, entry_point):
         # The user clicks on the TestShib button:
-        try_login_response = self.client.get(TPA_TESTSHIB_LOGIN_URL)
+        try_entry_response = self.client.get(entry_point)
         # The user should be redirected to TestShib:
-        self.assertEqual(try_login_response.status_code, 302)
-        self.assertTrue(try_login_response['Location'].startswith(TESTSHIB_SSO_URL))
+        self.assertEqual(try_entry_response.status_code, 302)
+        self.assertTrue(try_entry_response['Location'].startswith(TESTSHIB_SSO_URL))
 
         # Now the user will authenticate with the SAML provider
         self._fake_testshib_login_and_return()

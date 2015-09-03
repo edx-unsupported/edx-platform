@@ -517,7 +517,7 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
 
     def get_provider():
         """
-        Get's third-party provider for request
+        Gets third-party provider for request
         """
         return provider.Registry.get_from_pipeline({'backend': backend.name, 'kwargs': kwargs})
 
@@ -532,14 +532,14 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
         return current_provider and current_provider.skip_email_verification
 
     if not user:
+        if should_autoprovision_account():
+            # User has authenticated with the third party provider and provider is configured
+            # to automatically provision edX account, which is done via strategy.create_user in next pipeline step
+            return {'autoprovision': True}
+
         if auth_entry in [AUTH_ENTRY_LOGIN_API, AUTH_ENTRY_REGISTER_API]:
             return HttpResponseBadRequest()
         elif auth_entry in [AUTH_ENTRY_LOGIN, AUTH_ENTRY_LOGIN_2]:
-            if should_autoprovision_account():
-                # User has authenticated with the third party provider and provider is configured
-                # to automatically provision edX account, which is done via strategy.create_user in next pipeline step
-                return {'autoprovision': True}
-
             # User has authenticated with the third party provider but we don't know which edX
             # account corresponds to them yet, if any.
             if autosubmit_registration_form():
