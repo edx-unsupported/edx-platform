@@ -62,6 +62,22 @@ def render_from_lms(template_name, dictionary, context=None, namespace='main'):
     return render_to_string(template_name, dictionary, context, namespace="lms." + namespace)
 
 
+def _xmodule_recurse(item, action, ignore_exception=()):
+    """
+    Recursively apply provided action on item and its children
+
+    ignore_exception (Exception Object): A optional argument; when passed ignores the corresponding
+        exception raised during xmodule recursion,
+    """
+    for child in item.get_children():
+        _xmodule_recurse(child, action, ignore_exception)
+
+    try:
+        return action(item)
+    except ignore_exception:
+        return
+
+
 def get_parent_xblock(xblock):
     """
     Returns the xblock that is the parent of the specified xblock, or None if it has no parent.

@@ -181,6 +181,9 @@ INSTALLED_APPS += ('external_auth', )
 # Add milestones to Installed apps for testing
 INSTALLED_APPS += ('milestones', 'openedx.core.djangoapps.call_stack_manager')
 
+# Add projects, organizations,'api_manager', 'progress', 'gradebook to Installed apps for testing
+INSTALLED_APPS += ('projects', 'organizations', 'api_manager', 'progress', 'gradebook', )
+
 # hide ratelimit warnings while running tests
 filterwarnings('ignore', message='No request passed to the backend, unable to rate-limit')
 
@@ -283,3 +286,7 @@ FEATURES['ENABLE_TEAMS'] = True
 
 # Dummy secret key for dev/test
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
+
+# Test mode. Used to let code that might otherwise affect global state know that it shouldn't
+# (such as management commands.)
+TEST_MODE = True

@@ -76,6 +76,30 @@ DEBUG_TOOLBAR_CONFIG = {
 def should_show_debug_toolbar(_):
     return True  # We always want the toolbar on devstack regardless of IP, auth, etc.
 
+INSTALLED_APPS += (
+    # Mongo perf stats
+    'debug_toolbar_mongo',
+)
+
+############# Performance Profiler #################
+# Note: The Django Debug Toolbar creates a lot of profiling noise, so
+# when the profiler is enabled in Devstack we should also disable the toolbar
+FEATURES['PROFILER'] = False
+if FEATURES.get('PROFILER'):
+    INSTALLED_APPS += ('profiler',)
+    MIDDLEWARE_CLASSES += (
+        'profiler.middleware.HotshotProfilerMiddleware',
+        'profiler.middleware.CProfileProfilerMiddleware',
+    )
+
+# Set this to the dashboard URL in order to display the link from the
+# dashboard to the Analytics Dashboard.
+ANALYTICS_DASHBOARD_URL = None
+
+DEBUG_TOOLBAR_PANELS += (
+    'debug_toolbar_mongo.panel.MongoDebugPanel',
+)
+
 
 ########################### PIPELINE #################################
 
@@ -153,7 +177,7 @@ COURSE_DISCOVERY_MEANINGS = {
     'language': LANGUAGE_MAP,
 }
 
-FEATURES['ENABLE_COURSE_DISCOVERY'] = True
+FEATURES['ENABLE_COURSE_DISCOVERY'] = False
 FEATURES['COURSES_ARE_BROWSEABLE'] = True
 HOMEPAGE_COURSE_MAX = 9
 
@@ -181,6 +205,11 @@ FEATURES['ENABLE_COSMETIC_DISPLAY_PRICE'] = True
 if FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and 'third_party_auth.dummy.DummyBackend' not in AUTHENTICATION_BACKENDS:
     AUTHENTICATION_BACKENDS = ['third_party_auth.dummy.DummyBackend'] + list(AUTHENTICATION_BACKENDS)
 
+########################### EDX API #################################
+
+FEATURES['API'] = True
+
+
 #####################################################################
 # See if the developer has any local overrides.
 try:
@@ -193,3 +222,12 @@ except ImportError:
 MODULESTORE = convert_module_store_setting_if_needed(MODULESTORE)
 
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
+
+############# Student Module #################
+FEATURES['SIGNAL_ON_SCORE_CHANGED'] = True
+
+
+############# Student Gradebook #################
+FEATURES['STUDENT_GRADEBOOK'] = True
+if FEATURES.get('STUDENT_GRADEBOOK', False):
+    INSTALLED_APPS += ('gradebook',)

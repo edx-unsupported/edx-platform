@@ -18,6 +18,8 @@ class CourseUserGroup(models.Model):
     which may be treated specially.  For example, a user can be in at most one cohort per
     course, and cohorts are used to split up the forums by group.
     """
+    default_cohort_name = "default_cohort"
+
     class Meta:
         unique_together = (('name', 'course_id'), )
 
@@ -100,6 +102,12 @@ class CourseCohortsSettings(models.Model):
     def cohorted_discussions(self, value):
         """Un-Jsonify the cohorted_discussions"""
         self._cohorted_discussions = json.dumps(value)
+
+    class Meta(object):
+        """
+        Meta options for this model.
+        """
+        verbose_name_plural = "Course Cohort Settings"
 
 
 class CourseCohort(models.Model):

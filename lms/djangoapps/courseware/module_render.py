@@ -2,12 +2,16 @@
 Module rendering
 """
 
+from __future__ import absolute_import
 import hashlib
 import json
 import logging
 import mimetypes
 
 import static_replace
+
+from datetime import datetime
+from django.utils.timezone import UTC
 
 from collections import OrderedDict
 from functools import partial
@@ -35,6 +39,10 @@ from courseware.entrance_exams import (
     get_entrance_exam_score,
     user_must_complete_entrance_exam
 )
+from lms_xblock.runtime import (
+    SettingsService,
+)
+from xmodule.services import NotificationsService, CoursewareParentInfoService
 from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
@@ -68,6 +76,8 @@ from xmodule.lti_module import LTIModule
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.x_module import XModuleDescriptor
 from xmodule.mixin import wrap_with_license
+from progress.models import CourseModuleCompletion
+
 from util.json_request import JsonResponse
 from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 from util import milestones_helpers
@@ -425,6 +435,14 @@ def get_module_system_for_user(user, field_data_cache,  # TODO  # pylint: disabl
         """
         Manages the workflow for recording and updating of student module grade state
         """
+
+        if not settings.FEATURES.get("ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE", True):
+            # if a course has ended, don't register grading events
+            course = modulestore().get_course(course_id, depth=0)
+            now = datetime.now(UTC())
+            if course.end is not None and now > course.end:
+                return
+
         user_id = event.get('user_id', user.id)
 
         grade = event.get('value')
@@ -458,22 +476,52 @@ def get_module_system_for_user(user, field_data_cache,  # TODO  # pylint: disabl
             course_id,
             descriptor.location,
         )
+        # we can treat a grading event as a indication that a user
+        # "completed" an xBlock
+        if settings.FEATURES.get('MARK_PROGRESS_ON_GRADING_EVENT', False):
+            handle_progress_event(block, event_type, event)
+
+    def handle_progress_event(block, event_type, event):
+        """
+        tie into the CourseCompletions datamodels that are exposed in the api_manager djangoapp
+        """
+
+        if not settings.FEATURES.get("ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE", True):
+            # if a course has ended, don't register progress events
+            course = modulestore().get_course(course_id, depth=0)
+            now = datetime.now(UTC())
+            if course.end is not None and now > course.end:
+                return
+
+        user_id = event.get('user_id', user.id)
+        if not user_id:
+            return
 
         # Send a signal out to any listeners who are waiting for score change
         # events.
         SCORE_CHANGED.send(
             sender=None,
-            points_possible=event['max_value'],
-            points_earned=event['value'],
+            points_possible=event.get('max_value'),
+            points_earned=event.get('value'),
             user_id=user_id,
             course_id=unicode(course_id),
             usage_id=unicode(descriptor.location)
+        )
+
+        CourseModuleCompletion.objects.get_or_create(
+            user_id=user_id,
+            course_id=course_id,
+            content_id=unicode(descriptor.location)
         )
 
     def publish(block, event_type, event):
         """A function that allows XModules to publish events."""
         if event_type == 'grade':
             handle_grade_event(block, event_type, event)
+        elif event_type == 'progress':
+            # expose another special case event type which gets sent
+            # into the CourseCompletions models
+            handle_progress_event(block, event_type, event)
         else:
             track_function(event_type, event)
 
@@ -604,6 +652,21 @@ def get_module_system_for_user(user, field_data_cache,  # TODO  # pylint: disabl
 
     user_is_staff = has_access(user, u'staff', descriptor.location, course_id)
 
+    services_list = {
+        'i18n': ModuleI18nService(),
+        'fs': FSService(),
+        'field-data': field_data,
+        'settings': SettingsService(),
+        'courseware_parent_info': CoursewareParentInfoService(),
+        "reverification": ReverificationService(),
+        'user': DjangoXBlockUserService(user, user_is_staff=user_is_staff),
+    }
+
+    if settings.FEATURES.get('ENABLE_NOTIFICATIONS', False):
+        services_list.update({
+            "notifications": NotificationsService(),
+        })
+
     system = LmsModuleSystem(
         track_function=track_function,
         render_template=render_to_string,
@@ -646,13 +709,7 @@ def get_module_system_for_user(user, field_data_cache,  # TODO  # pylint: disabl
         mixins=descriptor.runtime.mixologist._mixins,  # pylint: disable=protected-access
         wrappers=block_wrappers,
         get_real_user=user_by_anonymous_id,
-        services={
-            'i18n': ModuleI18nService(),
-            'fs': FSService(),
-            'field-data': field_data,
-            'user': DjangoXBlockUserService(user, user_is_staff=user_is_staff),
-            "reverification": ReverificationService()
-        },
+        services=services_list,
         get_user_role=lambda: get_user_role(user, course_id),
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
         rebind_noauth_module_to_user=rebind_noauth_module_to_user,
@@ -667,8 +724,8 @@ def get_module_system_for_user(user, field_data_cache,  # TODO  # pylint: disabl
         except (ValueError, TypeError):
             log.exception('Non-integer %r passed as position.', position)
             position = None
-
     system.set('position', position)
+
     if settings.FEATURES.get('ENABLE_PSYCHOMETRICS') and user.is_authenticated():
         system.set(
             'psychometrics_handler',  # set callback for updating PsychometricsData
@@ -943,6 +1000,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
         usage_id (str): A string of the form i4x://org/course/category/name@revision
         handler (str): The name of the handler to invoke
         suffix (str): The suffix to pass to the handler when invoked
+        user (User): The currently logged in user
     """
 
     # Check submitted files

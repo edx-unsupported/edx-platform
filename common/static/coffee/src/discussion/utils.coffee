@@ -13,10 +13,20 @@ $ ->
 
 class @DiscussionUtil
 
+  @relative_path_regex = /(.*)\/.*\/threads\/.*$/
+  @baseUrl = ''
   @wmdEditors: {}
+
+  @localUrls: []
+
+  @force_async = false
+  @route_prefix = ''
 
   @getTemplate: (id) ->
     $("script##{id}").html()
+
+  @setBaseUrl: (baseUrl) ->
+    @baseUrl = baseUrl
 
   @setUser: (user) ->
     @user = user
@@ -54,7 +64,9 @@ class @DiscussionUtil
             .click -> handler(this)
 
   @urlFor: (name, param, param1, param2) ->
-    {
+    prefix = if name not in @localUrls then @baseUrl else ""
+
+    prefix + {
       follow_discussion       : "/courses/#{$$course_id}/discussion/#{param}/follow"
       unfollow_discussion     : "/courses/#{$$course_id}/discussion/#{param}/unfollow"
       create_thread           : "/courses/#{$$course_id}/discussion/#{param}/threads/create"
@@ -141,20 +153,25 @@ class @DiscussionUtil
       return deferred.promise()
 
     params["url"] = URI(params["url"]).addSearch ajax: 1
-    params["beforeSend"] = ->
-      if $elem
-        $elem.attr("disabled", "disabled")
-      if params["$loading"]
-        if params["loadingCallback"]?
-          params["loadingCallback"].apply(params["$loading"])
-        else
-          params["$loading"].loading(params["takeFocus"])
     if !params["error"]
       params["error"] = =>
         @discussionAlert(
           gettext("Sorry"),
           gettext("We had some trouble processing your request. Please ensure you have copied any unsaved work and then reload the page.")
         )
+
+    # important difference - can't use beforeSend as it's used in jquery.xblock to set up xhr parameters
+    if $elem
+      $elem.attr("disabled", "disabled")
+    if params["$loading"]
+      if params["loadingCallback"]?
+        params["loadingCallback"].apply(params["$loading"])
+      else
+        params["$loading"].loading(params["takeFocus"])
+
+    if @force_async
+      params["async"] = true
+
     request = $.ajax(params).always ->
       if $elem
         $elem.removeAttr("disabled")
@@ -165,11 +182,13 @@ class @DiscussionUtil
           params["$loading"].loaded()
     return request
 
-  @updateWithUndo: (model, updates, safeAjaxParams, errorMsg) ->
+  @updateWithUndo: (model, updates, safeAjaxParams, errorMsg, beforeSend) ->
     if errorMsg
       safeAjaxParams.error = => @discussionAlert(gettext("Sorry"), errorMsg)
     undo = _.pick(model.attributes, _.keys(updates))
     model.set(updates)
+    if beforeSend?
+      beforeSend()
     @safeAjax(safeAjaxParams).fail(() -> model.set(undo))
 
   @bindLocalEvents: ($local, eventsHandler) ->
@@ -347,3 +366,10 @@ class @DiscussionUtil
       rightdots: maxPage < numPages-1
       first: if minPage > 1 then pageInfo(1) else null
       last: if maxPage < numPages then pageInfo(numPages) else null
+
+  @getHistoryPath: (path, current_history_root) =>
+    if path.indexOf(current_history_root) == 0
+      path = path.replace(current_history_root, '')
+    if @relative_path_regex.test(path)
+      path = path.replace(@relative_path_regex, "$1")
+    path

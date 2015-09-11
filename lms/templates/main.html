@@ -156,10 +156,6 @@ from branding import api as branding_api
         </%block>
     % endif
 
-% if not disable_window_wrap:
-  </div>
-% endif
-
   % if not disable_courseware_js:
     <%static:js group='application'/>
     <%static:js group='module-js'/>
@@ -167,8 +163,6 @@ from branding import api as branding_api
 
   <%block name="js_extra"/>
   <script type="text/javascript" src="${static.url('js/vendor/noreferrer.js')}" charset="utf-8"></script>
-</body>
-</html>
 
 <%def name="login_query()">${
   u"?next={0}".format(urlquote_plus(login_redirect_url)) if login_redirect_url else ""
@@ -203,3 +197,5 @@ from branding import api as branding_api
   }());
 </script>
 % endif
+</body>
+</html>

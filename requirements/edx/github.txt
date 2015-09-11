@@ -32,14 +32,15 @@ git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c
 -e git+https://github.com/jazkarta/ccx-keys.git@e6b03704b1bb97c1d2f31301ecb4e3a687c536ea#egg=ccx-keys
 
 # Our libraries:
--e git+https://github.com/edx/XBlock.git@017b46b80e712b1318379912257cf1cc1b68eb0e#egg=XBlock
+# The Solutions fork commonly uses a customized version of XBlock. Comment it out here since we place it in custom.txt.
+#-e git+https://github.com/edx/XBlock.git@017b46b80e712b1318379912257cf1cc1b68eb0e#egg=XBlock
 -e git+https://github.com/edx/codejail.git@6b17c33a89bef0ac510926b1d7fea2748b73aadd#egg=codejail
 -e git+https://github.com/edx/js-test-tool.git@v0.1.6#egg=js_test_tool
 -e git+https://github.com/edx/event-tracking.git@0.2.0#egg=event-tracking
 -e git+https://github.com/edx-solutions/django-splash.git@7579d052afcf474ece1239153cffe1c89935bc4f#egg=django-splash
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
 -e git+https://github.com/edx/edx-ora2.git@release-2015-07-14T11.10#egg=edx-ora2
--e git+https://github.com/edx/edx-submissions.git@7c766502058e04bc9094e6cbe286e949794b80b3#egg=edx-submissions
+-e git+https://github.com/edx/edx-submissions.git@8b633d8dfa2040db0b0930dc53fca12290133d96#egg=edx-submissions
 -e git+https://github.com/edx/opaque-keys.git@df0dd602869e498e512659bb4bd243309e30e19a#egg=opaque-keys
 git+https://github.com/edx/ease.git@release-2015-07-14#egg=ease==0.1.3
 -e git+https://github.com/edx/i18n-tools.git@v0.1.1#egg=i18n-tools
@@ -57,4 +58,5 @@ git+https://github.com/edx/ecommerce-api-client.git@1.0.0#egg=ecommerce-api-clie
 
 # Third Party XBlocks
 -e git+https://github.com/mitodl/edx-sga@172a90fd2738f8142c10478356b2d9ed3e55334a#egg=edx-sga
--e git+https://github.com/open-craft/xblock-poll@v1.0#egg=xblock-poll
+# Solutions tracks our own copy of this in custom.txt.
+#-e git+https://github.com/open-craft/xblock-poll@v1.0#egg=xblock-poll

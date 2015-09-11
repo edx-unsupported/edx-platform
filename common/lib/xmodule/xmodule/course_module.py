@@ -136,8 +136,11 @@ class Textbook(object):
         return table_of_contents
 
     def __eq__(self, other):
-        return (self.title == other.title and
-                self.book_url == other.book_url)
+        try:
+            return (self.title == other.title and
+                    self.book_url == other.book_url)
+        except AttributeError:
+            return False
 
     def __ne__(self, other):
         return not self == other
@@ -1326,7 +1329,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
 
         for chapter in self.get_children():
             for section in chapter.get_children():
-                if section.graded:
+                if hasattr(section, 'graded') and section.graded:
                     xmoduledescriptors = list(yield_descriptor_descendents(section))
                     xmoduledescriptors.append(section)
 

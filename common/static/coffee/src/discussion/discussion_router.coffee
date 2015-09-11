@@ -1,10 +1,12 @@
 if Backbone?
   class @DiscussionRouter extends Backbone.Router
-    routes:
-      "": "allThreads"
-      ":forum_name/threads/:thread_id" : "showThread"
-
     initialize: (options) ->
+        @allThreadsRoute = DiscussionUtil.route_prefix
+        @singleThreadRoute = @getSingleThreadRoute(":forum_name", ":thread_id")
+
+        @route(@allThreadsRoute, "allThreads")
+        @route(@singleThreadRoute, "showThread")
+
         @discussion = options['discussion']
         @course_settings = options['course_settings']
 
@@ -14,7 +16,7 @@ if Backbone?
             courseSettings: @course_settings
         )
         @nav.on "thread:selected", @navigateToThread
-        @nav.on "thread:removed", @navigateToAllThreads
+        @nav.on "thread:deselected", @navigateToAllThreads
         @nav.on "threads:rendered", @setActiveThread
         @nav.on "thread:created", @navigateToThread
         @nav.render()
@@ -31,6 +33,12 @@ if Backbone?
         $('.new-post-btn').bind "click", @showNewPost
         $('.new-post-btn').bind "keydown", (event) => DiscussionUtil.activateOnSpace(event, @showNewPost)
 
+    getSingleThreadRoute: (commentable_id, thread_id) ->
+      base_route = "#{commentable_id}/threads/#{thread_id}"
+      if DiscussionUtil.route_prefix
+        base_route = "#{DiscussionUtil.route_prefix}/#{base_route}"
+      base_route
+
     allThreads: ->
       @nav.updateSidebar()
       @nav.goHome()
@@ -43,6 +51,15 @@ if Backbone?
 
     showThread: (forum_name, thread_id) ->
       @thread = @discussion.get(thread_id)
+      if !@thread
+        callback = (thread) =>
+          @thread = thread
+          @renderThreadView()
+        @retrieveSingleThread(forum_name, thread_id, callback)
+      else
+        @renderThreadView()
+
+    renderThreadView: () ->
       @thread.set("unread_comments_count", 0)
       @thread.set("read", true)
       @setActiveThread()
@@ -59,6 +76,7 @@ if Backbone?
 
       @main = new DiscussionThreadView(
         el: $(".forum-content"),
+
         model: @thread,
         mode: "tab",
         course_settings: @course_settings,
@@ -70,10 +88,10 @@ if Backbone?
 
     navigateToThread: (thread_id) =>
       thread = @discussion.get(thread_id)
-      @navigate("#{thread.get("commentable_id")}/threads/#{thread_id}", trigger: true)
+      @navigate(@getSingleThreadRoute(thread.get("commentable_id"), thread_id), trigger: true)
 
     navigateToAllThreads: =>
-      @navigate("", trigger: true)
+      @navigate(@allThreadsRoute, trigger: true)
 
     showNewPost: (event) =>
       $('.forum-content').fadeOut(
@@ -88,3 +106,21 @@ if Backbone?
         complete: =>
           $('.forum-content').fadeIn(200).find('.thread-wrapper').focus()
       )
+
+    retrieveSingleThread: (forum_name, thread_id, callback) ->
+      DiscussionUtil.safeAjax
+        url: DiscussionUtil.urlFor('retrieve_single_thread', forum_name, thread_id)
+        success: (data, textStatus, xhr) =>
+          callback(new Thread(data['content']))
+        error: (xhr) =>
+          if xhr.status == 404
+            DiscussionUtil.discussionAlert(
+              gettext("Sorry"),
+              gettext("The thread you selected has been deleted. Please select another thread.")
+            )
+          else
+            DiscussionUtil.discussionAlert(
+              gettext("Sorry"),
+              gettext("We had some trouble loading more responses. Please try again.")
+            )
+          @allThreads()
