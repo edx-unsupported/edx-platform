@@ -6,6 +6,7 @@ import logging
 
 from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_save
+from django.db.models import F
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from opaque_keys import InvalidKeyError
@@ -52,7 +53,7 @@ def handle_cmc_post_save_signal(sender, instance, created, **kwargs):
     if created and not any(category in content_id for category in detached_categories):
         try:
             progress = StudentProgress.objects.get(user=instance.user, course_id=instance.course_id)
-            progress.completions += 1
+            progress.completions = F('completions') + 1
             progress.save()
         except ObjectDoesNotExist:
             progress = StudentProgress(user=instance.user, course_id=instance.course_id, completions=1)
@@ -67,10 +68,12 @@ def save_history(sender, instance, **kwargs):  # pylint: disable=no-self-argumen
     """
     Event hook for creating progress entry copies
     """
+    # since instance.completions return F() ExpressionNode we have to pull completions from db
+    progress = StudentProgress.objects.get(pk=instance.id)
     history_entry = StudentProgressHistory(
         user=instance.user,
         course_id=instance.course_id,
-        completions=instance.completions
+        completions=progress.completions
     )
     history_entry.save()
 
