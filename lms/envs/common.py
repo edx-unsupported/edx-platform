@@ -643,7 +643,7 @@ ASSET_KEY_PATTERN = r'(?P<asset_key_string>(?:/?c4x(:/)?/[^/]+/[^/]+/[^/]+/[^@]+
 USAGE_ID_PATTERN = r'(?P<usage_id>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|(?:[^/]+))'
 
 # Modules having these categories would be excluded from progress calculations
-PROGRESS_DETACHED_CATEGORIES = ['discussion-course', 'group-project', 'discussion-forum']
+PROGRESS_DETACHED_CATEGORIES = ['discussion-course', 'group-project', 'discussion-forum', 'sb-step']
 ############################## EVENT TRACKING #################################
 
 # FIXME: Should we be doing this truncation?
