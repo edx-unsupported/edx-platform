@@ -644,6 +644,7 @@ USAGE_ID_PATTERN = r'(?P<usage_id>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|
 
 # Modules having these categories would be excluded from progress calculations
 PROGRESS_DETACHED_CATEGORIES = ['discussion-course', 'group-project', 'discussion-forum']
+PROGRESS_DETACHED_CHILDREN_CATEGORIES = ['html', 'ooyala-player']
 ############################## EVENT TRACKING #################################
 
 # FIXME: Should we be doing this truncation?
