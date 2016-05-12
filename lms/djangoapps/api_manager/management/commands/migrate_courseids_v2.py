@@ -4,7 +4,7 @@ One-time data migration script -- shoulen't need to run it again
 import logging
 
 from django.core.management.base import BaseCommand
-from progress.models import CourseModuleCompletion
+from edxsolutions.progress.models import CourseModuleCompletion
 from api_manager import models as api_models
 
 log = logging.getLogger(__name__)

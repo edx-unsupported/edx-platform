@@ -32,7 +32,7 @@ from lms.lib.comment_client.thread import get_course_thread_stats
 from lms.lib.comment_client.utils import CommentClientRequestError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from progress.models import StudentProgress
+from edxsolutions.progress.models import StudentProgress
 from projects.models import Project, Workgroup
 from projects.serializers import ProjectSerializer, BasicWorkgroupSerializer
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
@@ -48,13 +48,13 @@ from api_manager.models import (
     CourseContentGroupRelationship,
     GroupProfile,
 )
-from progress.models import CourseModuleCompletion
+from edxsolutions.progress.models import CourseModuleCompletion
 from api_manager.permissions import SecureAPIView, SecureListAPIView
 from api_manager.users.serializers import UserSerializer, UserCountByCitySerializer
 from api_manager.utils import generate_base_uri, str2bool, get_time_series_data, parse_datetime, get_ids_from_list_param
 from .serializers import CourseSerializer
 from .serializers import GradeSerializer, CourseLeadersSerializer, CourseCompletionsLeadersSerializer
-from progress.serializers import CourseModuleCompletionSerializer
+from edxsolutions.progress.serializers import CourseModuleCompletionSerializer
 
 
 log = logging.getLogger(__name__)

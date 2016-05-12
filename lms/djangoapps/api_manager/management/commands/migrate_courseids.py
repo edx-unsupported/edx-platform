@@ -8,7 +8,7 @@ from django.core.management.base import BaseCommand
 from django.test import RequestFactory
 
 from api_manager import models as api_models
-from progress.models import CourseModuleCompletion
+from edxsolutions.progress.models import CourseModuleCompletion
 from api_manager.courseware_access import get_course, get_course_child
 from opaque_keys import InvalidKeyError
 

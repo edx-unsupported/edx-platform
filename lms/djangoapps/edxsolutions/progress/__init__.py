@@ -1,7 +1,7 @@
 """
 Initialization module for progress djangoapp
 """
-import progress.receivers
+import edxsolutions.progress.receivers
 
 # Need to move receivers from signals.py to receivers.py
-import progress.signals
+import edxsolutions.progress.signals

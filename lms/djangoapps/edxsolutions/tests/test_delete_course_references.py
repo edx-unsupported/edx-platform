@@ -1,15 +1,15 @@
 """
 Run these tests @ Devstack:
-    paver test_system -s lms --fast_test --test_id=lms/djangoapps/courseware/management/tests/test_delete_course_references.py
+    paver test_system -s lms --fast_test --test_id=lms/djangoapps/edxsolutions/tests/test_delete_course_references.py
 """
 from datetime import datetime
 import uuid
 
 from django.conf import settings
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import Group
 from django.test.utils import override_settings
+from django.core.management import call_command
 
-from courseware.management.commands import delete_course_references
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -25,7 +25,7 @@ if settings.FEATURES.get('STUDENT_GRADEBOOK', False):
     from gradebook import models as gradebook_models
 
 if settings.FEATURES.get('STUDENT_PROGRESS', False):
-    from progress import models as progress_models
+    from edxsolutions.progress import models as progress_models
 
 
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
@@ -74,7 +74,7 @@ class DeleteCourseReferencesTests(ModuleStoreTestCase):
             self.assertEqual(CourseContentGroupRelationship.objects.filter(id=content_group_relationship.id).count(), 1)
 
             # Run the data migration
-            delete_course_references.Command().handle(unicode(self.course.id), 'commit')
+            call_command('delete_course_references', unicode(self.course.id), 'commit')
 
             # Validate that the course references were removed
             self.assertEqual(CourseGroupRelationship.objects.filter(id=course_group_relationship.id).count(), 0)
@@ -129,11 +129,13 @@ class DeleteCourseReferencesTests(ModuleStoreTestCase):
             self.assertEqual(project_models.WorkgroupUser.objects.filter(id=workgroup_user.id).count(), 1)
             self.assertEqual(project_models.WorkgroupReview.objects.filter(id=workgroup_review.id).count(), 1)
             self.assertEqual(project_models.WorkgroupSubmission.objects.filter(id=workgroup_submission.id).count(), 1)
-            self.assertEqual(project_models.WorkgroupSubmissionReview.objects.filter(id=workgroup_submission_review.id).count(), 1)
+            self.assertEqual(project_models.WorkgroupSubmissionReview.objects.filter(
+                id=workgroup_submission_review.id
+            ).count(), 1)
             self.assertEqual(project_models.WorkgroupPeerReview.objects.filter(id=workgroup_peer_review.id).count(), 1)
 
             # Run the course deletion command
-            delete_course_references.Command().handle(unicode(self.course.id), 'commit')
+            call_command('delete_course_references', unicode(self.course.id), 'commit')
 
             # Validate that the course references were removed
             self.assertEqual(project_models.Project.objects.filter(id=project.id).count(), 0)
@@ -141,7 +143,9 @@ class DeleteCourseReferencesTests(ModuleStoreTestCase):
             self.assertEqual(project_models.WorkgroupUser.objects.filter(id=workgroup_user.id).count(), 0)
             self.assertEqual(project_models.WorkgroupReview.objects.filter(id=workgroup_review.id).count(), 0)
             self.assertEqual(project_models.WorkgroupSubmission.objects.filter(id=workgroup_submission.id).count(), 0)
-            self.assertEqual(project_models.WorkgroupSubmissionReview.objects.filter(id=workgroup_submission_review.id).count(), 0)
+            self.assertEqual(project_models.WorkgroupSubmissionReview.objects.filter(
+                id=workgroup_submission_review.id
+            ).count(), 0)
             self.assertEqual(project_models.WorkgroupPeerReview.objects.filter(id=workgroup_peer_review.id).count(), 0)
 
     if settings.FEATURES.get('STUDENT_GRADEBOOK', False):
@@ -154,14 +158,18 @@ class DeleteCourseReferencesTests(ModuleStoreTestCase):
             )
 
             self.assertEqual(gradebook_models.StudentGradebook.objects.filter(id=gradebook.id).count(), 1)
-            self.assertEqual(gradebook_models.StudentGradebookHistory.objects.filter(user=self.user, course_id=self.course.id).count(), 1)
+            self.assertEqual(gradebook_models.StudentGradebookHistory.objects.filter(
+                user=self.user, course_id=self.course.id
+            ).count(), 1)
 
             # Run the course deletion command
-            delete_course_references.Command().handle(unicode(self.course.id), 'commit')
+            call_command('delete_course_references', unicode(self.course.id), 'commit')
 
             # Validate that the course references were removed
             self.assertEqual(gradebook_models.StudentGradebook.objects.filter(id=gradebook.id).count(), 0)
-            self.assertEqual(gradebook_models.StudentGradebookHistory.objects.filter(user=self.user, course_id=self.course.id).count(), 0)
+            self.assertEqual(gradebook_models.StudentGradebookHistory.objects.filter(
+                user=self.user, course_id=self.course.id
+            ).count(), 0)
 
     if settings.FEATURES.get('STUDENT_PROGRESS', False):
         def test_delete_course_references_progress(self):
@@ -178,12 +186,16 @@ class DeleteCourseReferencesTests(ModuleStoreTestCase):
 
             self.assertEqual(progress_models.CourseModuleCompletion.objects.filter(id=completion.id).count(), 1)
             self.assertEqual(progress_models.StudentProgress.objects.filter(course_id=self.course.id).count(), 1)
-            self.assertEqual(progress_models.StudentProgressHistory.objects.filter(user=self.user, course_id=self.course.id).count(), 1)
+            self.assertEqual(progress_models.StudentProgressHistory.objects.filter(
+                user=self.user, course_id=self.course.id
+            ).count(), 1)
 
             # Run the course deletion command
-            delete_course_references.Command().handle(unicode(self.course.id), 'commit')
+            call_command('delete_course_references', unicode(self.course.id), 'commit')
 
             # Validate that the course references were removed
             self.assertEqual(progress_models.CourseModuleCompletion.objects.filter(id=completion.id).count(), 0)
             self.assertEqual(progress_models.StudentProgress.objects.filter(id=progress.id).count(), 0)
-            self.assertEqual(progress_models.StudentProgressHistory.objects.filter(user=self.user, course_id=self.course.id).count(), 0)
+            self.assertEqual(progress_models.StudentProgressHistory.objects.filter(
+                user=self.user, course_id=self.course.id
+            ).count(), 0)

@@ -5,7 +5,7 @@ from django.dispatch import receiver
 
 from util.signals import course_deleted
 
-from progress.models import CourseModuleCompletion, StudentProgress, StudentProgressHistory
+from edxsolutions.progress.models import CourseModuleCompletion, StudentProgress, StudentProgressHistory
 
 
 @receiver(course_deleted)

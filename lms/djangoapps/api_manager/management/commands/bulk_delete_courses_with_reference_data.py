@@ -18,7 +18,7 @@ from openedx.core.djangoapps.content.course_metadata.models import CourseAggrega
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from courseware.models import StudentModule
-from progress.models import CourseModuleCompletion, StudentProgress, StudentProgressHistory
+from edxsolutions.progress.models import CourseModuleCompletion, StudentProgress, StudentProgressHistory
 from gradebook.models import StudentGradebook, StudentGradebookHistory
 from student.models import CourseAccessRole, CourseEnrollment
 

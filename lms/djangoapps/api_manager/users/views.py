@@ -48,7 +48,7 @@ from util.password_policy_validators import (
 )
 from xmodule.modulestore import InvalidLocationError, EdxJSONEncoder
 
-from progress.serializers import CourseModuleCompletionSerializer
+from edxsolutions.progress.serializers import CourseModuleCompletionSerializer
 from api_manager.courseware_access import get_course, get_course_child, get_course_key, course_exists
 from api_manager.permissions import SecureAPIView, SecureListAPIView, IdsInFilterBackend, HasOrgsFilterBackend
 from api_manager.models import GroupProfile, APIUser as User

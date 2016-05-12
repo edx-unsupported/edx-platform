@@ -1,11 +1,7 @@
 # pylint: disable=E1101
 """
 Run these tests @ Devstack:
-    paver test_system -s lms --test_id=lms/djangoapps/progress/tests.py
-
-- or -
-
-python -m coverage run --rcfile=lms/.coveragerc ./manage.py lms test --verbosity=1 lms/djangoapps/progress/tests.py   --traceback --settings=test
+    paver test_system -s lms --test_id=lms/djangoapps/edxsolutions/progress/tests.py
 
 """
 import uuid
@@ -22,7 +18,7 @@ from student.tests.factories import UserFactory, AdminFactory
 from courseware.tests.factories import StaffFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from progress.models import CourseModuleCompletion, StudentProgress, StudentProgressHistory
+from edxsolutions.progress.models import CourseModuleCompletion, StudentProgress, StudentProgressHistory
 from courseware.model_data import FieldDataCache
 from courseware import module_render
 from util.signals import course_deleted
@@ -62,6 +58,9 @@ class CourseModuleCompletionTests(ModuleStoreTestCase):
         initialize_notifications()
 
     def _create_course(self, start=None, end=None):
+        """
+        Creates a course to run tests against
+        """
         self.course = CourseFactory.create(
             start=start,
             end=end

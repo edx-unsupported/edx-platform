@@ -1,17 +1,19 @@
 """
-Tests for recalculate_progress_for_users.py
+Run these tests @ Devstack:
+    paver test_system -t lms/djangoapps/progress/management/commands/tests/test_generate_progress_entries.py --fasttest
 """
 from datetime import datetime
 import uuid
+import time
 
 from django.conf import settings
 from django.test.utils import override_settings
 from django.db.models.signals import post_save
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
-from progress.management.commands import recalculate_progress_for_users
-from progress.models import StudentProgress, StudentProgressHistory, CourseModuleCompletion
-from progress.signals import handle_cmc_post_save_signal
+from edxsolutions.progress.management.commands import generate_progress_entries
+from edxsolutions.progress.models import StudentProgress, StudentProgressHistory, CourseModuleCompletion
+from edxsolutions.progress.signals import handle_cmc_post_save_signal
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -20,14 +22,14 @@ MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, incl
 
 
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
-class RecalculateProgressEntriesTests(ModuleStoreTestCase):
+class GenerateProgressEntriesTests(ModuleStoreTestCase):
     """
-    Test suite for progress recalculation script
+    Test suite for progress generation script
     """
 
     def setUp(self):
-        super(RecalculateProgressEntriesTests, self).setUp()
-
+        super(GenerateProgressEntriesTests, self).setUp()
+        # Create a couple courses to work with
         self.course = CourseFactory.create(
             start=datetime(2014, 6, 16, 14, 30),
             end=datetime(2020, 1, 16)
@@ -102,11 +104,6 @@ class RecalculateProgressEntriesTests(ModuleStoreTestCase):
             display_name="lab problem 2",
             metadata={'rerandomize': 'always', 'graded': True, 'format': "Lab"}
         )
-        self.non_vertical_problem = ItemFactory.create(
-            parent_location=chapter1.location,
-            category='problem',
-            display_name="non vertical problem",
-        )
 
         # Create some users and enroll them
         self.users = [UserFactory.create(username="testuser" + str(__), profile='test') for __ in xrange(3)]
@@ -114,21 +111,17 @@ class RecalculateProgressEntriesTests(ModuleStoreTestCase):
             CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
         # Turn off the signalling mechanism temporarily
         post_save.disconnect(receiver=handle_cmc_post_save_signal,
-                             sender=CourseModuleCompletion, dispatch_uid='edxapp.api_manager.post_save_cms')
+                             sender=CourseModuleCompletion, dispatch_uid='lms.edxsolutions.progress.post_save_cms')
         self._generate_course_completion_test_entries()
         post_save.connect(receiver=handle_cmc_post_save_signal,
-                          sender=CourseModuleCompletion, dispatch_uid='edxapp.api_manager.post_save_cms')
+                          sender=CourseModuleCompletion, dispatch_uid='lms.edxsolutions.progress.post_save_cms')
 
     def _generate_course_completion_test_entries(self):
         """
         Clears existing CourseModuleCompletion entries and creates 3 for each user
         """
         CourseModuleCompletion.objects.all().delete()
-        for idx, user in enumerate(self.users):
-            if idx % 2 == 0:
-                StudentProgress.objects.get_or_create(
-                    user_id=user.id, course_id=self.course.id, completions=0
-                )
+        for user in self.users:
             CourseModuleCompletion.objects.get_or_create(user=user,
                                                          course_id=self.course.id,
                                                          content_id=unicode(self.problem.location),
@@ -143,10 +136,6 @@ class RecalculateProgressEntriesTests(ModuleStoreTestCase):
                                                          course_id=self.course.id,
                                                          content_id=unicode(self.problem3.location),
                                                          stage=None)
-            CourseModuleCompletion.objects.get_or_create(user=user,
-                                                         course_id=self.course.id,
-                                                         content_id=unicode(self.non_vertical_problem.location),
-                                                         stage=None)
 
     def test_generate_progress_entries_command(self):
         """
@@ -156,40 +145,42 @@ class RecalculateProgressEntriesTests(ModuleStoreTestCase):
         course_ids = '{},bogus/course/id'.format(self.course.id)
         user_ids = '{}'.format(self.users[0].id)
         current_entries = StudentProgress.objects.all()
-        self.assertEqual(len(current_entries), 2)
+        self.assertEqual(len(current_entries), 0)
         current_entries = StudentProgressHistory.objects.all()
-        self.assertEqual(len(current_entries), 2)
+        self.assertEqual(len(current_entries), 0)
 
         # Run the command just for one user
-        recalculate_progress_for_users.Command().handle(user_ids=user_ids)
+        generate_progress_entries.Command().handle(user_ids=user_ids)
 
         # Confirm the progress has been properly updated
         current_entries = StudentProgress.objects.all()
-        self.assertEqual(len(current_entries), 2)
+        self.assertEqual(len(current_entries), 1)
         current_entries = StudentProgressHistory.objects.all()
-        self.assertEqual(len(current_entries), 3)
+        self.assertEqual(len(current_entries), 1)
         user0_entry = StudentProgress.objects.get(user=self.users[0])
         self.assertEqual(user0_entry.completions, 3)
-
-        # Run the command across all users, but just for the specified course
-        recalculate_progress_for_users.Command().handle(course_ids=course_ids)
 
         # The first user will be skipped this next time around because they already have a progress record
-        # and their completions have not changed
-        user0_entry = StudentProgress.objects.get(user=self.users[0])
-        self.assertEqual(user0_entry.completions, 3)
+        # and their completions have not changed, and we need to test this valid use case ('skipped')
+        # We also need to test the 'updated' use case, so we'll add a new completion record for the
+        # second user which will alter their count on this next cycle and kick off the update flow
+        CourseModuleCompletion.objects.get_or_create(user=self.users[1],
+                                                     course_id=self.course.id,
+                                                     content_id=unicode(self.problem4.location),
+                                                     stage=None)
+
+        # Run the command across all users, but just for the specified course
+        generate_progress_entries.Command().handle(course_ids=course_ids)
 
         # Confirm that the progress has been properly updated
         current_entries = StudentProgress.objects.all()
-        self.assertEqual(len(current_entries), 2)
+        self.assertEqual(len(current_entries), 3)
         current_entries = StudentProgressHistory.objects.all()
         self.assertEqual(len(current_entries), 4)
-
-        # second user has no entry in StudentProgress so they should b skipped
-        user1_entry = StudentProgress.objects.filter(user=self.users[1])
-        self.assertEqual(len(user1_entry), 0)
-
-        # third user should have their progress updated
+        user0_entry = StudentProgress.objects.get(user=self.users[0])
+        self.assertEqual(user0_entry.completions, 3)
+        user1_entry = StudentProgress.objects.get(user=self.users[1])
+        self.assertEqual(user1_entry.completions, 4)
         user2_entry = StudentProgress.objects.get(user=self.users[2])
         self.assertEqual(user2_entry.completions, 3)
 
@@ -202,12 +193,11 @@ class RecalculateProgressEntriesTests(ModuleStoreTestCase):
         StudentProgressHistory.objects.all().delete()
         self._generate_course_completion_test_entries()
 
+        #let single bindings to complete their work
+        time.sleep(2)
         current_entries = StudentProgress.objects.all()
         self.assertEqual(len(current_entries), 3)
         current_entries = StudentProgressHistory.objects.all()
-        # StudentProgressHistory should have 11 entries
-        # 9 entries for progress history of 3 users each with 3 completions
-        # and 2 entries for initial progress creation of 2 users
-        self.assertEqual(len(current_entries), 11)
+        self.assertEqual(len(current_entries), 9)
         user0_entry = StudentProgress.objects.get(user=self.users[0])
         self.assertEqual(user0_entry.completions, 3)

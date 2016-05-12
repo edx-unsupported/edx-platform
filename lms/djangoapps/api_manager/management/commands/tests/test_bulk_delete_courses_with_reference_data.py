@@ -13,7 +13,7 @@ from django.test.utils import override_settings
 
 from api_manager.models import CourseGroupRelationship
 from gradebook.models import StudentGradebook
-from progress.models import StudentProgress, CourseModuleCompletion
+from edxsolutions.progress.models import StudentProgress, CourseModuleCompletion
 from student.models import CourseEnrollment, CourseAccessRole
 from openedx.core.djangoapps.content.course_metadata.models import CourseAggregatedMetaData
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure

@@ -5,7 +5,7 @@ Django database models supporting the progress app
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models import Sum, Q
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from model_utils.fields import AutoCreatedField, AutoLastModifiedField
 
@@ -24,7 +24,7 @@ class StudentProgress(models.Model):
     created = AutoCreatedField(_('created'))
     modified = AutoLastModifiedField(_('modified'), db_index=True)
 
-    class Meta:
+    class Meta(object):
         """
         Meta information for this Django model
         """
@@ -92,10 +92,34 @@ class StudentProgress(models.Model):
         Assembles a data set representing the Top N users, by progress, for a given course.
 
         data = [
-                {'id': 123, 'username': 'testuser1', 'title', 'Engineer', 'avatar_url': 'http://gravatar.com/123/', 'completions': 0.92},
-                {'id': 983, 'username': 'testuser2', 'title', 'Analyst', 'avatar_url': 'http://gravatar.com/983/', 'completions': 0.91},
-                {'id': 246, 'username': 'testuser3', 'title', 'Product Owner', 'avatar_url': 'http://gravatar.com/246/', 'completions': 0.90},
-                {'id': 357, 'username': 'testuser4', 'title', 'Director', 'avatar_url': 'http://gravatar.com/357/', 'completions': 0.89},
+                {
+                    'id': 123,
+                    'username': 'testuser1',
+                    'title': 'Engineer',
+                    'avatar_url': 'http://gravatar.com/123/',
+                    'completions': 0.92
+                },
+                {
+                    'id': 983,
+                    'username': 'testuser2',
+                    'title': 'Analyst',
+                    'avatar_url': 'http://gravatar.com/983/',
+                    'completions': 0.91
+                },
+                {
+                    'id': 246,
+                    'username': 'testuser3',
+                    'title': 'Product Owner',
+                    'avatar_url': 'http://gravatar.com/246/',
+                    'completions': 0.90
+                },
+                {
+                    'id': 357,
+                    'username': 'testuser4',
+                    'title': 'Director',
+                    'avatar_url': 'http://gravatar.com/357/',
+                    'completions': 0.89
+                },
         ]
 
         """

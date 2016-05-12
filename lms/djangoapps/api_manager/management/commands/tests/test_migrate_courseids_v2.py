@@ -10,7 +10,7 @@ from django.contrib.auth.models import Group, User
 from django.test.utils import override_settings
 
 from api_manager import models as api_models
-from progress.models import CourseModuleCompletion
+from edxsolutions.progress.models import CourseModuleCompletion
 from api_manager.management.commands import migrate_courseids_v2
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory

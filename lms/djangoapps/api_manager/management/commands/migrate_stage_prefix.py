@@ -5,7 +5,7 @@ import logging
 
 from django.core.management.base import BaseCommand
 
-from progress.models import CourseModuleCompletion
+from edxsolutions.progress.models import CourseModuleCompletion
 
 log = logging.getLogger(__name__)
 

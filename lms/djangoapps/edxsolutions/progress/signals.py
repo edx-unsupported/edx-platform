@@ -20,7 +20,7 @@ from edx_notifications.lib.publisher import (
 from edx_notifications.data import NotificationMessage
 from openedx.core.djangoapps.content.course_metadata.utils import is_progress_detached_vertical
 
-from progress.models import StudentProgress, StudentProgressHistory, CourseModuleCompletion
+from edxsolutions.progress.models import StudentProgress, StudentProgressHistory, CourseModuleCompletion
 
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -52,8 +52,8 @@ def is_valid_progress_module(content_id):
         return False
 
 
-@receiver(post_save, sender=CourseModuleCompletion, dispatch_uid='edxapp.api_manager.post_save_cms')
-def handle_cmc_post_save_signal(sender, instance, created, **kwargs):
+@receiver(post_save, sender=CourseModuleCompletion, dispatch_uid='lms.edxsolutions.progress.post_save_cms')
+def handle_cmc_post_save_signal(sender, instance, created, **kwargs):  # pylint: disable=unused-argument
     """
     Broadcast the progress change event
     """
@@ -66,9 +66,9 @@ def handle_cmc_post_save_signal(sender, instance, created, **kwargs):
         except ObjectDoesNotExist:
             progress = StudentProgress(user=instance.user, course_id=instance.course_id, completions=1)
             progress.save()
-        except Exception:
-            exc_type, exc_value, exc_traceback = sys.exc_info()
-            logging.error("Exception type: {} with value: {}".format(exc_type, exc_value))
+        except Exception:  # pylint: disable=broad-except
+            exc_type, exc_value, __ = sys.exc_info()
+            logging.error("Exception type: %s with value: %s", exc_type, exc_value)
 
 
 @receiver(post_save, sender=StudentProgress)
@@ -92,7 +92,7 @@ def save_history(sender, instance, **kwargs):  # pylint: disable=no-self-argumen
 # so we should be able to move these files easily when we are able to do so
 #
 @receiver(pre_save, sender=StudentProgress)
-def handle_progress_pre_save_signal(sender, instance, **kwargs):
+def handle_progress_pre_save_signal(sender, instance, **kwargs):  # pylint: disable=unused-argument
     """
     Handle the pre-save ORM event on CourseModuleCompletions
     """
@@ -109,7 +109,7 @@ def handle_progress_pre_save_signal(sender, instance, **kwargs):
 
 
 @receiver(post_save, sender=StudentProgress)
-def handle_progress_post_save_signal(sender, instance, **kwargs):
+def handle_progress_post_save_signal(sender, instance, **kwargs):  # pylint: disable=unused-argument, invalid-name
     """
     Handle the pre-save ORM event on CourseModuleCompletions
     """
@@ -126,7 +126,9 @@ def handle_progress_post_save_signal(sender, instance, **kwargs):
 
         # logic for Notification trigger is when a user enters into the Leaderboard
         leaderboard_size = getattr(settings, 'LEADERBOARD_SIZE', 3)
-        presave_leaderboard_rank = instance.presave_leaderboard_rank if instance.presave_leaderboard_rank else sys.maxint
+        presave_leaderboard_rank = sys.maxint
+        if instance.presave_leaderboard_rank:
+            presave_leaderboard_rank = instance.presave_leaderboard_rank
         if leaderboard_rank <= leaderboard_size and presave_leaderboard_rank > leaderboard_size:
             try:
                 notification_msg = NotificationMessage(
@@ -154,7 +156,7 @@ def handle_progress_post_save_signal(sender, instance, **kwargs):
                 })
 
                 publish_notification_to_user(int(instance.user.id), notification_msg)
-            except Exception, ex:
+            except Exception, ex:  # pylint: disable=broad-except
                 # Notifications are never critical, so we don't want to disrupt any
                 # other logic processing. So log and continue.
                 log.exception(ex)

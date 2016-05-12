@@ -8,8 +8,8 @@ from django.core.management.base import BaseCommand
 from django.conf import settings
 from django.db.models import Q
 
-from progress.models import StudentProgress, CourseModuleCompletion
-from progress.signals import is_valid_progress_module
+from edxsolutions.progress.models import StudentProgress, CourseModuleCompletion
+from edxsolutions.progress.signals import is_valid_progress_module
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
 

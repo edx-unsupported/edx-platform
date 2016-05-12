@@ -8,7 +8,7 @@ from django.core.management.base import BaseCommand
 from django.conf import settings
 from django.db.models import Q, Min
 
-from progress.models import StudentProgress, CourseModuleCompletion
+from edxsolutions.progress.models import StudentProgress, CourseModuleCompletion
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
 
@@ -19,26 +19,25 @@ class Command(BaseCommand):
     """
     Creates (or updates) progress entries for the specified course(s) and/or user(s)
     """
+    help = "Command to creaete or update progress entries"
+    option_list = BaseCommand.option_list + (
+        make_option(
+            "-c",
+            "--course_ids",
+            dest="course_ids",
+            help="List of courses for which to generate progress",
+            metavar="first/course/id,second/course/id"
+        ),
+        make_option(
+            "-u",
+            "--user_ids",
+            dest="user_ids",
+            help="List of users for which to generate progress",
+            metavar="1234,2468,3579"
+        ),
+    )
 
     def handle(self, *args, **options):
-        help = "Command to creaete or update progress entries"
-        option_list = BaseCommand.option_list + (
-            make_option(
-                "-c",
-                "--course_ids",
-                dest="course_ids",
-                help="List of courses for which to generate progress",
-                metavar="first/course/id,second/course/id"
-            ),
-            make_option(
-                "-u",
-                "--user_ids",
-                dest="user_ids",
-                help="List of users for which to generate progress",
-                metavar="1234,2468,3579"
-            ),
-        )
-
         course_ids = options.get('course_ids')
         user_ids = options.get('user_ids')
 

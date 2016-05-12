@@ -7,7 +7,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.test.utils import override_settings
 
-from progress.models import CourseModuleCompletion
+from edxsolutions.progress.models import CourseModuleCompletion
 from api_manager.management.commands import migrate_stage_prefix
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 
