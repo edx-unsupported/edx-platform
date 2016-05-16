@@ -1,14 +1,14 @@
 """ Django REST Framework Serializers """
 from rest_framework import serializers
 
-from organizations.models import Organization
+from .models import Organization
 
 
 class OrganizationSerializer(serializers.ModelSerializer):
     """ Serializer for Organization model interactions """
     url = serializers.HyperlinkedIdentityField(view_name='organization-detail')
 
-    class Meta:
+    class Meta(object):
         """ Serializer/field specification """
         model = Organization
         fields = ('url', 'id', 'name', 'display_name', 'contact_name', 'contact_email', 'contact_phone',
@@ -20,7 +20,7 @@ class BasicOrganizationSerializer(serializers.ModelSerializer):
     """ Serializer for Basic Organization fields """
     url = serializers.HyperlinkedIdentityField(view_name='organization-detail')
 
-    class Meta:
+    class Meta(object):
         """ Serializer/field specification """
         model = Organization
         fields = ('url', 'id', 'name', 'display_name', 'contact_name', 'contact_email', 'contact_phone',

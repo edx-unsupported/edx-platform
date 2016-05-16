@@ -8,26 +8,26 @@ from django.db.models import Sum, F, Count
 from django.db import IntegrityError
 from django.utils.translation import ugettext as _
 
-from rest_framework import status, viewsets
+from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.exceptions import ParseError
 
 from api_manager.courseware_access import get_course_key, get_course_descriptor
 from api_manager.courses.serializers import OrganizationCourseSerializer
-from organizations.models import Organization, OrganizationGroupUser
 from api_manager.users.serializers import SimpleUserSerializer
 from api_manager.groups.serializers import GroupSerializer
-from api_manager.permissions import SecureListAPIView
+from api_manager.permissions import SecureListAPIView, SecureAPIModelViewSet
 from api_manager.utils import str2bool
 from gradebook.models import StudentGradebook
 from student.models import CourseEnrollment
 from student.roles import get_aggregate_exclusion_user_ids
 
+from .models import Organization, OrganizationGroupUser
 from .serializers import OrganizationSerializer, BasicOrganizationSerializer
 
 
-class OrganizationsViewSet(viewsets.ModelViewSet):
+class OrganizationsViewSet(SecureAPIModelViewSet):
     """
     Django Rest Framework ViewSet for the Organization model.
     """
@@ -94,7 +94,7 @@ class OrganizationsViewSet(viewsets.ModelViewSet):
         return Response(response_data, status=status.HTTP_200_OK)
 
     @action(methods=['get', 'post', 'delete'])
-    def users(self, request, pk):
+    def users(self, request, pk):  # pylint: disable=R0915
         """
         - URI: ```/api/organizations/{org_id}/users/```
         - GET: Returns users in an organization
@@ -126,7 +126,8 @@ class OrganizationsViewSet(viewsets.ModelViewSet):
                 users = users.select_related('studentgradebook')
 
             if str2bool(include_course_counts):
-                enrollments = CourseEnrollment.objects.filter(user__in=users).values('user').order_by().annotate(total=Count('user'))
+                enrollments = CourseEnrollment.objects.filter(user__in=users).values('user').order_by()\
+                    .annotate(total=Count('user'))
                 enrollments_by_user = {}
                 for enrollment in enrollments:
                     enrollments_by_user[enrollment['user']] = enrollment['total']

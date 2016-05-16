@@ -13,7 +13,7 @@ from django.conf.urls import include, patterns, url
 
 from rest_framework.routers import SimpleRouter
 
-from organizations.views import OrganizationsViewSet
+from edxsolutions.organizations.views import OrganizationsViewSet
 from api_manager.system import views as system_views
 from projects import views as project_views
 
@@ -25,7 +25,7 @@ urlpatterns = patterns(
     url(r'^groups/*', include('api_manager.groups.urls')),
     url(r'^sessions/*', include('api_manager.sessions.urls')),
     url(r'^courses/*', include('api_manager.courses.urls')),
-    url(r'^organizations/*', include('organizations.urls')),
+    url(r'^organizations/*', include('edxsolutions.organizations.urls')),
 )
 
 server_api_router = SimpleRouter()

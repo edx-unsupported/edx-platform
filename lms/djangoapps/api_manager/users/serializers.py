@@ -3,7 +3,7 @@
 from rest_framework import serializers
 
 from api_manager.models import APIUser, GroupProfile
-from organizations.serializers import BasicOrganizationSerializer
+from edxsolutions.organizations.serializers import BasicOrganizationSerializer
 from student.models import UserProfile
 
 

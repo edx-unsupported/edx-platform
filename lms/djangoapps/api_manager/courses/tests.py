@@ -28,7 +28,7 @@ from courseware.model_data import FieldDataCache
 from django_comment_common.models import Role, FORUM_ROLE_MODERATOR
 from gradebook.models import StudentGradebook
 from instructor.access import allow_access
-from organizations.models import Organization
+from edxsolutions.organizations.models import Organization
 from projects.models import Workgroup, Project
 from student.tests.factories import UserFactory, CourseEnrollmentFactory, GroupFactory
 from student.models import CourseEnrollment
@@ -84,10 +84,8 @@ def _fake_get_course_thread_stats(course_id):
 @mock.patch("api_manager.courses.views.get_course_thread_stats", _fake_get_course_thread_stats)
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @override_settings(EDX_API_KEY=TEST_API_KEY)
-@mock.patch.dict("django.conf.settings.FEATURES", {'ENFORCE_PASSWORD_POLICY': False,
-                                                   'ADVANCED_SECURITY': False,
-                                                   'PREVENT_CONCURRENT_LOGINS': False
-                                                   })
+@mock.patch.dict("django.conf.settings.FEATURES",
+                 {'ENFORCE_PASSWORD_POLICY': False, 'ADVANCED_SECURITY': False, 'PREVENT_CONCURRENT_LOGINS': False})
 class CoursesApiTests(ModuleStoreTestCase):
     """ Test suite for Courses API views """
 

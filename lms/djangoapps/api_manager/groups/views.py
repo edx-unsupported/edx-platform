@@ -13,7 +13,7 @@ from api_manager.courseware_access import get_course
 from api_manager.models import GroupRelationship, CourseGroupRelationship, GroupProfile, APIUser as User
 from api_manager.permissions import SecureAPIView, SecureListAPIView
 from api_manager.utils import str2bool, generate_base_uri
-from organizations import serializers
+from edxsolutions.organizations import serializers
 from projects.serializers import BasicWorkgroupSerializer, GroupSerializer
 
 

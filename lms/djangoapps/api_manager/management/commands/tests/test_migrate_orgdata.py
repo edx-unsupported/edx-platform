@@ -10,7 +10,7 @@ from django.test import TestCase
 
 from api_manager.management.commands import migrate_orgdata
 from api_manager.models import GroupProfile, GroupRelationship
-from organizations.models import Organization
+from edxsolutions.organizations.models import Organization
 
 
 class MigrateOrgDataTests(TestCase):

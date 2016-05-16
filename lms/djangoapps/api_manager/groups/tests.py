@@ -20,7 +20,7 @@ from django.utils import timezone
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 from api_manager.models import GroupRelationship, GroupProfile
-from organizations.models import Organization
+from edxsolutions.organizations.models import Organization
 from projects.models import Project
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 

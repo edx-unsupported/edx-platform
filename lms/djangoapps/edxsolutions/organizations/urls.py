@@ -1,7 +1,7 @@
 """ Organizations API URI specification """
 from django.conf.urls import patterns, url
 
-from organizations import views as organizations_views
+from . import views as organizations_views
 
 
 urlpatterns = patterns(

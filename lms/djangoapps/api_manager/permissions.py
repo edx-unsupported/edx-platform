@@ -4,7 +4,7 @@ import logging
 from django.conf import settings
 
 from api_manager.utils import get_client_ip_address, address_exists_in_network
-from rest_framework import permissions, generics, filters, pagination, serializers
+from rest_framework import permissions, generics, filters, pagination, serializers, viewsets
 from rest_framework.views import APIView
 
 from api_manager.utils import str2bool
@@ -169,3 +169,10 @@ class SecureListAPIView(PermissionMixin,
             return None
         else:
             return super(SecureListAPIView, self).get_paginate_by()
+
+
+class SecureAPIModelViewSet(PermissionMixin, viewsets.ModelViewSet):
+    """
+    ModelViewSet used for protecting access to specific workflows
+    """
+    pass

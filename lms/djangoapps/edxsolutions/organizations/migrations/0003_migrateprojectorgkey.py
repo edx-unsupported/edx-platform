@@ -6,7 +6,7 @@ from south.db import db
 from south.v2 import SchemaMigration
 from django.db import connection, models, transaction
 
-from organizations.models import Organization
+from edxsolutions.organizations.models import Organization
 
 log = logging.getLogger(__name__)
 
@@ -19,88 +19,27 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         if not db.dry_run:
-            existing_entries = Organization.objects.all().count()
-            self.print_message('EXISTING ENTRIES: {}'.format(existing_entries))
-            if existing_entries == 0:
-                try:
-                    cursor = connection.cursor()
-                    cursor.execute('INSERT INTO organizations_organization SELECT * from api_manager_organization')
-                    log_msg = 'organizations entries moved from api_manager to organizations app'
-                    self.print_message(log_msg)
+            try:
+                cursor = connection.cursor()
+                cursor.execute('ALTER TABLE projects_project ADD CONSTRAINT organization_id_refs_id_616e28c0fa4287c FOREIGN KEY (organization_id) REFERENCES organizations_organization(id);')
+                log_msg = 'Foreign Key reference "organizations_organization.id" added to "projects_project" table'
+                self.print_message(log_msg)
 
-                    cursor.execute('INSERT INTO organizations_organization_workgroups '
-                                   'SELECT * from api_manager_organization_workgroups')
-                    log_msg = 'organization_workgroups entries moved from api_manager to organizations app'
-                    self.print_message(log_msg)
-
-                    cursor.execute('INSERT INTO organizations_organization_users '
-                                   'SELECT * from api_manager_organization_users')
-                    log_msg = 'organization_users entries moved from api_manager to organizations app'
-                    self.print_message(log_msg)
-
-                    cursor.execute('INSERT INTO organizations_organization_groups '
-                                   'SELECT * from api_manager_organization_groups')
-                    log_msg = 'organization_groups entries moved from api_manager to organizations app'
-                    self.print_message(log_msg)
-                    transaction.commit()
-
-                    # Deleting model 'Organization'
-                    db.delete_table('api_manager_organization')
-
-                    # Removing M2M table for field users on 'Organization'
-                    db.delete_table('api_manager_organization_users')
-
-                    # Removing M2M table for field groups on 'Organization'
-                    db.delete_table('api_manager_organization_groups')
-
-                    # Removing M2M table for field workgroups on 'Organization'
-                    db.delete_table('api_manager_organization_workgroups')
-
-                except Exception as e:
-                    log_msg = e.message
-                    self.print_message(log_msg)
-            else:
-                log_msg = 'oroganizations_organization is not empty. You might have already filled it.'
+            except Exception as e:
+                log_msg = e.message
                 self.print_message(log_msg)
 
     def backwards(self, orm):
-        # Adding model 'Organization'
-        db.create_table('api_manager_organization', (
-            ('contact_email', self.gf('django.db.models.fields.EmailField')(max_length=255, null=True, blank=True)),
-            ('contact_name', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('display_name', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('created', self.gf('model_utils.fields.AutoCreatedField')(default=datetime.datetime.now)),
-            ('modified', self.gf('model_utils.fields.AutoLastModifiedField')(default=datetime.datetime.now)),
-            ('logo_url', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
-            ('contact_phone', self.gf('django.db.models.fields.CharField')(max_length=50, null=True, blank=True)),
-        ))
-        db.send_create_signal('api_manager', ['Organization'])
+        if not db.dry_run:
+            try:
+                cursor = connection.cursor()
+                cursor.execute('ALTER TABLE projects_project DROP FOREIGN KEY organization_id_refs_id_616e28c0fa4287c')
+                log_msg = 'Foreign Key reference "organizations_organization.id" removed from "projects_project" table'
+                self.print_message(log_msg)
 
-        # Adding M2M table for field users on 'Organization'
-        db.create_table('api_manager_organization_users', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('organization', models.ForeignKey(orm['api_manager.organization'], null=False)),
-            ('user', models.ForeignKey(orm['auth.user'], null=False))
-        ))
-        db.create_unique('api_manager_organization_users', ['organization_id', 'user_id'])
-
-        # Adding M2M table for field groups on 'Organization'
-        db.create_table('api_manager_organization_groups', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('organization', models.ForeignKey(orm['api_manager.organization'], null=False)),
-            ('group', models.ForeignKey(orm['auth.group'], null=False))
-        ))
-        db.create_unique('api_manager_organization_groups', ['organization_id', 'group_id'])
-
-        # Adding M2M table for field workgroups on 'Organization'
-        db.create_table('api_manager_organization_workgroups', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('organization', models.ForeignKey(orm['api_manager.organization'], null=False)),
-            ('workgroup', models.ForeignKey(orm['projects.workgroup'], null=False))
-        ))
-        db.create_unique('api_manager_organization_workgroups', ['organization_id', 'workgroup_id'])
+            except Exception as e:
+                log_msg = e.message
+                self.print_message(log_msg)
 
     models = {
         'api_manager.coursecontentgrouprelationship': {

@@ -18,11 +18,13 @@ from rest_framework.test import APIClient
 
 from api_manager.models import CourseGroupRelationship
 from gradebook.models import StudentGradebook
-from organizations.models import OrganizationGroupUser
 from student.models import UserProfile
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 from student.tests.factories import CourseEnrollmentFactory, UserFactory, GroupFactory
 from xmodule.modulestore.tests.factories import CourseFactory
+
+from .models import OrganizationGroupUser
+
 TEST_API_KEY = str(uuid.uuid4())
 
 MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
@@ -40,10 +42,8 @@ class SecureClient(APIClient):
 
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @override_settings(EDX_API_KEY=TEST_API_KEY)
-@mock.patch.dict("django.conf.settings.FEATURES", {'ENFORCE_PASSWORD_POLICY': False,
-                                                   'ADVANCED_SECURITY': False,
-                                                   'PREVENT_CONCURRENT_LOGINS': False
-                                                   })
+@mock.patch.dict("django.conf.settings.FEATURES",
+                 {'ENFORCE_PASSWORD_POLICY': False, 'ADVANCED_SECURITY': False, 'PREVENT_CONCURRENT_LOGINS': False})
 class OrganizationsApiTests(ModuleStoreTestCase):
     """ Test suite for Users API views """
 
@@ -136,6 +136,19 @@ class OrganizationsApiTests(ModuleStoreTestCase):
         response = self.do_post(self.base_organizations_uri, data)
         self.assertEqual(response.status_code, 201)
         return response.data
+
+    @override_settings(EDX_API_KEY='WRONG_KEY')
+    def test_organizations_viewset_security(self):
+        response = self.do_get(self.base_organizations_uri)
+        self.assertEqual(response.status_code, 403)
+
+        data = {'name': self.test_organization_name}
+        response = self.do_post(self.base_organizations_uri, data)
+        self.assertEqual(response.status_code, 403)
+
+        test_uri = '{}123/'.format(self.base_organizations_uri)
+        response = self.do_delete(test_uri, data={})
+        self.assertEqual(response.status_code, 403)
 
     def test_organizations_list_post(self):
         users = []
@@ -537,7 +550,7 @@ class OrganizationsApiTests(ModuleStoreTestCase):
         self.assertEqual(response.data['users_grade_average'], 0.838)
         self.assertEqual(response.data['users_grade_complete_count'], 4)
 
-    def test_organizations_metrics_get_courses_filter(self):
+    def test_organizations_metrics_get_courses_filter(self):  # pylint: disable=R0915
         users = []
         course1 = CourseFactory.create(display_name="COURSE1", org="CRS1", run="RUN1")
         course2 = CourseFactory.create(display_name="COURSE2", org="CRS2", run="RUN2")
