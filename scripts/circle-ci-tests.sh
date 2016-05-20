@@ -54,11 +54,16 @@ case $CIRCLE_NODE_INDEX in
         echo "Running code complexity report (python)."
         paver run_complexity > reports/code_complexity.log || echo "Unable to calculate code complexity. Ignoring error."
 
-        exit $EXIT
+        if [ $EXIT -gt 0 ] ; then
+          echo "Exiting command due to quality violations"
+          exit $EXIT
+        fi
+
+        paver test_lib --extra_args="--with-flaky" --cov_args="-p"
         ;;
 
     1)  # run all of the lms unit tests
-        paver test_system -s lms --extra_args="--with-flaky" --cov_args="-p"
+        paver test_system -s lms --extra_args="--attr='shard_1' --with-flaky" --cov_args="-p"
         ;;
 
     2)  # run all of the cms unit tests
@@ -66,7 +71,7 @@ case $CIRCLE_NODE_INDEX in
         ;;
 
     3)  # run the commonlib unit tests
-        paver test_lib --extra_args="--with-flaky" --cov_args="-p"
+        paver test_system -s lms --extra_args="--attr='shard_1=False' --with-flaky" --cov_args="-p"
         ;;
 
     *)
