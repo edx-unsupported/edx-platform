@@ -10,7 +10,7 @@ from xblock.core import XBlock
 from xblock.fields import Scope, String
 from xblock.fragment import Fragment
 
-from utils import _, asset_to_static_url
+from utils import _, add_resources_to_fragment, asset_to_static_url
 
 
 log = logging.getLogger(__name__)
@@ -48,8 +48,7 @@ class DiscussionCourseXBlock(XBlock):
         context = discussion_service.get_course_template_context()
         context['enable_new_post_btn'] = True
 
-        # FIXME: Do we still need all of these resources?
-        # add_resources_to_fragment(fragment)
+        add_resources_to_fragment(fragment)
 
         fragment.add_content(self.runtime.render_template('discussion/_discussion_course.html', context))
 
