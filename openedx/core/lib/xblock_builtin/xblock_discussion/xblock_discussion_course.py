@@ -10,7 +10,7 @@ from xblock.core import XBlock
 from xblock.fields import Scope, String
 from xblock.fragment import Fragment
 
-from utils import _, add_resources_to_fragment, asset_to_static_url
+from utils import _, add_resources_to_fragment, asset_to_static_url, render_mustache_templates
 
 
 log = logging.getLogger(__name__)
@@ -56,8 +56,7 @@ class DiscussionCourseXBlock(XBlock):
             'course_id': self.course_id
         }))
 
-        # FIXME: No directory "common/templates/discussion/mustache" on this branch, so "render_mustache_templates" has no effect
-        # fragment.add_content(render_mustache_templates())
+        fragment.add_content(render_mustache_templates())
 
         fragment.initialize_js('DiscussionCourseBlock')
 
