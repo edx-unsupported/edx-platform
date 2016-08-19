@@ -42,7 +42,7 @@ class DiscussionCourseXBlock(XBlock):
         fragment = Fragment()
 
         fragment.add_css_url(asset_to_static_url('css/discussion-forum.css'))
-        fragment.add_css_url('static/css/discussion-course-custom.css')
+        fragment.add_css_url(asset_to_static_url('xblock/discussion/css/discussion-course-custom.css'))
 
         discussion_service = self.xmodule_runtime.service(self, 'discussion')  # pylint: disable=no-member
         context = discussion_service.get_course_template_context()
