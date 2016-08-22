@@ -48,7 +48,6 @@
 
             DiscussionRouter.prototype.routes = {
                 "": "allThreads",
-                ":forum_name/threads/:thread_id": "showThread"
             };
 
             DiscussionRouter.prototype.initialize = function(options) {
@@ -93,8 +92,8 @@
                 }
             };
 
-            DiscussionRouter.prototype.showThread = function(forum_name, thread_id) {
-                this.thread = this.discussion.get(thread_id);
+            DiscussionRouter.prototype.showThread = function(thread) {
+                this.thread = thread;
                 this.thread.set("unread_comments_count", 0);
                 this.thread.set("read", true);
                 this.setActiveThread();
@@ -129,9 +128,7 @@
             DiscussionRouter.prototype.navigateToThread = function(thread_id) {
                 var thread;
                 thread = this.discussion.get(thread_id);
-                return this.navigate("" + (thread.get("commentable_id")) + "/threads/" + thread_id, {
-                    trigger: true
-                });
+                return this.showThread(thread);
             };
 
             DiscussionRouter.prototype.navigateToAllThreads = function() {
