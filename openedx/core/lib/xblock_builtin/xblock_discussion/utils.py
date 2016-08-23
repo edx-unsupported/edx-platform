@@ -4,10 +4,11 @@ Utils for Discussion XBlock and Course Discussion XBlock
 
 import os
 
-from django.conf import settings
 from django.templatetags.static import static
 
 from mako.template import Template as MakoTemplate
+
+from path import Path as path
 
 
 JS_URLS = [
@@ -28,7 +29,7 @@ def _(text):
 
 def render_mustache_templates():
     """ Renders all mustache templates as script tags """
-    mustache_dir = settings.REPO_ROOT / 'lms' / 'templates' / 'discussion' / 'mustache'
+    mustache_dir = path(__file__).abspath().dirname() / 'templates' / 'mustache'
 
     def is_valid_file_name(file_name):
         """ Checks if file is a mustache template """
