@@ -11,11 +11,15 @@ from xblock.core import XBlock
 from xblock.fields import Scope, String, UNIQUE_ID
 from xblock.fragment import Fragment
 
-from utils import _
-
-
 log = logging.getLogger(__name__)
 loader = ResourceLoader(__name__)  # pylint: disable=invalid-name
+
+
+def _(text):
+    """
+    A noop underscore function that marks strings for extraction.
+    """
+    return text
 
 
 @XBlock.needs('user')

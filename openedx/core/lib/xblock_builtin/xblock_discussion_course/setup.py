@@ -1,5 +1,5 @@
 """
-Setup for discussion-forum XBlock.
+Setup for discussion-course XBlock.
 """
 
 import os
@@ -20,16 +20,16 @@ def package_data(pkg, root_list):
 
 
 setup(
-    name='xblock-discussion',
+    name='xblock-discussion-course',
     version='0.1',
-    description='XBlock - Discussion',
+    description='XBlock - Course Discussion',
     install_requires=[
         'XBlock',
     ],
     entry_points={
         'xblock.v1': [
-            'discussion = xblock_discussion:DiscussionXBlock'
+            'discussion-course = xblock_discussion_course:DiscussionCourseXBlock',
         ]
     },
-    package_data=package_data("xblock_discussion", ["static"]),
+    package_data=package_data("xblock_discussion_course", ["static"]),
 )
