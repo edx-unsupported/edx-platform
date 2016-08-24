@@ -568,17 +568,17 @@ FEATURES['CUSTOM_COURSES_EDX'] = True
 
 ##### edx solutions apps for McKA #####
 EDX_API_KEY = 'test_api_key'
-FEATURES['EDX_SOLUTIONS_API'] = True
+FEATURES['EDX_SOLUTIONS_API'] = False
 
-INSTALLED_APPS += (
-    'course_metadata',
-    'edx_solutions_api_integration',
-    'social_engagement',
-    'gradebook',
-    'progress',
-    'edx_solutions_projects',
-    'edx_solutions_organizations',
-)
+# INSTALLED_APPS += (
+#     'course_metadata',
+#     'edx_solutions_api_integration',
+#     'social_engagement',
+#     'gradebook',
+#     'progress',
+#     'edx_solutions_projects',
+#     'edx_solutions_organizations',
+# )
 
 
 ############# Student Module #################
