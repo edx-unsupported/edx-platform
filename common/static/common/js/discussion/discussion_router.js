@@ -48,6 +48,18 @@
 
             DiscussionRouter.prototype.routes = {
                 "": "allThreads",
+                ":forum_name/threads/:thread_id": function(forum_name, thread_id) {
+                    // Make this a no-op until we figure out why handlers listed here
+                    // do not have access to up-to-date information about existing threads:
+                    //
+                    // When creating a new post, the collection of threads stored in this.discussion
+                    // does not contain that post when referenced from a handler set up here.
+                    // As a result, newly added posts can not be displayed.
+                    //
+                    // This problem might be related to "Uncaught Error: Backbone.history has already been started"
+                    // error that comes up in the console when loading a unit
+                    // containing an instance of DiscussionCourseXBlock in the LMS.
+                },
             };
 
             DiscussionRouter.prototype.initialize = function(options) {
@@ -128,6 +140,9 @@
             DiscussionRouter.prototype.navigateToThread = function(thread_id) {
                 var thread;
                 thread = this.discussion.get(thread_id);
+                this.navigate("" + (thread.get("commentable_id")) + "/threads/" + thread_id, {
+                    trigger: true
+                });
                 return this.showThread(thread);
             };
 
