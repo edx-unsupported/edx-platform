@@ -9,7 +9,6 @@ from django.test.utils import override_settings
 from django.utils import translation
 from lms.lib.comment_client.utils import CommentClientPaginatedResult
 
-from django_comment_client.forum.views import get_threads
 from django_comment_common.utils import ThreadContext
 from django_comment_client.forum.views import get_threads
 from django_comment_client.forum import views
@@ -1145,14 +1144,13 @@ class SingleCohortedThreadTestCase(CohortedTestCase):
     def test_html(self, mock_request):
         self._create_mock_cohorted_thread(mock_request)
 
-        request = RequestFactory().get("dummy_url")
-        request.user = self.student
-        mako_middleware_process_request(request)
-        response = views.single_thread(
-            request,
-            self.course.id.to_deprecated_string(),
-            "cohorted_topic",
-            self.mock_thread_id
+        self.client.login(username=self.student.username, password='test')
+        response = self.client.get(
+            reverse('single_thread', kwargs={
+                'course_id': unicode(self.course.id),
+                'discussion_id': "cohorted_topic",
+                'thread_id': self.mock_thread_id,
+            })
         )
 
         self.assertEquals(response.status_code, 200)

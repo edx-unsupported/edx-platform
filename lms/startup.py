@@ -93,8 +93,8 @@ def run():
     if settings.FEATURES.get('ENABLE_NOTIFICATIONS', False):
         startup_notification_subsystem()
 
-    if settings.FEATURES.get('DISABLE_COURSE_PUBLISHED_SIGNAL', False):
-        disable_course_published_signals()
+    if settings.FEATURES.get('DISABLE_SOLUTIONS_APPS_SIGNALS', False):
+        disable_solutions_apps_signals()
 
 
     # In order to allow modules to use a handler url, we need to
@@ -172,12 +172,12 @@ def enable_third_party_auth():
     auth_settings.apply_settings(settings)
 
 
-def disable_course_published_signals():
+def disable_solutions_apps_signals():
     """
-    Disables course_published signal receivers in openedx.core.djangoapps
+    Disables signals receivers in solutions apps
     """
-    from openedx.core.djangoapps.util.testing import SignalDisconnectTestMixin
-    SignalDisconnectTestMixin.disconnect_course_published_signals()
+    from edx_solutions_api_integration.test_utils import SignalDisconnectTestMixin
+    SignalDisconnectTestMixin.disconnect_signals()
 
 
 def startup_notification_subsystem():

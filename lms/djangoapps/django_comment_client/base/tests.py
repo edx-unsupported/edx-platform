@@ -1476,7 +1476,7 @@ class ViewPermissionsTestCase(UrlResetMixin, SharedModuleStoreTestCase, MockRequ
 
 @attr('shard_2')
 @patch.dict("django.conf.settings.FEATURES", {"ENABLE_SOCIAL_ENGAGEMENT": False})
-class CreateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
+class CreateThreadUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
     def setUp(self):
         super(CreateThreadUnicodeTestCase, self).setUp()
 
@@ -1516,7 +1516,7 @@ class CreateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockReq
 @attr('shard_2')
 @disable_signal(views, 'thread_edited')
 @patch.dict("django.conf.settings.FEATURES", {"ENABLE_SOCIAL_ENGAGEMENT": False})
-class UpdateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
+class UpdateThreadUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
     def setUp(self):
         super(UpdateThreadUnicodeTestCase, self).setUp()
 
