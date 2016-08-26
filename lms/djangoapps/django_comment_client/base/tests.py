@@ -582,6 +582,11 @@ class ViewsTestCase(
             yield
 
     def test_create_thread(self, mock_request):
+        # make sure course is not cohorted
+        self.course.cohort_config = {
+            'cohorted': False,
+        }
+        self.store.update_item(self.course, self.student.id)
         with self.assert_discussion_signals('thread_created'):
             self.create_thread_helper(mock_request)
 
