@@ -41,7 +41,7 @@ class DiscussionCourseXBlock(XBlock):
         """ Renders student view for LMS """
         fragment = Fragment()
 
-        fragment.add_css(loader.load_unicode('static/css/discussion-forum.css'))
+        fragment.add_css_url(asset_to_static_url('css/discussion/lms-discussion-main.css'))
         fragment.add_css_url(asset_to_static_url('xblock/discussion/css/discussion-course-custom.css'))
 
         discussion_service = self.xmodule_runtime.service(self, 'discussion')  # pylint: disable=no-member
