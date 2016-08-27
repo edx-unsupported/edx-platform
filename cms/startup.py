@@ -58,6 +58,10 @@ def run():
     if settings.FEATURES.get('ENABLE_NOTIFICATIONS', False):
         startup_notification_subsystem()
 
+    if settings.FEATURES.get('EDX_SOLUTIONS_API', False) and \
+        settings.FEATURES.get('DISABLE_SOLUTIONS_APPS_SIGNALS', False):
+        disable_solutions_apps_signals()
+
     # In order to allow descriptors to use a handler url, we need to
     # monkey-patch the x_module library.
     # TODO: Remove this code when Runtimes are no longer created by modulestores
@@ -109,6 +113,14 @@ def enable_theme():
     settings.STATICFILES_DIRS.append(
         (u'themes/{}'.format(settings.THEME_NAME), theme_root / 'static')
     )
+
+
+def disable_solutions_apps_signals():
+    """
+    Disables signals receivers in solutions apps
+    """
+    from edx_solutions_api_integration.test_utils import SignalDisconnectTestMixin
+    SignalDisconnectTestMixin.disconnect_signals()
 
 
 def startup_notification_subsystem():

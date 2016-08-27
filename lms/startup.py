@@ -93,7 +93,8 @@ def run():
     if settings.FEATURES.get('ENABLE_NOTIFICATIONS', False):
         startup_notification_subsystem()
 
-    if settings.FEATURES.get('DISABLE_SOLUTIONS_APPS_SIGNALS', False):
+    if settings.FEATURES.get('EDX_SOLUTIONS_API', False) and \
+        settings.FEATURES.get('DISABLE_SOLUTIONS_APPS_SIGNALS', False):
         disable_solutions_apps_signals()
 
 

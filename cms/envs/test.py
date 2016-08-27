@@ -347,3 +347,4 @@ INSTALLED_APPS += (
     'edx_solutions_projects',
     'edx_solutions_organizations',
 )
+FEATURES['DISABLE_SOLUTIONS_APPS_SIGNALS'] = True
