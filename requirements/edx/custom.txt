@@ -27,5 +27,5 @@ git+https://github.com/edx-solutions/organizations-edx-platform-extensions.git@2
 git+https://github.com/edx-solutions/gradebook-edx-platform-extensions.git@cf9cf44daa2c6cca27af950fabc2e3f55c0c871d#egg=gradebook-edx-platform-extensions
 git+https://github.com/edx-solutions/projects-edx-platform-extensions.git@8eae0c7ff14de44a4c014807781ffbe192d50f1f#egg=projects-edx-platform-extensions
 git+https://github.com/edx-solutions/discussion-edx-platform-extensions.git@e8bcf9a79e42e44bee3770ba873a5638b7c9d287#egg=discussion-edx-platform-extensions
-git+https://github.com/edx-solutions/course-edx-platform-extensions.git@fa356bffc7f8a572274adc753770d17941f2946c#egg=course-edx-platform-extensions
+git+https://github.com/edx-solutions/course-edx-platform-extensions.git@3a1fb2a62fcb02b7ea90af5d04939af3b1ea203a#egg=course-edx-platform-extensions
 git+https://github.com/edx-solutions/progress-edx-platform-extensions.git@1608a99f0ff3062ae7069639a0d9d96b5c0ec1d8#egg=progress-edx-platform-extensions
