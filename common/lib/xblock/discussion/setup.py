@@ -28,7 +28,6 @@ setup(
     entry_points={
         'xblock.v1': [
             'discussion-forum = discussion_forum:DiscussionXBlock',
-            'discussion-course = discussion_forum:DiscussionCourseXBlock'
         ]
     },
     package_data=package_data("discussion_forum", ["static"]),

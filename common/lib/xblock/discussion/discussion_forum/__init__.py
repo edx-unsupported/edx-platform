@@ -1,1 +1,1 @@
-from .discussion_forum import DiscussionXBlock, DiscussionCourseXBlock
+from .discussion_forum import DiscussionXBlock
