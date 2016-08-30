@@ -1,6 +1,6 @@
 machine:
   environment:
-    _JAVA_OPTIONS: "-Xms3g -Xmx3g"
+    _JAVA_OPTIONS: "-Xms1.3g -Xmx2.6g"
   python:
     version: 2.7.10
 

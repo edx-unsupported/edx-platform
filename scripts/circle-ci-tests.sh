@@ -83,13 +83,13 @@ else
 
         3)  # run the commonlib and solutions apps unit tests
             paver test_lib --extra_args="--with-flaky" --cov_args="-p" --with-xunitmp
-            paver test_system -s lms -t edx_solutions_organizations
-            paver test_system -s lms -t gradebook
-            paver test_system -s lms -t progress
-            paver test_system -s lms -t edx_solutions_projects
-            paver test_system -s lms -t course_metadata
-            paver test_system -s lms -t social_engagement
-            paver test_system -s lms -t edx_solutions_api_integration
+            paver test_system -s lms -t edx_solutions_api_integration --with-xunitmp
+            paver test_system -s lms -t edx_solutions_organizations --with-xunitmp
+            paver test_system -s lms -t edx_solutions_projects --with-xunitmp
+            paver test_system -s lms -t gradebook --with-xunitmp
+            paver test_system -s lms -t progress --with-xunitmp
+            paver test_system -s lms -t social_engagement  --with-xunitmp
+            paver test_system -s lms -t course_metadata  --with-xunitmp
             ;;
 
         *)
