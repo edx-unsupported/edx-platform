@@ -29,6 +29,10 @@ setup(
     entry_points={
         'xblock.v1': [
             'discussion = xblock_discussion:DiscussionXBlock',
+            # Alias "discussion-forum" entry point to the same XBlock.
+            # This is necessary to ensure backward compatibility for courses
+            # containing instances of the solutions-specific inline DiscussionXBlock,
+            # which was removed in favor of the implementation provided in this package.
             'discussion-forum = xblock_discussion:DiscussionXBlock'
         ]
     },
