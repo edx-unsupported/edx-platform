@@ -8,6 +8,10 @@ general:
     - "test_root/log"
 
 dependencies:
+  pre:
+    - gem install bundler
+    - sudo apt-get update; sudo apt-get install libxmlsec1-dev
+
   override:
     - npm install
     - bundle install
