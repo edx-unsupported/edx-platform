@@ -65,8 +65,15 @@ case $CIRCLE_NODE_INDEX in
         paver test_system -s cms --extra_args="--with-flaky" --cov_args="-p"
         ;;
 
-    3)  # run the commonlib unit tests
+    3)  # run the commonlib and solutions apps unit tests
         paver test_lib --extra_args="--with-flaky" --cov_args="-p"
+        paver test_system -s lms -t edx_solutions_organizations
+        paver test_system -s lms -t gradebook
+        paver test_system -s lms -t progress
+        paver test_system -s lms -t edx_solutions_projects
+        paver test_system -s lms -t course_metadata
+        paver test_system -s lms -t social_engagement
+        paver test_system -s lms -t edx_solutions_api_integration
         ;;
 
     *)

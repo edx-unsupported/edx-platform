@@ -1963,7 +1963,7 @@ INSTALLED_APPS = (
 
     'openedx.core.djangoapps.content.course_overviews',
     'openedx.core.djangoapps.content.course_structures',
-    'openedx.core.djangoapps.content.course_metadata',
+    'course_metadata',
     'course_structure_api',
 
     # Mailchimp Syncing
@@ -1984,7 +1984,7 @@ INSTALLED_APPS = (
     'xblock_django',
 
     # EDX API application
-    'api_manager',
+    'edx_solutions_api_integration',
 
     # Social Engagement
     'social_engagement',
@@ -2453,8 +2453,8 @@ OPTIONAL_APPS = (
     # mckinsey apps
     'gradebook',
 
-    'projects',
-    'organizations',
+    'edx_solutions_projects',
+    'edx_solutions_organizations',
 )
 
 for app_name in OPTIONAL_APPS:
