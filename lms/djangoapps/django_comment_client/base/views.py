@@ -9,7 +9,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core import exceptions
-from django.http import Http404, HttpResponseBadRequest, HttpResponse
+from django.http import Http404, HttpResponse, HttpResponseServerError
 from django.utils.translation import ugettext as _
 from django.views.decorators import csrf
 from django.views.decorators.http import require_GET, require_POST
@@ -271,7 +271,7 @@ def create_thread(request, course_id, commentable_id):
     try:
         group_id = get_group_id_for_comments_service(request, course_key, commentable_id)
     except ValueError:
-        return HttpResponseBadRequest("Invalid cohort id")
+        return HttpResponseServerError("Invalid cohort id")
     if group_id is not None:
         thread.group_id = group_id
 
