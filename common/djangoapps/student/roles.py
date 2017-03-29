@@ -408,11 +408,7 @@ def get_aggregate_exclusion_user_ids(course_key, roles=None):  # pylint: disable
     exclude_role_list = roles or getattr(settings, 'AGGREGATION_EXCLUDE_ROLES', [CourseObserverRole.ROLE])
 
     for role in exclude_role_list:
-        users = CourseRole(role, course_key).users_with_role()
-        user_ids = set()
-        for user in users:
-            user_ids.add(user.id)
-
+        user_ids = CourseRole(role, course_key).users_with_role().values_list('id', flat=True)
         exclude_user_ids = exclude_user_ids.union(user_ids)
 
     return exclude_user_ids

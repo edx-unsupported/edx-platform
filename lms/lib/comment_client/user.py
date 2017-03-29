@@ -197,7 +197,7 @@ def get_user_social_stats(user_id, course_id, end_date=None, thread_type=None, t
     return response
 
 
-def get_course_social_stats(course_id, end_date=None):
+def get_course_social_stats(course_id, end_date=None, user_ids=None):
     """
     Helper method to get the social stats from the comment service
     """
@@ -205,6 +205,10 @@ def get_course_social_stats(course_id, end_date=None):
     params = {'course_id': course_id}
     if end_date:
         params.update({'end_date': end_date.isoformat()})
+
+    # Pass in user ids if available
+    if user_ids:
+        params.update({'user_ids[]': user_ids})
 
     response = perform_request(
         'get',
