@@ -2,6 +2,7 @@
 Views handling read (GET) requests for the Discussion tab and inline discussions.
 """
 
+from collections import OrderedDict
 from functools import wraps
 import logging
 from sets import Set
@@ -28,9 +29,9 @@ from openedx.core.djangoapps.course_groups.cohorts import (
     is_course_cohorted,
     get_cohort_id,
     get_course_cohorts,
-    get_cohorted_commentables,
     get_cohort_by_id,
 )
+from courseware.module_render import hash_resource
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
 
@@ -645,6 +646,25 @@ class DiscussionBoardFragmentView(EdxFragmentView):
     """
     Component implementation of the discussion board.
     """
+    def get(self, request, *args, **kwargs):
+        """
+        Render a fragment to HTML or return JSON describing it, based on the request.
+        """
+        fragment = self.render_to_fragment(request, **kwargs)
+        response_format = request.GET.get('format') or request.POST.get('format') or 'html'
+        if response_format == 'json':
+            # The frontend expects hashed resources and a csrf_token as well
+            hashed_resources = OrderedDict()
+            for resource in fragment.resources:
+                hashed_resources[hash_resource(resource)] = resource
+            return utils.JsonResponse({
+                "html": fragment.content,
+                "resources": hashed_resources.items(),
+                "csrf_token": unicode(csrf(request)['csrf_token'])
+            })
+        else:
+            return super(DiscussionBoardFragmentView, self).get(request, *args, **kwargs)
+
     def render_to_fragment(self, request, course_id=None, discussion_id=None, thread_id=None, **kwargs):
         """
         Render the discussion board to a fragment.
@@ -671,9 +691,18 @@ class DiscussionBoardFragmentView(EdxFragmentView):
 
             fragment = Fragment(html)
             self.add_fragment_resource_urls(fragment)
-            fragment.add_javascript(inline_js)
+
+            if request.GET.get('format', 'html') == 'json':
+                fragment.add_javascript_url(staticfiles_storage.url('common/js/vendor/require.js'))
+                fragment.add_javascript_url(staticfiles_storage.url('lms/js/require-config.js'))
+                
             if not settings.REQUIRE_DEBUG:
-                fragment.add_javascript_url(staticfiles_storage.url('discussion/js/discussion_board_factory.js'))
+                fragment.add_javascript_url(
+                    staticfiles_storage.url('discussion/js/discussion_board_factory.js')
+                )
+
+            fragment.add_javascript(inline_js)
+
             return fragment
         except cc.utils.CommentClientMaintenanceError:
             log.warning('Forum is in maintenance mode')

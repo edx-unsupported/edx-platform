@@ -1086,6 +1086,18 @@ def get_static_tab_fragment(request, course, tab):
     return fragment
 
 
+def get_static_tab_contents(request, course, tab):
+    """
+    Returns the contents for the given static tab.
+
+    This is a pass-through to the new fragment-based static method above,
+    get_static_tab_fragment. It is here simply to maintain API compatibility
+    with api-integration which still currently relies on this method
+    existing.
+    """
+    return get_static_tab_fragment(request, course, tab).content
+
+
 @require_GET
 @ensure_valid_course_key
 def get_course_lti_endpoints(request, course_id):

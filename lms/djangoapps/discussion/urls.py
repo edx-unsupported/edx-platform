@@ -13,9 +13,9 @@ urlpatterns = patterns(
     url(r'^(?P<discussion_id>[\w\-.]+)/threads/(?P<thread_id>\w+)$', 'single_thread', name='single_thread'),
     url(r'^(?P<discussion_id>[\w\-.]+)/inline$', 'inline_discussion', name='inline_discussion'),
     url(
-        r'discussion_board_fragment_view$',
+        r'discussion_board_fragment_view/$',
         DiscussionBoardFragmentView.as_view(),
         name='discussion_board_fragment_view'
     ),
-    url(r'', 'forum_form_discussion', name='forum_form_discussion'),
+    url(r'^$', 'forum_form_discussion', name='forum_form_discussion'),
 )
