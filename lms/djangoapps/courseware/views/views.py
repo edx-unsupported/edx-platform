@@ -1095,7 +1095,7 @@ def get_static_tab_contents(request, course, tab):
     with api-integration which still currently relies on this method
     existing.
     """
-    return get_static_tab_fragment(request, course, tab)
+    return get_static_tab_fragment(request, course, tab).content
 
 
 @require_GET
