@@ -632,7 +632,7 @@ USERNAME_PATTERN = r'(?P<username>[\w.@+-]+)'
 # Verticals having children with any of these categories would be excluded from progress calculations
 PROGRESS_DETACHED_VERTICAL_CATEGORIES = ['discussion-course', 'group-project', 'gp-v2-project']
 # Modules having these categories would be excluded from progress calculations
-PROGRESS_DETACHED_CATEGORIES = PROGRESS_DETACHED_VERTICAL_CATEGORIES + ['discussion-forum']
+PROGRESS_DETACHED_CATEGORIES = PROGRESS_DETACHED_VERTICAL_CATEGORIES + ['discussion-forum', 'eoc-journal']
 ############################## EVENT TRACKING #################################
 LMS_SEGMENT_KEY = None
 
