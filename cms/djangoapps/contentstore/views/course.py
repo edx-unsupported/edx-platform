@@ -1016,6 +1016,7 @@ def course_info_update_handler(request, course_key_string, provided_id=None):
                             'excerpt': excerpt,
                             'announcement_date': announcement_date,
                             'title': title,
+                            'group': 'enrollments',
                         }
                     )
 
@@ -1034,12 +1035,13 @@ def course_info_update_handler(request, course_key_string, provided_id=None):
 
                     # Send the notification_msg to the Celery task
                     if settings.FEATURES.get('ENABLE_NOTIFICATIONS_CELERY', False):
-                        publish_course_notifications_task.delay(course_key,
-                                                                notification_msg, 'urban-airship')
+                        publish_course_notifications_task.delay(
+                            course_key, notification_msg
+                        )
                     else:
-                        publish_course_notifications_task(course_key,
-                                                          notification_msg,
-                                                          'urban-airship')
+                        publish_course_notifications_task(
+                            course_key, notification_msg
+                        )
                 except Exception, ex:
                     # Notifications aren't considered critical, so it's OK to fail
                     # log and then continue
