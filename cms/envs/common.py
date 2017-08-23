@@ -1244,6 +1244,13 @@ NOTIFICATION_CHANNEL_PROVIDERS = {
             }
         }
     },
+    'urban-airship': {
+        'class': 'edx_notifications.channels.urban_airship.UrbanAirshipNotificationChannelProvider',
+        'options': {
+            'application_id': '1uQHCCsrQzyzfXheW8bqaQ',
+            'rest_api_key': 'YC0I-59xSBatXPu2F0DK2g',
+        }
+    },
     'null': {
         'class': 'edx_notifications.channels.null.NullNotificationChannel',
         'options': {}
@@ -1253,6 +1260,7 @@ NOTIFICATION_CHANNEL_PROVIDERS = {
 # list all of the mappings of notification types to channel
 NOTIFICATION_CHANNEL_PROVIDER_TYPE_MAPS = {
     '*': 'durable',  # default global mapping
+    'open-edx.studio.announcements.new-announcement': 'urban-airship',
 }
 
 ################################ Settings for Microsites ################################
