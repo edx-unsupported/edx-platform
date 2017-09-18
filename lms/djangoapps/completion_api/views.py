@@ -5,14 +5,20 @@ API views to read completion information.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from django.contrib.auth import get_user_model
-from opaque_keys.edx.keys import CourseKey
 from progress.models import StudentProgress
 from rest_framework.exceptions import NotAuthenticated, NotFound, ParseError, PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from rest_framework import status
+from courseware.courses import get_course
+from opaque_keys.edx.keys import CourseKey, UsageKey
+from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from openedx.core.lib.api import authentication, paginators
+from progress.models import CourseModuleCompletion
+from student.models import CourseEnrollment
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from .models import CourseCompletionFacade, AGGREGATE_CATEGORIES
 from .serializers import course_completion_serializer_factory
@@ -358,11 +364,72 @@ class CompletionDetailView(CompletionViewMixin, APIView):
     """
     # pylint: enable=line-too-long
 
-    def get(self, request, course_key):
+    def get(self, request, course_id):
         """
         Handler for GET requests.
         """
-        course_key = CourseKey.from_string(course_key)
-        progress = self.get_progress_queryset().get(course_id=course_key)
+        course_id = CourseKey.from_string(course_id)
+        try:
+            progress = self.get_progress_queryset().get(course_id=course_id)
+        except StudentProgress.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
         completion = CourseCompletionFacade(progress)
         return Response(self.get_serializer()(completion, requested_fields=self.get_requested_fields()).data)
+
+
+class CompletionBlockUpdateView(APIView):
+    """
+    API view to mark blocks as completed.
+    This is a transitional implementation.
+    """
+
+    authentication_classes = (
+        authentication.OAuth2AuthenticationAllowInactiveUser,
+        authentication.SessionAuthenticationAllowInactiveUser
+    )
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, course_id, usage_id):
+        """
+        Handler for GET requests. Attempts to be forward-compatible with the completion API.
+        """
+        try:
+            completion = float(request.data.get('completion'))
+        except (TypeError, ValueError):
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        if completion != 1:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        # Thanks to URL validation, course key must be formatted correctly.
+        # Check if a course exists for this key.
+        course_key = CourseKey.from_string(course_id)
+        try:
+            get_course(course_key)
+        except ValueError:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        # Check if the user is enrolled in this course.
+        if not CourseEnrollment.is_enrolled(request.user, course_key):
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        # Check if content exists for this usage_id.
+        content_key = UsageKey.from_string(usage_id)
+        try:
+            modulestore().get_item(content_key)
+        except ItemNotFoundError:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        # Check if the content belongs to the given course
+        course_structure = CourseStructure.objects.get(course_id=course_key)
+        if usage_id not in course_structure.structure['blocks'].keys():
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        _, created = CourseModuleCompletion.objects.get_or_create(
+            user_id=request.user.id,
+            course_id=course_key,
+            content_id=usage_id,
+        )
+
+        return Response(status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
