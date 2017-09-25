@@ -49,7 +49,7 @@ from django_comment_common.models import (
     FORUM_ROLE_COMMUNITY_TA,
 )
 from edxmako.shortcuts import render_to_string
-from courseware.models import StudentModule
+from lms.djangoapps.courseware.models import StudentModule
 from shoppingcart.models import (
     Coupon,
     CourseRegistrationCode,

@@ -18,7 +18,7 @@ from functools import partial
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from opaque_keys.edx.locations import i4xEncoder
 
-from courseware.models import StudentModule
+from lms.djangoapps.courseware.models import StudentModule
 from courseware.tests.factories import StudentModuleFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 

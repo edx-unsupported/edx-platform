@@ -18,7 +18,7 @@ from django.contrib.auth.models import User
 from django.db import transaction
 from django.db.utils import IntegrityError
 from xblock.fields import Scope
-from courseware.models import StudentModule, BaseStudentModuleHistory
+from lms.djangoapps.courseware.models import StudentModule, BaseStudentModuleHistory
 from edx_user_state_client.interface import XBlockUserStateClient, XBlockUserState
 
 log = logging.getLogger(__name__)

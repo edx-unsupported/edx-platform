@@ -19,7 +19,7 @@ from opaque_keys.edx.keys import UsageKey
 import xmodule.graders as xmgraders
 from student.models import CourseEnrollmentAllowed, CourseEnrollment
 from edx_proctoring.api import get_all_exam_attempts
-from courseware.models import StudentModule
+from lms.djangoapps.courseware.models import StudentModule
 from certificates.models import GeneratedCertificate
 from django.db.models import Count
 from certificates.models import CertificateStatuses

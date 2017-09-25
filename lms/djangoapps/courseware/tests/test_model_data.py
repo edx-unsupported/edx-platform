@@ -7,8 +7,8 @@ from nose.plugins.attrib import attr
 from functools import partial
 
 from courseware.model_data import DjangoKeyValueStore, FieldDataCache, InvalidScopeError
-from courseware.models import StudentModule, XModuleUserStateSummaryField
-from courseware.models import XModuleStudentInfoField, XModuleStudentPrefsField
+from lms.djangoapps.courseware.models import StudentModule, XModuleUserStateSummaryField
+from lms.djangoapps.courseware.models import XModuleStudentInfoField, XModuleStudentPrefsField
 
 from student.tests.factories import UserFactory
 from courseware.tests.factories import StudentModuleFactory as cmfStudentModuleFactory, location, course_id

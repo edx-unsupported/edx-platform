@@ -16,7 +16,7 @@ from django.db import DatabaseError
 from django.db import transaction
 from django.core.management.base import BaseCommand, CommandError
 
-from courseware.models import StudentModule
+from lms.djangoapps.courseware.models import StudentModule
 from util.query import use_read_replica_if_available
 
 log = logging.getLogger("fix_student_module_newlines")

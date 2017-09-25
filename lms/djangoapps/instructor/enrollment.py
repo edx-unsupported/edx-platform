@@ -17,7 +17,7 @@ from eventtracking import tracker
 import pytz
 
 from course_modes.models import CourseMode
-from courseware.models import StudentModule
+from lms.djangoapps.courseware.models import StudentModule
 from edxmako.shortcuts import render_to_string
 from lms.djangoapps.grades.signals.signals import PROBLEM_RAW_SCORE_CHANGED
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
@@ -28,7 +28,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from course_modes.models import CourseMode
-from courseware.models import StudentModule
+from lms.djangoapps.courseware.models import StudentModule
 from edxmako.shortcuts import render_to_string
 from student.models import CourseEnrollment, CourseEnrollmentAllowed, anonymous_id_for_user
 from track.event_transaction_utils import (

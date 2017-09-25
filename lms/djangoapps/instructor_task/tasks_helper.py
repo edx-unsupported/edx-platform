@@ -43,7 +43,7 @@ from courseware.courses import get_course_by_id, get_problems_in_section
 from lms.djangoapps.grades.context import grading_context_for_course
 from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
 from courseware.model_data import DjangoKeyValueStore, FieldDataCache
-from courseware.models import StudentModule
+from lms.djangoapps.courseware.models import StudentModule
 from courseware.module_render import get_module_for_descriptor_internal
 from edxmako.shortcuts import render_to_string
 from instructor_analytics.basic import (

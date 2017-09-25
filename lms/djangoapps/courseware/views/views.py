@@ -67,7 +67,7 @@ from courseware.courses import (
 )
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache
-from courseware.models import StudentModule, BaseStudentModuleHistory
+from lms.djangoapps.courseware.models import StudentModule, BaseStudentModuleHistory
 from courseware.url_helpers import get_redirect_url, get_redirect_url_for_global_staff
 from courseware.user_state_client import DjangoXBlockUserStateClient
 from edxmako.shortcuts import render_to_response, render_to_string, marketing_link

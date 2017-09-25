@@ -32,7 +32,7 @@ from xmodule.modulestore import ModuleStoreEnum
 
 from bulk_email.models import BulkEmailFlag
 from course_modes.models import CourseMode
-from courseware.models import StudentModule
+from lms.djangoapps.courseware.models import StudentModule
 from courseware.tests.factories import (
     BetaTesterFactory, GlobalStaffFactory, InstructorFactory, StaffFactory, UserProfileFactory
 )
@@ -56,7 +56,7 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, Mo
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.fields import Date
 
-from courseware.models import StudentFieldOverride
+from lms.djangoapps.courseware.models import StudentFieldOverride
 
 import lms.djangoapps.instructor_task.api
 import lms.djangoapps.instructor.views.api
