@@ -240,7 +240,7 @@ FEATURES = {
     'ENABLE_MKTG_SITE': False,
 
     # Prevent concurrent logins per user
-    'PREVENT_CONCURRENT_LOGINS': True,
+    'PREVENT_CONCURRENT_LOGINS': False,
 
     # Turn on Advanced Security by default
     'ADVANCED_SECURITY': True,
