@@ -33,7 +33,12 @@ def parse_args():
         add_help=False,
         usage='%(prog)s [options] ...'
     )
-    lms.add_argument('-h', '--help', action='store_true', help='show this help message and exit')
+    lms.add_argument(
+        '-h',
+        '--help',
+        action='store_true',
+        help='show this help message and exit'
+    )
     lms.add_argument(
         '--settings',
         help="Which django settings module to use under lms.envs. If not provided, the DJANGO_SETTINGS_MODULE "
