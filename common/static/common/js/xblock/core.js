@@ -12,7 +12,7 @@
             selector = '.' + blockClass;
         }
         return $(element).immediateDescendents(selector).map(function(idx, elem) {
-            return initializer(elem, requestToken);
+            return initializer($(elem), requestToken);
         }).toArray();
     }
 
