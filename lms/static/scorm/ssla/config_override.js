@@ -7,12 +7,27 @@ var sslaConfig = {
     setDataHeaders: dataHeaders,
     getDataHeaders: dataHeaders,
     openContentIn: openContentIn,
-    popupWindowParams: popupWindowParams,
+    //popupWindowParams: popupWindowParams,
     courseId: courseId,
     courseDirectory: courseDirectory,
     studentId: studentId,
-    studentName: studentName
+    studentName: studentName,
+	
+    // McKA specific configurations
+    closePopupSingleScoBehavior: "",
+    closePopupMultiScoBehavior: "",
+    singleScoView: "HIDE_ALL",
+    popupMainContentMessageAfterOpen: function() {
+        return '<a style="pointer-events: none; font-family: \'Open Sans\', Arial, sans-serif; font-size: 14px; color: #cccccc;" href="#">Click here to open the content experience.</a>';
+    },
+    popupMainContentMessageFailed: function() {
+        return '<a style="font-family: \'Open Sans\', Arial, sans-serif; font-size: 14px; color: #3384CA;" onclick="parent.ssla.ssla.popupManually();" href="#">Click here to open the content experience.</a>';
+    },
+    popupWindowParams: "status=1,toolbar=1,scrollbars=yes,resizable=yes,alwaysRaised=1"
 };
+
+
+
 
 
 var messageData = null;
@@ -105,7 +120,7 @@ function courseId() {
 function courseDirectory() {
   try {
     //console.log('courseDirectory is '+messageData.course_location);
-    return messageData.course_location;
+    return messageData.course_location.replace(/^.*\/\/[^\/]+/, '');
   }
   catch (e){
     console.log(e)
