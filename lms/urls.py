@@ -13,6 +13,8 @@ from courseware.views.index import CoursewareIndex
 from courseware.module_render import XblockCallbackView
 from courseware.views.views import CourseTabView, EnrollStaffView, StaticCourseTabView
 from django_comment_common.models import ForumsConfig
+
+from lms.djangoapps.courseware.module_render import XblockCallbackView
 from openedx.core.djangoapps.auth_exchange.views import LoginWithAccessTokenView
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig

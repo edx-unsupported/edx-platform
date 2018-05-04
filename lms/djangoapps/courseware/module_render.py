@@ -11,6 +11,11 @@ from functools import partial
 from datetime import datetime
 from django.utils.timezone import UTC
 
+from rest_framework.views import APIView
+from rest_framework.authentication import SessionAuthentication
+from rest_framework_oauth.authentication import OAuth2Authentication
+from rest_framework.permissions import IsAuthenticated
+
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
@@ -933,6 +938,29 @@ class XblockCallbackView(APIView):
 
     def delete(self, request, course_id, usage_id, handler, suffix=None):
         return _get_course_and_invoke_handler(request, course_id, usage_id, handler, suffix)
+
+
+# TODO: deprecated (XblockCallbackView is deprecated in favour of handle_xblock_callback as a function based view)
+# Need to be removed soon after all apps shifted to new URL in API Integration.
+class XblockCallbackView(APIView):
+
+    authentication_classes = (SessionAuthentication, OAuth2Authentication,)
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, course_id, usage_id, handler, suffix=None):
+        return handle_xblock_callback(request, course_id, usage_id, handler, suffix)
+
+    def post(self, request, course_id, usage_id, handler, suffix=None):
+        return handle_xblock_callback(request, course_id, usage_id, handler, suffix)
+
+    def put(self, request, course_id, usage_id, handler, suffix=None):
+        return handle_xblock_callback(request, course_id, usage_id, handler, suffix)
+
+    def patch(self, request, course_id, usage_id, handler, suffix=None):
+        return handle_xblock_callback(request, course_id, usage_id, handler, suffix)
+
+    def delete(self, request, course_id, usage_id, handler, suffix=None):
+        return handle_xblock_callback(request, course_id, usage_id, handler, suffix)
 
 
 def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_info=False, course=None):
