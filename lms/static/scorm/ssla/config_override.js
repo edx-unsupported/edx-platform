@@ -7,7 +7,6 @@ var sslaConfig = {
     setDataHeaders: dataHeaders,
     getDataHeaders: dataHeaders,
     openContentIn: openContentIn,
-    //popupWindowParams: popupWindowParams,
     courseId: courseId,
     courseDirectory: courseDirectory,
     studentId: studentId,
@@ -119,7 +118,6 @@ function courseId() {
 
 function courseDirectory() {
   try {
-    //console.log('courseDirectory is '+messageData.course_location);
     return messageData.course_location.replace(/^.*\/\/[^\/]+/, '');
   }
   catch (e){
