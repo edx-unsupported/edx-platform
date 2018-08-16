@@ -23,7 +23,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls_range
 
 from course_modes.models import CourseMode
-from enrollment import api
+from enrollment import api, data
 from enrollment.errors import CourseEnrollmentError
 from enrollment.views import EnrollmentUserThrottle
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -1240,3 +1240,164 @@ class EnrollmentCrossDomainTest(ModuleStoreTestCase):
             HTTP_REFERER=self.REFERER,
             HTTP_X_CSRFTOKEN=csrf_cookie
         )
+
+
+@attr(shard=3)
+@ddt.ddt
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+class CourseEnrollmentsByUsernameOrCourseIDListTest(APITestCase, ModuleStoreTestCase):
+    """
+    Test the course enrollments by username or course id endpoint.
+    """
+    def setUp(self):
+        super(CourseEnrollmentsByUsernameOrCourseIDListTest, self).setUp()
+        self.rate_limit_config = RateLimitConfiguration.current()
+        self.rate_limit_config.enabled = False
+        self.rate_limit_config.save()
+
+        throttle = EnrollmentUserThrottle()
+        self.rate_limit, __ = throttle.parse_rate(throttle.rate)
+
+        self.course = CourseFactory.create(org='e', number='d', run='X', emit_signals=True)
+        self.course2 = CourseFactory.create(org='x', number='y', run='Z', emit_signal=True)
+
+        for mode_slug in ('honor', 'verified', 'audit'):
+            CourseModeFactory.create(
+                course_id=self.course.id,
+                mode_slug=mode_slug,
+                mode_display_name=mode_slug
+            )
+
+        self.staff_user = AdminFactory(
+            username='staff',
+            email='staff@example.com',
+            password='edx'
+        )
+
+        self.student1 = UserFactory(
+            username='student1',
+            email='student1@example.com',
+            password='edx'
+        )
+
+        self.student2 = UserFactory(
+            username='student2',
+            email='student2@example.com',
+            password='edx'
+        )
+
+        self.student3 = UserFactory(
+            username='student3',
+            email='student3@example.com',
+            password='edx'
+        )
+
+        data.create_course_enrollment(
+            self.student1.username,
+            unicode(self.course.id),
+            'honor',
+            True
+        )
+        data.create_course_enrollment(
+            self.student2.username,
+            unicode(self.course.id),
+            'honor',
+            True
+        )
+        data.create_course_enrollment(
+            self.student3.username,
+            unicode(self.course2.id),
+            'verified',
+            True
+        )
+        data.create_course_enrollment(
+            self.student2.username,
+            unicode(self.course2.id),
+            'honor',
+            True
+        )
+        data.create_course_enrollment(
+            self.staff_user.username,
+            unicode(self.course2.id),
+            'verified',
+            True
+        )
+        self.url = reverse('courseenrollmentsbyusernameorcourseid')
+
+    def _login_as_staff(self):
+        self.client.login(username=self.staff_user.username, password='edx')
+
+    def _make_request(self, query_params=None):
+        return self.client.get(self.url, query_params)
+
+    def _assert_list_of_enrollments(self, query_params=None, expected_status=status.HTTP_200_OK, error_fields=None):
+        response = self._make_request(query_params)
+        self.assertEqual(response.status_code, expected_status)
+        content = json.loads(response.content)
+        if error_fields is not None:
+            self.assertIn('field_errors', content)
+            for error_field in error_fields:
+                self.assertIn(error_field, content['field_errors'])
+        return content
+
+    def test_user_not_authenticated(self):
+        self.client.logout()
+        response = self.client.get(self.url, {'course_id': self.course.id})
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_user_not_authorized(self):
+        self.client.login(username=self.student1.username, password='edx')
+        response = self.client.get(self.url, {'course_id': self.course.id})
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_missing_required_query_string_parameters(self):
+        self._login_as_staff()
+        content = self._assert_list_of_enrollments(expected_status=status.HTTP_400_BAD_REQUEST)
+        self.assertIn('developer_message', content)
+
+    @ddt.data(
+        ({'course_id': '1'}, status.HTTP_400_BAD_REQUEST, ['course_id', ]),
+        ({'course_id': '1', 'username': 'staff'}, status.HTTP_400_BAD_REQUEST, ['course_id', ]),
+        ({'username': '1*2'}, status.HTTP_400_BAD_REQUEST, ['username', ]),
+        ({'username': '1*2', 'course_id': 'org.0/course_0/Run_0'}, status.HTTP_400_BAD_REQUEST, ['username', ]),
+        ({'username': '1*2', 'course_id': '1'}, status.HTTP_400_BAD_REQUEST, ['username', 'course_id'])
+    )
+    @ddt.unpack
+    def test_query_string_parameters_invalid_errors(self, query_params, expected_status, error_fields):
+        self._login_as_staff()
+        self._assert_list_of_enrollments(query_params, expected_status, error_fields)
+
+    @ddt.data(
+        # Non-existent user
+        ({'username': 'nobody'}, status.HTTP_200_OK),
+        ({'username': 'nobody', 'course_id': 'e/d/X'}, status.HTTP_200_OK),
+
+        # Non-existent course
+        ({'course_id': 'a/b/c'}, status.HTTP_200_OK),
+        ({'course_id': 'a/b/c', 'username': 'student1'}, status.HTTP_200_OK),
+
+        # Non-existent course and user
+        ({'course_id': 'a/b/c', 'username': 'dummy'}, status.HTTP_200_OK)
+    )
+    @ddt.unpack
+    def test_non_existent_course_user(self, query_params, expected_status):
+        self._login_as_staff()
+        content = self._assert_list_of_enrollments(query_params, expected_status)
+        self.assertEqual(len(content['results']), 0)
+
+    @ddt.data(
+        ({'course_id': 'e/d/X'}, status.HTTP_200_OK, 2),
+        ({'course_id': 'x/y/Z'}, status.HTTP_200_OK, 3),
+        ({'course_id': 'x/y/Z', 'username': 'student2,student3'}, status.HTTP_200_OK, 2),
+        ({'course_id': 'x/y/Z', 'username': 'student1,student2'}, status.HTTP_200_OK, 1),
+        ({'username': 'student2,staff'}, status.HTTP_200_OK, 3)
+    )
+    @ddt.unpack
+    def test_response_valid_queries(self, query_params, expected_status, num_results):
+        self._login_as_staff()
+        content = self._assert_list_of_enrollments(query_params, expected_status)
+        self.assertEqual(len(content['results']), num_results)
+
+        expected_fields = ('course_id', 'user', 'mode', 'created', 'is_active')
+        for item in content['results']:
+            self.assertTrue(any(field in item for field in expected_fields))
