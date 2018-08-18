@@ -3,7 +3,7 @@ jobs:
  build:
    working_directory: ~/edx-platform
    docker:
-     - image: circleci/python:2.7.12
+     - image: circleci/python:2.7.10
      - image: circle/node:6.11.1
    steps:
      - checkout
