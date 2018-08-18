@@ -1,4 +1,4 @@
-version: 2.0
+version: 2
 jobs:
  build:
    working_directory: ~/edx-platform
@@ -38,7 +38,6 @@ jobs:
            rm -rf 2.8.3.tar.gz sqlite-autoconf-3140100.tar.gz pysqlite-2.8.3 sqlite-autoconf-3140100
 
  test:
-    working_directory: ~/edx-platform
     docker:
       - image: circleci/python:2.7.12
       - image: circle/node:6.11.1
@@ -46,7 +45,7 @@ jobs:
       - checkout
       - run:
           name: Testing Application
-          command: ./scripts/all-tests.sh:
+          command: ./scripts/all-tests.sh
           no_output_timeout: 15m
       - run:
           name: Generate report
