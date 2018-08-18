@@ -38,6 +38,7 @@ case `uname -s` in
                 cat $APT_REPOS_FILE | xargs -n 1 sudo add-apt-repository -y
                 sudo apt-get -yq update
                 cat $APT_PKGS_FILE | xargs sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install
+                sudo chown -R $USER /usr/local
                 ;;
             *)
                 error "Unsupported distribution - $distro"
