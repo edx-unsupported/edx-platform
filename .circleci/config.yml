@@ -16,7 +16,6 @@ jobs:
          name: Installing pre-reqs
          command: |
            bash ./scripts/install-system-req.sh
-           npm install
            pip install --exists-action w -r requirements/edx/pre.txt
            pip install --exists-action w -r requirements/edx/base.txt
            pip install --exists-action w -r requirements/edx/github.txt
