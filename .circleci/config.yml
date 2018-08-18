@@ -4,7 +4,7 @@ jobs:
    working_directory: ~/edx-platform
    docker:
      - image: circleci/python:2.7.15-node-browsers
-     - image: circleci/node:6.14-stretch-browsers
+     - image: circleci/node:6-browsers
    steps:
      - checkout
      # Mirror what paver install_prereqs does.
@@ -39,7 +39,7 @@ jobs:
  test:
     docker:
       - image: circleci/python:2.7.15-node-browsers
-      - image: circleci/node:6.14-stretch-browsers
+      - image: circleci/node:6-browsers
     steps:
       - checkout
       - run:
