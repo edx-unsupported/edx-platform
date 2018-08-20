@@ -36,36 +36,21 @@ jobs:
            cd ./pysqlite-2.8.3 && python setup.py build_static install
            rm -rf 2.8.3.tar.gz sqlite-autoconf-3140100.tar.gz pysqlite-2.8.3 sqlite-autoconf-3140100
 
- test:
-    docker:
-      - image: circleci/build-image:ubuntu-14.04-XXL-1327-3401d20
-      - image: circleci/node:6.14-stretch-browsers
-    steps:
-      - checkout
-      - run:
-          name: Testing Application
-          command: ./scripts/all-tests.sh
-          no_output_timeout: 15m
-      - run:
-          name: Generate report
-          command: |
-            mkdir -p $CIRCLE_TEST_REPORTS/junit
-            "if [ $(find reports -type f | wc -l) -gt 0 ] ; then cp -r reports/. $CIRCLE_TEST_REPORTS/junit ; fi":
-              parallel: true
-            if [ -z $COVERALLS_REPO_TOKEN ]; then echo "Coveralls token not defined."; else coveralls; fi
+     - run:
+         name: Testing Application
+         command: ./scripts/all-tests.sh
+         no_output_timeout: 15m
+     - run:
+         name: Generate report
+         command: |
+           mkdir -p $CIRCLE_TEST_REPORTS/junit
+           "if [ $(find reports -type f | wc -l) -gt 0 ] ; then cp -r reports/. $CIRCLE_TEST_REPORTS/junit ; fi":
+             parallel: true
+           if [ -z $COVERALLS_REPO_TOKEN ]; then echo "Coveralls token not defined."; else coveralls; fi
 
-      - store_artifacts:
-                path: test_root/log
-                prefix: logs
-      - store_artifacts:
-          path: reports
-          prefix: reports
-
-workflows:
-  version: 2
-  build_and_test:
-    jobs:
-      - build
-      - test:
-          requires:
-            - build
+     - store_artifacts:
+         path: test_root/log
+         prefix: logs
+     - store_artifacts:
+         path: reports
+         prefix: reports
