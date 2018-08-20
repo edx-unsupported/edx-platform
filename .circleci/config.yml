@@ -3,7 +3,7 @@ jobs:
  build:
    working_directory: ~/edx-platform
    docker:
-     - image: circleci/python:2.7.15-jessie-browsers
+     - image: circleci/build-image:ubuntu-14.04-XXL-1327-3401d20
      - image: circleci/node:6.14-stretch-browsers
    steps:
      - checkout
@@ -38,7 +38,7 @@ jobs:
 
  test:
     docker:
-      - image: circleci/python:2.7.15-jessie-browsers
+      - image: circleci/build-image:ubuntu-14.04-XXL-1327-3401d20
       - image: circleci/node:6.14-stretch-browsers
     steps:
       - checkout
