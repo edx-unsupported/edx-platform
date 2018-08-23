@@ -37,20 +37,3 @@ class CourseEnrollmentsApiListForm(Form):
                 student_forms.validate_username(username)
             return usernames
         return usernames_csv_string
-
-    def clean(self):
-        """
-        Validate if at least one of course_id or username field is present and return the validated data.
-        """
-
-        cleaned_data = super(CourseEnrollmentsApiListForm, self).clean()
-
-        if not self.errors:
-            course_id = cleaned_data.get('course_id')
-            username = cleaned_data.get('username')
-
-            if not course_id and not username:
-                raise ValidationError(
-                    "At least one of 'course_id', 'username' query string parameters is required."
-                )
-        return cleaned_data

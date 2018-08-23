@@ -11,13 +11,11 @@ from edx_rest_framework_extensions.authentication import JwtAuthentication
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from rest_framework import status
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
-from rest_framework_oauth.authentication import OAuth2Authentication
 
 from course_modes.models import CourseMode
 from enrollment import api
@@ -781,8 +779,11 @@ class CourseEnrollmentsApiListView(DeveloperErrorViewMixin, ListAPIView):
             usernames do not correspond to valid users, an HTTP 200 "OK" response is returned with an
             empty 'results' field.
     """
-    authentication_classes = (JwtAuthentication, OAuth2Authentication,
-                              SessionAuthentication,)
+    authentication_classes = (
+        JwtAuthentication,
+        OAuth2AuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
     permission_classes = IsAdminUser,
     throttle_classes = EnrollmentUserThrottle,
     serializer_class = CourseEnrollmentsApiListSerializer

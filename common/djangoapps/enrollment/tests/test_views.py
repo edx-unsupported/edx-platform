@@ -1350,11 +1350,6 @@ class CourseEnrollmentsApiListTest(APITestCase, ModuleStoreTestCase):
         response = self.client.get(self.url, {'course_id': self.course.id})
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_missing_required_query_string_parameters(self):
-        self._login_as_staff()
-        content = self._assert_list_of_enrollments(expected_status=status.HTTP_400_BAD_REQUEST)
-        self.assertIn('developer_message', content)
-
     @ddt.data(
         ({'course_id': '1'}, ['course_id', ]),
         ({'course_id': '1', 'username': 'staff'}, ['course_id', ]),
