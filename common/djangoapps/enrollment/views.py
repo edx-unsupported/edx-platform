@@ -772,7 +772,7 @@ class CourseEnrollmentsApiListView(DeveloperErrorViewMixin, ListAPIView):
 
             If the user is not logged in, a 401 error is returned.
 
-            If the user is not course or global staff, a 403 error is returned.
+            If the user is not global staff, a 403 error is returned.
 
             If the specified course_id is not valid or any of the specified usernames
             are not valid, a 400 error is returned.
