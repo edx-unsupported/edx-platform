@@ -22,8 +22,8 @@ from rest_framework_oauth.authentication import OAuth2Authentication
 from course_modes.models import CourseMode
 from enrollment import api
 from enrollment.errors import CourseEnrollmentError, CourseEnrollmentExistsError, CourseModeNotFoundError
-from enrollment.forms import CourseEnrollmentsByUsernameOrCourseIDListForm
-from enrollment.serializers import CourseEnrollmentMinimalDataSerializer
+from enrollment.forms import CourseEnrollmentsApiListForm
+from enrollment.serializers import CourseEnrollmentsApiListSerializer
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
 from openedx.core.djangoapps.embargo import api as embargo_api
@@ -710,7 +710,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
 
 
 @can_disable_rate_limit
-class CourseEnrollmentsByUsernameOrCourseIDListView(DeveloperErrorViewMixin, ListAPIView, ApiKeyPermissionMixIn):
+class CourseEnrollmentsApiListView(DeveloperErrorViewMixin, ListAPIView):
     """
         **Use Cases**
 
@@ -785,24 +785,24 @@ class CourseEnrollmentsByUsernameOrCourseIDListView(DeveloperErrorViewMixin, Lis
                               SessionAuthentication,)
     permission_classes = IsAdminUser,
     throttle_classes = EnrollmentUserThrottle,
-    serializer_class = CourseEnrollmentMinimalDataSerializer
+    serializer_class = CourseEnrollmentsApiListSerializer
 
     def get_queryset(self):
         """
         Get all the course enrollments for the given course_id and/or given list of usernames.
         """
-        form = CourseEnrollmentsByUsernameOrCourseIDListForm(self.request.query_params)
+        form = CourseEnrollmentsApiListForm(self.request.query_params)
 
         if not form.is_valid():
             raise ValidationError(form.errors)
 
-        qset = CourseEnrollment.objects.all()
+        queryset = CourseEnrollment.objects.all()
         course_id = form.cleaned_data.get('course_id')
         usernames = form.cleaned_data.get('username')
 
         if course_id:
-            qset = qset.filter(course_id=course_id)
+            queryset = queryset.filter(course_id=course_id)
         if usernames:
-            qset = qset.filter(user__username__in=form.cleaned_data['username'])
+            queryset = queryset.filter(user__username__in=usernames)
 
-        return qset
+        return queryset

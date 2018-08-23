@@ -7,7 +7,7 @@ from opaque_keys.edx.keys import CourseKey
 from student import forms as student_forms
 
 
-class CourseEnrollmentsByUsernameOrCourseIDListForm(Form):
+class CourseEnrollmentsApiListForm(Form):
     """
     A form that validates the query string parameters for the CourseEnrollmentsByUsernameOrCourseIDListView.
     """
@@ -43,7 +43,7 @@ class CourseEnrollmentsByUsernameOrCourseIDListForm(Form):
         Validate if at least one of course_id or username field is present and return the validated data.
         """
 
-        cleaned_data = super(CourseEnrollmentsByUsernameOrCourseIDListForm, self).clean()
+        cleaned_data = super(CourseEnrollmentsApiListForm, self).clean()
 
         if not self.errors:
             course_id = cleaned_data.get('course_id')

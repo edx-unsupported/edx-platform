@@ -6,7 +6,7 @@ from django.conf import settings
 from django.conf.urls import patterns, url
 
 from .views import (
-    CourseEnrollmentsByUsernameOrCourseIDListView,
+    CourseEnrollmentsApiListView,
     EnrollmentCourseDetailView,
     EnrollmentListView,
     EnrollmentView,
@@ -28,8 +28,8 @@ urlpatterns = patterns(
     ),
     url(
         r'^enrollments/?$',
-        CourseEnrollmentsByUsernameOrCourseIDListView.as_view(),
-        name='courseenrollmentsbyusernameorcourseid'
+        CourseEnrollmentsApiListView.as_view(),
+        name='courseenrollmentsapilist'
     ),
     url(r'^enrollment$', EnrollmentListView.as_view(), name='courseenrollments'),
     url(

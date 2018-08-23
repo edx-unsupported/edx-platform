@@ -1245,12 +1245,12 @@ class EnrollmentCrossDomainTest(ModuleStoreTestCase):
 @attr(shard=3)
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class CourseEnrollmentsByUsernameOrCourseIDListTest(APITestCase, ModuleStoreTestCase):
+class CourseEnrollmentsApiListTest(APITestCase, ModuleStoreTestCase):
     """
     Test the course enrollments by username or course id endpoint.
     """
     def setUp(self):
-        super(CourseEnrollmentsByUsernameOrCourseIDListTest, self).setUp()
+        super(CourseEnrollmentsApiListTest, self).setUp()
         self.rate_limit_config = RateLimitConfiguration.current()
         self.rate_limit_config.enabled = False
         self.rate_limit_config.save()
@@ -1322,7 +1322,7 @@ class CourseEnrollmentsByUsernameOrCourseIDListTest(APITestCase, ModuleStoreTest
             'verified',
             True
         )
-        self.url = reverse('courseenrollmentsbyusernameorcourseid')
+        self.url = reverse('courseenrollmentsapilist')
 
     def _login_as_staff(self):
         self.client.login(username=self.staff_user.username, password='edx')
@@ -1356,48 +1356,53 @@ class CourseEnrollmentsByUsernameOrCourseIDListTest(APITestCase, ModuleStoreTest
         self.assertIn('developer_message', content)
 
     @ddt.data(
-        ({'course_id': '1'}, status.HTTP_400_BAD_REQUEST, ['course_id', ]),
-        ({'course_id': '1', 'username': 'staff'}, status.HTTP_400_BAD_REQUEST, ['course_id', ]),
-        ({'username': '1*2'}, status.HTTP_400_BAD_REQUEST, ['username', ]),
-        ({'username': '1*2', 'course_id': 'org.0/course_0/Run_0'}, status.HTTP_400_BAD_REQUEST, ['username', ]),
-        ({'username': '1*2', 'course_id': '1'}, status.HTTP_400_BAD_REQUEST, ['username', 'course_id'])
+        ({'course_id': '1'}, ['course_id', ]),
+        ({'course_id': '1', 'username': 'staff'}, ['course_id', ]),
+        ({'username': '1*2'}, ['username', ]),
+        ({'username': '1*2', 'course_id': 'org.0/course_0/Run_0'}, ['username', ]),
+        ({'username': '1*2', 'course_id': '1'}, ['username', 'course_id'])
     )
     @ddt.unpack
-    def test_query_string_parameters_invalid_errors(self, query_params, expected_status, error_fields):
+    def test_query_string_parameters_invalid_errors(self, query_params, error_fields):
         self._login_as_staff()
-        self._assert_list_of_enrollments(query_params, expected_status, error_fields)
+        self._assert_list_of_enrollments(query_params, status.HTTP_400_BAD_REQUEST, error_fields)
 
     @ddt.data(
         # Non-existent user
-        ({'username': 'nobody'}, status.HTTP_200_OK),
-        ({'username': 'nobody', 'course_id': 'e/d/X'}, status.HTTP_200_OK),
+        ({'username': 'nobody'}, ),
+        ({'username': 'nobody', 'course_id': 'e/d/X'}, ),
 
         # Non-existent course
-        ({'course_id': 'a/b/c'}, status.HTTP_200_OK),
-        ({'course_id': 'a/b/c', 'username': 'student1'}, status.HTTP_200_OK),
+        ({'course_id': 'a/b/c'}, ),
+        ({'course_id': 'a/b/c', 'username': 'student1'}, ),
 
         # Non-existent course and user
-        ({'course_id': 'a/b/c', 'username': 'dummy'}, status.HTTP_200_OK)
+        ({'course_id': 'a/b/c', 'username': 'dummy'}, )
     )
     @ddt.unpack
-    def test_non_existent_course_user(self, query_params, expected_status):
+    def test_non_existent_course_user(self, query_params):
         self._login_as_staff()
-        content = self._assert_list_of_enrollments(query_params, expected_status)
+        content = self._assert_list_of_enrollments(query_params, status.HTTP_200_OK)
         self.assertEqual(len(content['results']), 0)
 
-    @ddt.data(
-        ({'course_id': 'e/d/X'}, status.HTTP_200_OK, 2),
-        ({'course_id': 'x/y/Z'}, status.HTTP_200_OK, 3),
-        ({'course_id': 'x/y/Z', 'username': 'student2,student3'}, status.HTTP_200_OK, 2),
-        ({'course_id': 'x/y/Z', 'username': 'student1,student2'}, status.HTTP_200_OK, 1),
-        ({'username': 'student2,staff'}, status.HTTP_200_OK, 3)
-    )
+    @ddt.file_data('fixtures/course-enrollments-api-list-valid-data.json')
     @ddt.unpack
-    def test_response_valid_queries(self, query_params, expected_status, num_results):
+    def test_response_valid_queries(self, args):
+        query_params = args[0]
+        expected_results = args[1]
+
         self._login_as_staff()
-        content = self._assert_list_of_enrollments(query_params, expected_status)
-        self.assertEqual(len(content['results']), num_results)
+        content = self._assert_list_of_enrollments(query_params, status.HTTP_200_OK)
+        results = content['results']
+        self.assertEqual(len(results), len(expected_results))
 
         expected_fields = ('course_id', 'user', 'mode', 'created', 'is_active')
         for item in content['results']:
             self.assertTrue(any(field in item for field in expected_fields))
+
+            # Remove the 'created' field since the fixtures in the next assertions
+            # do not have the 'created' timestamp
+            del item['created']
+
+        for item in expected_results:
+            self.assertIn(item, results)
