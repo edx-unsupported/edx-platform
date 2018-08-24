@@ -1393,10 +1393,5 @@ class CourseEnrollmentsApiListTest(APITestCase, ModuleStoreTestCase):
         self._login_as_staff()
         content = self._assert_list_of_enrollments(query_params, status.HTTP_200_OK)
         results = content['results']
-        self.assertEqual(len(results), len(expected_results))
-
-        expected_fields = ('course_id', 'user', 'mode', 'created', 'is_active')
-        for item in content['results']:
-            self.assertTrue(any(field in item for field in expected_fields))
 
         self.assertItemsEqual(results, expected_results)
