@@ -15,6 +15,7 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.core.urlresolvers import reverse
 from django.test import Client
 from django.test.utils import override_settings
+from freezegun import freeze_time
 from mock import patch
 from nose.plugins.attrib import attr
 from rest_framework import status
@@ -1249,6 +1250,8 @@ class CourseEnrollmentsApiListTest(APITestCase, ModuleStoreTestCase):
     """
     Test the course enrollments by username or course id endpoint.
     """
+    CREATED_DATA = datetime.datetime(2018, 1, 1, 0, 0, 1, tzinfo=pytz.UTC)
+
     def setUp(self):
         super(CourseEnrollmentsApiListTest, self).setUp()
         self.rate_limit_config = RateLimitConfiguration.current()
@@ -1292,36 +1295,37 @@ class CourseEnrollmentsApiListTest(APITestCase, ModuleStoreTestCase):
             password='edx'
         )
 
-        data.create_course_enrollment(
-            self.student1.username,
-            unicode(self.course.id),
-            'honor',
-            True
-        )
-        data.create_course_enrollment(
-            self.student2.username,
-            unicode(self.course.id),
-            'honor',
-            True
-        )
-        data.create_course_enrollment(
-            self.student3.username,
-            unicode(self.course2.id),
-            'verified',
-            True
-        )
-        data.create_course_enrollment(
-            self.student2.username,
-            unicode(self.course2.id),
-            'honor',
-            True
-        )
-        data.create_course_enrollment(
-            self.staff_user.username,
-            unicode(self.course2.id),
-            'verified',
-            True
-        )
+        with freeze_time(self.CREATED_DATA):
+            data.create_course_enrollment(
+                self.student1.username,
+                unicode(self.course.id),
+                'honor',
+                True
+            )
+            data.create_course_enrollment(
+                self.student2.username,
+                unicode(self.course.id),
+                'honor',
+                True
+            )
+            data.create_course_enrollment(
+                self.student3.username,
+                unicode(self.course2.id),
+                'verified',
+                True
+            )
+            data.create_course_enrollment(
+                self.student2.username,
+                unicode(self.course2.id),
+                'honor',
+                True
+            )
+            data.create_course_enrollment(
+                self.staff_user.username,
+                unicode(self.course2.id),
+                'verified',
+                True
+            )
         self.url = reverse('courseenrollmentsapilist')
 
     def _login_as_staff(self):
@@ -1395,9 +1399,4 @@ class CourseEnrollmentsApiListTest(APITestCase, ModuleStoreTestCase):
         for item in content['results']:
             self.assertTrue(any(field in item for field in expected_fields))
 
-            # Remove the 'created' field since the fixtures in the next assertions
-            # do not have the 'created' timestamp
-            del item['created']
-
-        for item in expected_results:
-            self.assertIn(item, results)
+        self.assertItemsEqual(results, expected_results)

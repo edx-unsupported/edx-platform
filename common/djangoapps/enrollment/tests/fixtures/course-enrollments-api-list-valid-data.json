@@ -8,13 +8,15 @@
                 "course_id": "e/d/X",
                 "is_active": true,
                 "mode": "honor",
-                "user": "student1"
+                "user": "student1",
+                "created": "2018-01-01T00:00:01Z"
             },
             {
                 "course_id": "e/d/X",
                 "is_active": true,
                 "mode": "honor",
-                "user": "student2"
+                "user": "student2",
+                "created": "2018-01-01T00:00:01Z"
             }
         ]
     ],
@@ -27,19 +29,22 @@
                 "course_id": "x/y/Z",
                 "is_active": true,
                 "mode": "verified",
-                "user": "staff"
+                "user": "staff",
+                "created": "2018-01-01T00:00:01Z"
             },
             {
                 "course_id": "x/y/Z",
                 "is_active": true,
                 "mode": "honor",
-                "user": "student2"
+                "user": "student2",
+                "created": "2018-01-01T00:00:01Z"
             },
             {
                 "course_id": "x/y/Z",
                 "is_active": true,
                 "mode": "verified",
-                "user": "student3"
+                "user": "student3",
+                "created": "2018-01-01T00:00:01Z"
             }
         ]
     ],
@@ -53,13 +58,15 @@
                 "course_id": "x/y/Z",
                 "is_active": true,
                 "mode": "honor",
-                "user": "student2"
+                "user": "student2",
+                "created": "2018-01-01T00:00:01Z"
             },
             {
                 "course_id": "x/y/Z",
                 "is_active": true,
                 "mode": "verified",
-                "user": "student3"
+                "user": "student3",
+                "created": "2018-01-01T00:00:01Z"
             }
         ]
     ],
@@ -73,7 +80,8 @@
                 "course_id": "x/y/Z",
                 "is_active": true,
                 "mode": "honor",
-                "user": "student2"
+                "user": "student2",
+                "created": "2018-01-01T00:00:01Z"
             }
         ]
     ],
@@ -86,19 +94,22 @@
                 "course_id": "x/y/Z",
                 "is_active": true,
                 "mode": "verified",
-                "user": "staff"
+                "user": "staff",
+                "created": "2018-01-01T00:00:01Z"
             },
             {
                 "course_id": "e/d/X",
                 "is_active": true,
                 "mode": "honor",
-                "user": "student2"
+                "user": "student2",
+                "created": "2018-01-01T00:00:01Z"
             },
             {
                 "course_id": "x/y/Z",
                 "is_active": true,
                 "mode": "honor",
-                "user": "student2"
+                "user": "student2",
+                "created": "2018-01-01T00:00:01Z"
             }
         ]
 
@@ -110,31 +121,36 @@
                 "course_id": "e/d/X",
                 "is_active": true,
                 "mode": "honor",
-                "user": "student1"
+                "user": "student1",
+                "created": "2018-01-01T00:00:01Z"
             },
             {
                 "course_id": "e/d/X",
                 "is_active": true,
                 "mode": "honor",
-                "user": "student2"
+                "user": "student2",
+                "created": "2018-01-01T00:00:01Z"
             },
             {
                 "course_id": "x/y/Z",
                 "is_active": true,
                 "mode": "verified",
-                "user": "student3"
+                "user": "student3",
+                "created": "2018-01-01T00:00:01Z"
             },
             {
                 "course_id": "x/y/Z",
                 "is_active": true,
                 "mode": "honor",
-                "user": "student2"
+                "user": "student2",
+                "created": "2018-01-01T00:00:01Z"
             },
             {
                 "course_id": "x/y/Z",
                 "is_active": true,
                 "mode": "verified",
-                "user": "staff"
+                "user": "staff",
+                "created": "2018-01-01T00:00:01Z"
             }
         ]
     ]
