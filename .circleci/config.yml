@@ -1,6 +1,6 @@
 version: 2
 jobs:
- build:
+ test_platform:
    working_directory: ~/edx-platform
    docker:
      - image: circleci/build-image:ubuntu-14.04-XXL-1327-3401d20
@@ -54,3 +54,9 @@ jobs:
      - store_artifacts:
          path: reports
          prefix: reports
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - test_platform
