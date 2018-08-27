@@ -1,10 +1,10 @@
 version: 2
 jobs:
  build:
-   working_directory: ~/edx-platform
+   #working_directory: ~/edx-platform
    docker:
      - image: circleci/build-image:ubuntu-14.04-XXL-1327-3401d20
-     - image: circleci/node:6.14-stretch-browsers
+     #- image: circleci/node:6.14-stretch-browsers
    parallelism: 4
    steps:
      - checkout
@@ -15,9 +15,15 @@ jobs:
      # from scratch again.
      - run:
          name: Installing pre-reqs
+         command: bash ./scripts/install-system-req.sh
+
+     - run:
+         name: Installing node packages
+         command: npm install
+
+     - run:
+         name: Installing python packages
          command: |
-           bash ./scripts/install-system-req.sh
-           npm install
            pip install --exists-action w -r requirements/edx/pre.txt
            pip install --exists-action w -r requirements/edx/base.txt
            pip install --exists-action w -r requirements/edx/github.txt
@@ -30,6 +36,9 @@ jobs:
            pip install --upgrade --force-reinstall git+https://github.com/edx/django-rest-framework.git@3c72cb5ee5baebc4328947371195eae2077197b0#egg=djangorestframework==3.2.3
            pip freeze
 
+     - run:
+         name: Installing custom sqlite 3.14
+         command: |
            wget https://github.com/ghaering/pysqlite/archive/2.8.3.tar.gz
            wget https://www.sqlite.org/2016/sqlite-autoconf-3140100.tar.gz
            tar -xzvf sqlite-autoconf-3140100.tar.gz
