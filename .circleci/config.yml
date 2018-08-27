@@ -5,6 +5,7 @@ jobs:
    docker:
      - image: circleci/build-image:ubuntu-14.04-XXL-1327-3401d20
      - image: circleci/node:6.14-stretch-browsers
+   parallelism: 4
    steps:
      - checkout
      # Mirror what paver install_prereqs does.
