@@ -20,8 +20,7 @@ jobs:
      - run:
          name: Installing node packages
          command: |
-           mv /root/.npm/af95ab40-t-npm-lodash-4-17-10-package-tgz.lock /tmp
-           npm install
+           sudo npm install
 
      - run:
          name: Installing python packages
