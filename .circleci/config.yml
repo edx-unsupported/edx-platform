@@ -1,7 +1,7 @@
 version: 2
 jobs:
  build:
-   #working_directory: ~edx-solutions/edx-platform
+   working_directory: ~/edx-platform
    docker:
      - image: circleci/build-image:ubuntu-14.04-XXL-1327-3401d20
      #- image: circleci/node:6.14-stretch-browsers
@@ -17,6 +17,7 @@ jobs:
          name: Installing pre-reqs
          command: |
            echo "Python version $(python -V)"
+           echo "Node version $(node -v)"
            bash ./scripts/install-system-req.sh
 
 #     - run:
