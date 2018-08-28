@@ -3,8 +3,8 @@ jobs:
  build:
    #working_directory: ~edx-solutions/edx-platform
    docker:
-     - image: circleci/build-image:ubuntu-14.04-XXL-1327-3401d20
-     #- image: circleci/node:6.14-stretch-browsers
+     #- image: circleci/build-image:ubuntu-14.04-XXL-1327-3401d20
+     - image: circleci/node:6.14-stretch-browsers
    parallelism: 4
    steps:
      - checkout
@@ -16,7 +16,7 @@ jobs:
      - run:
          name: Installing pre-reqs
          command: |
-           echo "Python version $(python -v)"
+           echo "Python version $(python -V)"
            bash ./scripts/install-system-req.sh
 
 #     - run:
