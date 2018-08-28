@@ -3,8 +3,8 @@ jobs:
  build:
    #working_directory: ~edx-solutions/edx-platform
    docker:
-     #- image: circleci/build-image:ubuntu-14.04-XXL-1327-3401d20
-     - image: circleci/node:6.14-stretch-browsers
+     - image: circleci/build-image:ubuntu-14.04-XXL-1327-3401d20
+     #- image: circleci/node:6.14-stretch-browsers
    parallelism: 4
    steps:
      - checkout
@@ -17,13 +17,11 @@ jobs:
          name: Installing pre-reqs
          command: |
            echo "Python version $(python -v)"
-           echo "Node version $(node -v)"
            bash ./scripts/install-system-req.sh
 
-     - run:
-         name: Installing node packages
-         command: |
-           sudo npm install
+#     - run:
+#         name: Installing node packages
+#         command: sudo npm install
 
      - run:
          name: Installing python packages
