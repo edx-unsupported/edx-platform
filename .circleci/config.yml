@@ -4,7 +4,7 @@ jobs:
    #working_directory: ~/edx-platform
    docker:
      - image: circleci/build-image:ubuntu-14.04-XL-922-9410082 #14.04-XXL-1327-3401d20
-     - image: circleci/node:6-jessie-browsers #6.14-stretch-browsers
+     - image: circleci/node:8.11.4-jessie-browsers #6.14-stretch-browsers
    parallelism: 4
    steps:
      - checkout
