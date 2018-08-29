@@ -24,6 +24,9 @@ jobs:
          command: |
            curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
            apt-get install nodejs
+           npm install -g n
+           n 6.11.1
+           echo "NPM version $(npm -v)"
            echo "Python version $(python -V)"
            echo "Node version $(node -v)"
            npm install
