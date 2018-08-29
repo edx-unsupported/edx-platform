@@ -41,14 +41,15 @@ jobs:
      - run:
          name: Installing python packages
          command: |
-           pip install --exists-action w -r requirements/edx/pre.txt
-           pip install --exists-action w -r requirements/edx/base.txt
-           pip install --exists-action w -r requirements/edx/github.txt
-           pip install --exists-action w -r requirements/edx/local.txt
-           pip install --exists-action w -r requirements/edx/custom.txt
-           pip install --exists-action w -r requirements/edx/paver.txt
+           cd ~
+           pip install --exists-action w -r edx-platform/requirements/edx/pre.txt
+           pip install --exists-action w -r edx-platform/requirements/edx/base.txt
+           pip install --exists-action w -r edx-platform/requirements/edx/github.txt
+           pip install --exists-action w -r edx-platform/requirements/edx/local.txt
+           pip install --exists-action w -r edx-platform/requirements/edx/custom.txt
+           pip install --exists-action w -r edx-platform/requirements/edx/paver.txt
 
-           if [ -e requirements/edx/post.txt ]; then pip install --exists-action w -r requirements/edx/post.txt ; fi
+           if [ -e edx-platform/requirements/edx/post.txt ]; then pip install --exists-action w -r edx-platform/requirements/edx/post.txt ; fi
            pip install coveralls==1.0
            pip install --upgrade --force-reinstall git+https://github.com/edx/django-rest-framework.git@3c72cb5ee5baebc4328947371195eae2077197b0#egg=djangorestframework==3.2.3
            pip freeze
