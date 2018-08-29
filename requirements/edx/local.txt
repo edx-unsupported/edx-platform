@@ -1,13 +1,13 @@
 # Python libraries to install that are local to the edx-platform repo
 -e .
--e common/lib/calc
--e common/lib/capa
--e common/lib/chem
--e common/lib/dogstats
--e common/lib/safe_lxml
--e common/lib/sandbox-packages
--e common/lib/symmath
--e common/lib/xmodule
+-e edx-platform/common/lib/calc
+-e edx-platform/common/lib/capa
+-e edx-platform/common/lib/chem
+-e edx-platform/common/lib/dogstats
+-e edx-platform/common/lib/safe_lxml
+-e edx-platform/common/lib/sandbox-packages
+-e edx-platform/common/lib/symmath
+-e edx-platform/common/lib/xmodule
 
--e openedx/core/lib/xblock_builtin/xblock_discussion
--e openedx/core/lib/xblock_builtin/xblock_discussion_course
+-e edx-platform/openedx/core/lib/xblock_builtin/xblock_discussion
+-e edx-platform/openedx/core/lib/xblock_builtin/xblock_discussion_course
