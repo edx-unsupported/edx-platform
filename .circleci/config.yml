@@ -24,9 +24,6 @@ jobs:
            apt-get install nodejs
            npm install -g n
            n 6.11.1
-           echo "NPM version $(npm -v)"
-           echo "Python version $(python -V)"
-           echo "Node version $(node -v)"
            npm install
 
       #Mirror what paver install_prereqs does.
@@ -41,9 +38,6 @@ jobs:
      - run:
          name: Installing python packages
          command: |
-           echo "Python version $(python -V)"
-           echo "Node version $(node -v)"
-           echo "NPM version $(npm -v)"
            pip install --exists-action w -r requirements/edx/pre.txt
            pip install --exists-action w -r requirements/edx/base.txt
            pip install --exists-action w -r requirements/edx/github.txt
@@ -69,7 +63,11 @@ jobs:
 
      - run:
          name: Testing Application
-         command: ./scripts/all-tests.sh
+         command: |
+           echo "Python version $(python -V)"
+           echo "Node version $(node -v)"
+           echo "NPM version $(npm -v)"
+           ./scripts/all-tests.sh
          no_output_timeout: 15m
      - run:
          name: Generate report
