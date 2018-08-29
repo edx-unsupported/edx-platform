@@ -1,5 +1,5 @@
 # Python libraries to install that are local to the edx-platform repo
--e .
+-e edx-platform/.
 -e edx-platform/common/lib/calc
 -e edx-platform/common/lib/capa
 -e edx-platform/common/lib/chem
