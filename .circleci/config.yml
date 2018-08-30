@@ -5,8 +5,17 @@ jobs:
    docker:
      - image: circleci/build-image:ubuntu-14.04-XXL-1327-3401d20
    parallelism: 4
+   # CircleCI 2.0 does not support environment variables that refer to each other the same way as 1.0 did.
+   # If any of these refer to each other, rewrite them so that they don't or see https://circleci.com/docs/2.0/env-vars/#interpolating-environment-variables-to-set-other-environment-variables .
+   environment:
+     CIRCLE_ARTIFACTS: /tmp/circleci-artifacts
+     CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
+
    steps:
      - checkout
+
+     # 'See docs on artifact collection here https://circleci.com/docs/2.0/artifacts/'
+     - run: mkdir -p $CIRCLE_ARTIFACTS $CIRCLE_TEST_REPORTS
 
      - restore_cache:
          name: Restores cache if the Branch key template or pre.txt file have not changed since the previous run
@@ -142,18 +151,15 @@ jobs:
      - run:
          name: Generate report
          command: |
-           cd ~
-           mkdir -p reports/junit
-           if [ $(find reports -type f | wc -l) -gt 0 ] ; then cp -r reports/. reports/junit ; fi
            if [ -z $COVERALLS_REPO_TOKEN ]; then echo "Coveralls token not defined."; else coveralls; fi
 
      - store_test_results:
-         path: /tmp/test-results
+         path: /tmp/circleci-test-results
 
      - store_artifacts:
-         path: ~/test_root/log
-         destination: reports
+         path: /tmp/circleci-artifacts
+         destination: artifacts
 
      - store_artifacts:
-         path: ~/reports
-         destination: reports
+         path: /tmp/circleci-artifacts
+         destination: artifacts
