@@ -33,7 +33,7 @@ jobs:
          command: |
            cd ~
            pip install virtualenv
-           python2 -m virtualenv --python=`which python` venv
+           virtualenv --python=`which python` venv
            source venv/bin/activate
            echo "Python path $(which python)"
            echo "Python version $(python -V)"
