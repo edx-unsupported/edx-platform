@@ -29,11 +29,11 @@ jobs:
            echo "Python version $(python -V)"
 
      - run:
-         name: Installing Virtual Environment
+         name: Installing and creating virtual environment
          command: |
            cd ~
            pip install virtualenv
-           python -m virtualenv --python=/usr/local/bin/python venv
+           python2 -m virtualenv --python=`which python` venv
            source venv/bin/activate
            echo "Python path $(which python)"
            echo "Python version $(python -V)"
