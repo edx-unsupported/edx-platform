@@ -34,7 +34,7 @@ jobs:
            virtualenv --python=`which python` venv
            source venv/bin/activate
            echo "Default encoding $(python -c 'import sys; print(sys.getdefaultencoding())')"
-           python -c 'import sys; reload(sys); sys.setdefaultencoding('UTF8')'
+           python -c 'import sys; reload(sys); sys.setdefaultencoding('utf-8')'
            echo "Default encoding $(python -c 'import sys; print(sys.getdefaultencoding())')"
 
 #     - run:
