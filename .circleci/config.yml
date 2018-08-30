@@ -24,6 +24,9 @@ jobs:
            cd Python-2.7.10
            ./configure
            sudo make install
+           echo "Default encoding $(python -c 'import sys; print(sys.getdefaultencoding())')"
+           python -c 'import sys; reload(sys); sys.setdefaultencoding("utf-8")'
+           echo "Default encoding $(python -c 'import sys; print(sys.getdefaultencoding())')"
 
      - run:
          name: Installing and creating virtual environment
@@ -32,9 +35,6 @@ jobs:
            pip install virtualenv
            virtualenv --python=`which python` venv
            source venv/bin/activate
-           echo "Default encoding $(python -c 'import sys; print(sys.getdefaultencoding())')"
-           python -c 'import sys; reload(sys); sys.setdefaultencoding("utf-8")'
-           echo "Default encoding $(python -c 'import sys; print(sys.getdefaultencoding())')"
 
      - run:
          name: Installing Node v6.11.1 and Node packages
