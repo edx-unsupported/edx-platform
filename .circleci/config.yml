@@ -17,8 +17,6 @@ jobs:
          name: Installing Python v2.7.10
          command: |
            cd ~
-           echo "OLD Python path $(which python)"
-           echo "Python version $(python -V)"
            mkdir python_2.7.10
            cd python_2.7.10
            wget https://www.python.org/ftp/python/2.7.10/Python-2.7.10.tgz
@@ -27,6 +25,25 @@ jobs:
            ./configure
            sudo make install
            cd ~
+           echo "Python path $(which python)"
+           echo "Python version $(python -V)"
+
+     - run:
+         name: Installing Virtual Environment
+         command: |
+           cd ~
+           pip install virtualenv
+           python -m virtualenv --python=/usr/local/bin/python venv
+           source venv/bin/activate
+           echo "Python path $(which python)"
+           echo "Python version $(python -V)"
+
+     - run:
+         name: Test VENV
+         command: |
+           echo "Python Without VENV path $(which python)"
+           echo "Python Without VENV version $(python -V)"
+           source ~/venv/bin/activate
            echo "Python path $(which python)"
            echo "Python version $(python -V)"
 
