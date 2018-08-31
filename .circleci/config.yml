@@ -3,7 +3,7 @@ jobs:
  build:
    working_directory: ~/edx-platform
    docker:
-     - image: circleci/build-image:ubuntu-14.04-XXL-1327-3401d20
+     - image: circleci/build-image:ubuntu-14.04-XL-922-9410082 #- image: circleci/build-image:ubuntu-14.04-XXL-1327-3401d20
    parallelism: 4
 
    steps:
@@ -34,7 +34,7 @@ jobs:
          name: Installing and creating virtual environment
          command: |
            cd ~
-           sudo pip install virtualenv
+           pip install virtualenv
            virtualenv --python=`which python` virtualenvs/venv-2.7.10
            source virtualenvs/venv-2.7.10/bin/activate
 
@@ -42,7 +42,7 @@ jobs:
          name: Installing Node v6.11.1 and Node packages
          command: |
            curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
-           apt-get install nodejs
+           sudo apt-get install -y nodejs
            npm install -g n
            n 6.11.1
            npm install
