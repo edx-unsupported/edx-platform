@@ -3,7 +3,7 @@ jobs:
  build:
    working_directory: ~/edx-platform
    docker:
-     - image: circleci/build-image:ubuntu-14.04-XXL-1327-3401d20
+     - image: circleci/buildpack-deps:trusty
    parallelism: 4
 
    steps:
