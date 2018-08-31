@@ -1,7 +1,7 @@
 version: 2
 jobs:
  build:
-   working_directory: ~/edx-platform
+   #working_directory: ~/edx-platform
    docker:
      - image: circleci/build-image:ubuntu-14.04-XXL-1327-3401d20
    parallelism: 4
@@ -30,13 +30,13 @@ jobs:
          command: |
            cd ~
            pip install virtualenv
-           virtualenv --python=`which python` venv-2.7.10
-           source venv-2.7.10/bin/activate
+           virtualenv --python=`which python` virtualenvs/venv-2.7.10
+           source virtualenvs/venv-2.7.10/bin/activate
 
      - run:
          name: Installing Node v6.11.1 and Node packages
          command: |
-           source ~/venv-2.7.10/bin/activate
+           source ~/virtualenvs/venv-2.7.10/bin/activate
            curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
            apt-get install nodejs
            npm install -g n
@@ -51,7 +51,7 @@ jobs:
      - run:
          name: Installing pre-reqs
          command: |
-            source ~/venv-2.7.10/bin/activate
+            source ~/virtualenvs/venv-2.7.10/bin/activate
             bash ./scripts/install-system-req.sh
 
      - restore_cache:
@@ -79,7 +79,7 @@ jobs:
      - run:
          name: Installing requirements
          command: |
-           source ~/venv-2.7.10/bin/activate
+           source ~/virtualenvs/venv-2.7.10/bin/activate
            cd ~
            pip install --exists-action w -r edx-platform/requirements/edx/pre.txt
            pip install --exists-action w -r edx-platform/requirements/edx/base.txt
@@ -97,7 +97,7 @@ jobs:
      - run:
          name: Installing custom sqlite 3.14
          command: |
-           source ~/venv-2.7.10/bin/activate
+           source ~/virtualenvs/venv-2.7.10/bin/activate
            cd ~
            mkdir sqlite_3.14
            cd sqlite_3.14
@@ -154,7 +154,7 @@ jobs:
      - run:
          name: Running Tests
          command: |
-           source ~/venv-2.7.10/bin/activate
+           source ~/virtualenvs/venv-2.7.10/bin/activate
            ./scripts/all-tests.sh
          no_output_timeout: 15m
 
@@ -166,7 +166,7 @@ jobs:
 #     - run:
 #         name: Generate report
 #         command: |
-#           source ~/venv-2.7.10/bin/activate
+#           source ~/virtualenvs/venv-2.7.10/bin/activate
 #           if [ -z $COVERALLS_REPO_TOKEN ]; then echo "Coveralls token not defined."; else coveralls; fi
 #
 #     - store_test_results:
