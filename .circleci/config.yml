@@ -1,7 +1,7 @@
 version: 2
 jobs:
  build:
-   #working_directory: ~/edx-platform
+   working_directory: ~/edx-platform
    docker:
      - image: circleci/build-image:ubuntu-14.04-XXL-1327-3401d20
    parallelism: 4
@@ -36,7 +36,6 @@ jobs:
      - run:
          name: Installing Node v6.11.1 and Node packages
          command: |
-           ls
            curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
            apt-get install nodejs
            npm install -g n
@@ -90,8 +89,11 @@ jobs:
            pip install coveralls==1.0
            pip install --upgrade --force-reinstall git+https://github.com/edx/django-rest-framework.git@3c72cb5ee5baebc4328947371195eae2077197b0#egg=djangorestframework==3.2.3
            pip freeze
+           cd ~
+           ls
 
-     # Install custom sqlite 3.14
+
+   # Install custom sqlite 3.14
      - run:
          name: Installing custom sqlite 3.14
          command: |
