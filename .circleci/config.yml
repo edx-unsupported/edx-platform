@@ -2,8 +2,9 @@ version: 2
 jobs:
  build:
    working_directory: ~/edx-platform
-   docker:
-      - image: circleci/build-image:ubuntu-14.04-XL-922-9410082
+   machine:
+     enabled: true
+     image: circleci/classic:latest #circleci/build-image:ubuntu-14.04-XL-922-9410082
    parallelism: 4
 
    steps:
