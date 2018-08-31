@@ -2,7 +2,7 @@ version: 2
 jobs:
  build:
    working_directory: ~/edx-platform
-   docker:
+   machine:
       - image: circleci/build-image:ubuntu-14.04-XL-922-9410082
    parallelism: 4
 
@@ -29,7 +29,6 @@ jobs:
          name: Installing and creating virtual environment
          command: |
            cd ~
-           pip install --exists-action w pip==9.0.1
            pip install virtualenv
            virtualenv --python=`which python` virtualenvs/venv-2.7.10
            source virtualenvs/venv-2.7.10/bin/activate
