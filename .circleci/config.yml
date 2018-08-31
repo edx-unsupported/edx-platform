@@ -16,6 +16,7 @@ jobs:
            mkdir -p ~/tmp/circleci-artifacts ~/tmp/circleci-test-results
            cd ~
            cd /
+           cd home
            ls
 
      - run:
