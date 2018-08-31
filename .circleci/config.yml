@@ -36,6 +36,7 @@ jobs:
      - run:
          name: Installing Node v6.11.1 and Node packages
          command: |
+           ls
            curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
            apt-get install nodejs
            npm install -g n
