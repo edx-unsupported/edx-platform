@@ -33,13 +33,13 @@ jobs:
          command: |
            cd ~
            pip install virtualenv
-           python -m virtualenv venv
-           source venv/bin/activate
+           python -m virtualenv venv-2.7.10
+           source venv-2.7.10/bin/activate
 
      - run:
          name: Installing Node v6.11.1 and Node packages
          command: |
-           source ~/venv/bin/activate
+           source ~/venv-2.7.10/bin/activate
            curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
            apt-get install nodejs
            npm install -g n
@@ -54,7 +54,7 @@ jobs:
      - run:
          name: Installing pre-reqs
          command: |
-            source ~/venv/bin/activate
+            source ~/venv-2.7.10/bin/activate
             bash ./scripts/install-system-req.sh
 
      - restore_cache:
@@ -82,7 +82,7 @@ jobs:
      - run:
          name: Installing requirements
          command: |
-           source ~/venv/bin/activate
+           source ~/venv-2.7.10/bin/activate
            cd ~
            pip install --exists-action w -r edx-platform/requirements/edx/pre.txt
            pip install --exists-action w -r edx-platform/requirements/edx/base.txt
@@ -100,7 +100,7 @@ jobs:
      - run:
          name: Installing custom sqlite 3.14
          command: |
-           source ~/venv/bin/activate
+           source ~/venv-2.7.10/bin/activate
            cd ~
            mkdir sqlite_3.14
            cd sqlite_3.14
@@ -111,8 +111,6 @@ jobs:
            cp -av sqlite-autoconf-3140100/. pysqlite-2.8.3/
            cd ./pysqlite-2.8.3 && python setup.py build_static install
            rm -rf 2.8.3.tar.gz sqlite-autoconf-3140100.tar.gz pysqlite-2.8.3 sqlite-autoconf-3140100
-           cd ~
-           ls
 
      - save_cache:
          key: cache-edx-platform-{{ .Branch }}-{{ checksum "requirements/edx/local.txt" }}
@@ -159,7 +157,7 @@ jobs:
      - run:
          name: Running Tests
          command: |
-           source ~/venv/bin/activate
+           source ~/venv-2.7.10/bin/activate
            ./scripts/all-tests.sh
          no_output_timeout: 15m
 
@@ -171,7 +169,7 @@ jobs:
 #     - run:
 #         name: Generate report
 #         command: |
-#           source ~/venv/bin/activate
+#           source ~/venv-2.7.10/bin/activate
 #           if [ -z $COVERALLS_REPO_TOKEN ]; then echo "Coveralls token not defined."; else coveralls; fi
 #
 #     - store_test_results:
