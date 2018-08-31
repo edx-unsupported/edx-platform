@@ -14,11 +14,7 @@ jobs:
 
      # 'See docs on artifact collection here https://circleci.com/docs/2.0/artifacts/'
      # CircleCI 2.0 does not support environment variables that refer to each other the same way as 1.0 did.
-     - run:
-         command: |
-           dpkg-divert --local --rename --add /sbin/initctl
-           ln -s /bin/true /sbin/initctl
-           mkdir -p ~/tmp/circleci-artifacts ~/tmp/circleci-test-results
+     - run: mkdir -p ~/tmp/circleci-artifacts ~/tmp/circleci-test-results
 
      - run:
          name: Installing Python v2.7.10
@@ -37,7 +33,7 @@ jobs:
          name: Installing and creating virtual environment
          command: |
            cd ~
-           pip install virtualenv
+           sudo pip install virtualenv
            virtualenv --python=`which python` virtualenvs/venv-2.7.10
            source virtualenvs/venv-2.7.10/bin/activate
 
