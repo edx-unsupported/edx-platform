@@ -17,6 +17,7 @@ jobs:
      - run:
          name: Installing Python v2.7.10
          command: |
+           echo "Python Version $(python -V)"
            cd ~
            mkdir python_2.7.10
            cd python_2.7.10
