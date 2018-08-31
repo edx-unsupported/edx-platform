@@ -13,30 +13,29 @@ jobs:
      # CircleCI 2.0 does not support environment variables that refer to each other the same way as 1.0 did.
      - run: mkdir -p ~/tmp/circleci-artifacts ~/tmp/circleci-test-results
 
-     - run:
-         name: Installing Python v2.7.10
-         command: |
-           cd ~
-           mkdir python_2.7.10
-           cd python_2.7.10
-           wget https://www.python.org/ftp/python/2.7.10/Python-2.7.10.tgz
-           tar -xvf Python-2.7.10.tgz
-           cd Python-2.7.10
-           ./configure
-           sudo make install
-
-     - run:
-         name: Installing and creating virtual environment
-         command: |
-           cd ~
-           pip install virtualenv
-           virtualenv --python=`which python` virtualenvs/venv-2.7.10
-           source virtualenvs/venv-2.7.10/bin/activate
+#     - run:
+#         name: Installing Python v2.7.10
+#         command: |
+#           cd ~
+#           mkdir python_2.7.10
+#           cd python_2.7.10
+#           wget https://www.python.org/ftp/python/2.7.10/Python-2.7.10.tgz
+#           tar -xvf Python-2.7.10.tgz
+#           cd Python-2.7.10
+#           ./configure
+#           sudo make install
+#
+#     - run:
+#         name: Installing and creating virtual environment
+#         command: |
+#           cd ~
+#           pip install virtualenv
+#           virtualenv --python=`which python` virtualenvs/venv-2.7.10
+#           source virtualenvs/venv-2.7.10/bin/activate
 
      - run:
          name: Installing Node v6.11.1 and Node packages
          command: |
-           source ~/virtualenvs/venv-2.7.10/bin/activate
            curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
            apt-get install nodejs
            npm install -g n
@@ -51,7 +50,6 @@ jobs:
      - run:
          name: Installing pre-reqs
          command: |
-            source ~/virtualenvs/venv-2.7.10/bin/activate
             bash ./scripts/install-system-req.sh
 
      - restore_cache:
@@ -79,7 +77,6 @@ jobs:
      - run:
          name: Installing requirements
          command: |
-           source ~/virtualenvs/venv-2.7.10/bin/activate
            cd ~
            pip install --exists-action w -r edx-platform/requirements/edx/pre.txt
            pip install --exists-action w -r edx-platform/requirements/edx/base.txt
@@ -97,7 +94,6 @@ jobs:
      - run:
          name: Installing custom sqlite 3.14
          command: |
-           source ~/virtualenvs/venv-2.7.10/bin/activate
            cd ~
            mkdir sqlite_3.14
            cd sqlite_3.14
@@ -154,7 +150,6 @@ jobs:
      - run:
          name: Running Tests
          command: |
-           source ~/virtualenvs/venv-2.7.10/bin/activate
            ./scripts/all-tests.sh
          no_output_timeout: 15m
 
@@ -166,7 +161,6 @@ jobs:
      - run:
          name: Generate report
          command: |
-           source ~/virtualenvs/venv-2.7.10/bin/activate
            if [ -z $COVERALLS_REPO_TOKEN ]; then echo "Coveralls token not defined."; else coveralls; fi
 
      - store_test_results:
