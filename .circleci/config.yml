@@ -13,27 +13,24 @@ jobs:
      # CircleCI 2.0 does not support environment variables that refer to each other the same way as 1.0 did.
      - run: mkdir -p ~/tmp/circleci-artifacts ~/tmp/circleci-test-results
 
-#     - run:
-#         name: Installing Python v2.7.10
-#         command: |
-#           cd ~
-#           mkdir python_2.7.10
-#           cd python_2.7.10
-#           wget https://www.python.org/ftp/python/2.7.10/Python-2.7.10.tgz
-#           tar -xvf Python-2.7.10.tgz
-#           cd Python-2.7.10
-#           ./configure
-#           sudo make install
-#           echo "Default encoding $(python -c 'import sys; print(sys.getdefaultencoding())')"
-#           python -c 'import sys; reload(sys); sys.setdefaultencoding("utf-8")'
-#           echo "Default encoding $(python -c 'import sys; print(sys.getdefaultencoding())')"
+     - run:
+         name: Installing Python v2.7.10
+         command: |
+           cd ~
+           mkdir python_2.7.10
+           cd python_2.7.10
+           wget https://www.python.org/ftp/python/2.7.10/Python-2.7.10.tgz
+           tar -xvf Python-2.7.10.tgz
+           cd Python-2.7.10
+           ./configure
+           sudo make install
 
      - run:
          name: Installing and creating virtual environment
          command: |
            cd ~
            pip install virtualenv
-           python -m virtualenv venv-2.7.10
+           virtualenv --python=`which python` venv-2.7.10
            source venv-2.7.10/bin/activate
 
      - run:
