@@ -4,7 +4,7 @@ jobs:
    working_directory: ~/edx-platform
    machine:
      enabled: true
-     image: circleci/classic:201808-01 #circleci/classic:latest
+     image: circleci/classic:latest
 
    parallelism: 4
 
