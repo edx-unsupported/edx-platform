@@ -6,7 +6,7 @@ jobs:
      enabled: true
      image: circleci/classic:latest #circleci/build-image:ubuntu-14.04-XL-922-9410082
 #   docker:
-#      - image: circleci/build-image:ubuntu-14.04-XXL-1327-3401d20
+#      - image: circleci/build-image:ubuntu-14.04-XXL-1325-0ccc9ce #circleci/build-image:ubuntu-14.04-XXL-1327-3401d20
    parallelism: 4
 
    steps:
@@ -43,7 +43,7 @@ jobs:
            curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
            sudo apt-get install -y nodejs
            sudo npm install -g n
-           n 6.11.1
+           sudo n 6.11.1
            npm install
 
       #Mirror what paver install_prereqs does.
