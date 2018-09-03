@@ -13,7 +13,14 @@ jobs:
 
      # 'See docs on artifact collection here https://circleci.com/docs/2.0/artifacts/'
      # CircleCI 2.0 does not support environment variables that refer to each other the same way as 1.0 did.
-     - run: mkdir -p ~/tmp/circleci-artifacts ~/tmp/circleci-test-results
+     - run:
+          name: Creating Artifacts directory
+          command: |
+           mkdir -p ~/tmp/circleci-artifacts
+           touch ~/tmp/circleci-artifacts/artifacts.yml
+           mkdir -p ~/tmp/circleci-test-results
+           touch ~/tmp/circleci-test-results/artifacts.yml
+           touch ~/tmp/circleci-test-results/junit.xml
 
 #     - run:
 #          name: Installing Python v2.7.10
@@ -146,20 +153,20 @@ jobs:
 #         key: cache-edx-platform-{{ .Branch }}-{{ checksum "package.json" }}
 #         paths:
 #            - ~/store_cache
-#
-#      # Run tests for the system.
-#      # all-tests.sh is the entry point for determining
-#      # which tests to run.
-#      # See the circleCI documentation regarding parallelism
-#      # to understand how multiple containers can be used to
-#      # run subsets of tests in parallel.
-#      # if a command runs 900 seconds without output, kill it
-#     - run:
-#         name: Running Tests
-#         command: |
-#           source ~/virtualenvs/venv-2.7.10/bin/activate
-#           ./scripts/all-tests.sh
-#         no_output_timeout: 15m
+
+      # Run tests for the system.
+      # all-tests.sh is the entry point for determining
+      # which tests to run.
+      # See the circleCI documentation regarding parallelism
+      # to understand how multiple containers can be used to
+      # run subsets of tests in parallel.
+      # if a command runs 900 seconds without output, kill it
+     - run:
+         name: Running Tests
+         command: |
+           source ~/virtualenvs/venv-2.7.10/bin/activate
+           ./scripts/all-tests.sh
+         no_output_timeout: 15m
 
      # If you have enabled coveralls for your repo, configure your COVERALLS_REPO_TOKEN
      # as an Environment Variable in the Project Settings on CircleCI, and coverage
