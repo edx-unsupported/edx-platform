@@ -19,7 +19,8 @@ jobs:
      - run:
          name: Check Python versions
          command: |
-           echo "Python Version $(python -V)"
+           echo "Python2 Version $(python2 -V)"
+           echo "Python2.7 Version $(python2.7 -V)"
            cd ~
            cd /usr/bin/
            ls
@@ -34,7 +35,7 @@ jobs:
 #           cd Python-2.7.10
 #           ./configure
 #           sudo make install
-
+#
 #     - run:
 #         name: Installing and creating virtual environment
 #         command: |
