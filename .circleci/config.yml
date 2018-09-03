@@ -16,9 +16,9 @@ jobs:
      - run:
           name: Creating Artifacts directory
           command: |
-           mkdir -p circleci-artifacts circleci-test-results
+           mkdir -p circleci-artifacts circleci-test-results/junit
            echo "Artifacts file" > circleci-artifacts/artifacts
-           echo "Tests report file" > circleci-test-results/junit
+           echo "Tests report file" > circleci-test-results/junit/junit
 
 #     - run:
 #          name: Installing Python v2.7.10
@@ -171,14 +171,15 @@ jobs:
      # data will automatically be sent to coveralls. See https://coveralls.io/
      # If you have not set up set up coveralls then the following statement will
      # print a message but not affect the pass/fail status of the build.
-#     - run:
-#         name: Generate report
-#         command: |
-#           source ~/virtualenvs/venv-2.7.10/bin/activate
-#           if [ -z $COVERALLS_REPO_TOKEN ]; then echo "Coveralls token not defined."; else coveralls; fi
+     - run:
+         name: Generate report
+         command: |
+           source ~/virtualenvs/venv-2.7.10/bin/activate
+           if [ $(find reports -type f | wc -l) -gt 0 ] ; then cp -r reports/. circleci-test-results/junit; fi
+           if [ -z $COVERALLS_REPO_TOKEN ]; then echo "Coveralls token not defined."; else coveralls; fi
 
      - store_test_results:
-         path: circleci-test-results/junit
+         path: circleci-test-results/junit/junit
 
      - store_artifacts:
          path: circleci-artifacts/artifacts
