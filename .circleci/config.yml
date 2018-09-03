@@ -44,11 +44,10 @@ jobs:
      - run:
          name: Installing Node v6.11.1 and Node packages
          command: |
-           source ~/virtualenvs/venv-2.7.10/bin/activate
            curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
-           apt-get install -y nodejs
+           sudo apt-get install -y nodejs
            npm install -g n
-           n 6.11.1
+           sudo n 6.11.1
            npm install
 
       #Mirror what paver install_prereqs does.
