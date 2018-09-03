@@ -172,9 +172,8 @@ jobs:
      # If you have not set up set up coveralls then the following statement will
      # print a message but not affect the pass/fail status of the build.
      - run:
-         name: Generate report
+         name: Generate report #source ~/virtualenvs/venv-2.7.10/bin/activate
          command: |
-           source ~/virtualenvs/venv-2.7.10/bin/activate
            if [ $(find reports -type f | wc -l) -gt 0 ] ; then cp -r reports/. circleci-test-results/junit; fi
            if [ -z $COVERALLS_REPO_TOKEN ]; then echo "Coveralls token not defined."; else coveralls; fi
 
