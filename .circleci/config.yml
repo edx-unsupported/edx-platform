@@ -16,11 +16,9 @@ jobs:
      - run:
           name: Creating Artifacts directory
           command: |
-           mkdir -p ~/tmp/circleci-artifacts
-           touch ~/tmp/circleci-artifacts/artifacts.yml
-           mkdir -p ~/tmp/circleci-test-results
-           touch ~/tmp/circleci-test-results/artifacts.yml
-           touch ~/tmp/circleci-test-results/junit.xml
+           mkdir -p /circleci-artifacts /circleci-test-results
+           echo "Artifacts file" /circleci-artifacts/artifacts
+           echo "Tests report file" /circleci-test-results/junit
 
 #     - run:
 #          name: Installing Python v2.7.10
@@ -160,32 +158,28 @@ jobs:
       # See the circleCI documentation regarding parallelism
       # to understand how multiple containers can be used to
       # run subsets of tests in parallel.
-      # if a command runs 900 seconds without output, kill it
-     - run:
-         name: Running Tests
-         command: |
-           source ~/virtualenvs/venv-2.7.10/bin/activate
-           ./scripts/all-tests.sh
-         no_output_timeout: 15m
+#      # if a command runs 900 seconds without output, kill it
+#     - run:
+#         name: Running Tests
+#         command: |
+#           source ~/virtualenvs/venv-2.7.10/bin/activate
+#           ./scripts/all-tests.sh
+#         no_output_timeout: 15m
 
      # If you have enabled coveralls for your repo, configure your COVERALLS_REPO_TOKEN
      # as an Environment Variable in the Project Settings on CircleCI, and coverage
      # data will automatically be sent to coveralls. See https://coveralls.io/
      # If you have not set up set up coveralls then the following statement will
      # print a message but not affect the pass/fail status of the build.
-     - run:
-         name: Generate report
-         command: |
-           source ~/virtualenvs/venv-2.7.10/bin/activate
-           if [ -z $COVERALLS_REPO_TOKEN ]; then echo "Coveralls token not defined."; else coveralls; fi
+#     - run:
+#         name: Generate report
+#         command: |
+#           source ~/virtualenvs/venv-2.7.10/bin/activate
+#           if [ -z $COVERALLS_REPO_TOKEN ]; then echo "Coveralls token not defined."; else coveralls; fi
 
      - store_test_results:
-         path: ~/tmp/circleci-test-results/junit.xml
+         path: /circleci-test-results/junit
 
      - store_artifacts:
-         path: ~/tmp/circleci-artifacts/artifacts.yml
-         destination: artifacts
-
-     - store_artifacts:
-         path: ~/tmp/circleci-artifacts/artifacts.yml
+         path: /circleci-artifacts/artifacts
          destination: artifacts
