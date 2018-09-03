@@ -17,8 +17,8 @@ jobs:
           name: Creating Artifacts directory
           command: |
            mkdir -p circleci-artifacts circleci-test-results
-           echo "Artifacts file" > /circleci-artifacts/artifacts
-           echo "Tests report file" > /circleci-test-results/junit
+           echo "Artifacts file" > circleci-artifacts/artifacts
+           echo "Tests report file" > circleci-test-results/junit
 
 #     - run:
 #          name: Installing Python v2.7.10
