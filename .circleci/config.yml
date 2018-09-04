@@ -13,15 +13,15 @@ jobs:
 
      # 'See docs on artifact collection here https://circleci.com/docs/2.0/artifacts/'
      # CircleCI 2.0 does not support environment variables that refer to each other the same way as 1.0 did.
-     #echo "Artifacts file" > ~/tmp/circleci-artifacts/artifacts
    #           echo "Tests report file" > ~/tmp/circleci-test-results/junit/junit
      - run:
           name: Creating directories and files
           command: |
            mkdir -p ~/python_2.7.10 ~/sqlite_3.14
-           mkdir -p circleci-artifacts
+           mkdir -p circleci-artifacts circleci-test-results/artifacts
+           echo "Artifacts file" > circleci-test-results/artifacts/artifacts
 
-#     - run:
+         #     - run:
 #          name: Installing Python v2.7.10
 #          command: |
 #           cd ~/python_2.7.10
@@ -161,13 +161,6 @@ jobs:
 #           ./scripts/all-tests.sh
 #         no_output_timeout: 15m
 
-     - store_artifacts:
-              path: circleci-test-results
-              destination: artifacts
-
-     - store_test_results:
-         path: circleci-test-results
-
      # If you have enabled coveralls for your repo, configure your COVERALLS_REPO_TOKEN
      # as an Environment Variable in the Project Settings on CircleCI, and coverage
      # data will automatically be sent to coveralls. See https://coveralls.io/
@@ -177,5 +170,12 @@ jobs:
          name: Generate report #source ~/virtualenvs/venv-2.7.10/bin/activate
 
          command: |
-           if [ $(find reports -type f | wc -l) -gt 0 ] ; then cp -r reports/. circleci-test-results/artifacts; else echo "No reports found"; fi
+           if [ $(find ~/edx-platform/reports -type f | wc -l) -gt 0 ]; then cp -r ~/edx-platform/reports/. ~/edx-platform/circleci-test-results/artifacts; else echo "No reports found"; fi
            if [ -z $COVERALLS_REPO_TOKEN ]; then echo "Coveralls token not defined."; else coveralls; fi
+
+     - store_artifacts:
+              path: circleci-test-results/artifacts
+              destination: artifacts
+
+     - store_test_results:
+         path: circleci-test-results
