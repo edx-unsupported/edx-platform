@@ -17,7 +17,8 @@ jobs:
           name: Creating directories and files
           command: |
            mkdir -p ~/python_2.7.10 ~/sqlite_3.14
-           mkdir -p circleci-test-results/junit
+           mkdir -p circleci-test-results/artifacts/junit
+           echo "Artifacts file" > circleci-test-results/artifacts/junit/artifacts
 
      - run:
           name: Installing Python v2.7.10
@@ -56,35 +57,18 @@ jobs:
             bash ./scripts/install-system-req.sh
 
      - restore_cache:
-              name: Restores cache if the Branch key template or pre.txt file have not changed since the previous run
-              key: v1-edx-platform-{{ .Branch }}
+              name: Restores cache if any of the requirements file have not changed since the previous run
+              key: cache-edx-platform
                 -{{ checksum "requirements/edx/pre.txt" }}
                 -{{ checksum "requirements/edx/base.txt" }}
                 -{{ checksum "requirements/edx/github.txt" }}
                 -{{ checksum "requirements/edx/local.txt" }}
                 -{{ checksum "requirements/edx/custom.txt" }}
                 -{{ checksum "requirements/edx/paver.txt" }}
-   #     - restore_cache:
-#         name: Restores cache if the Branch key template or pre.txt file have not changed since the previous run
-#         key: cache-edx-platform-{{ .Branch }}-{{ checksum "requirements/edx/pre.txt" }}
-#     - restore_cache:
-#         name: Restores cache if the Branch key template or base.txt file have not changed since the previous run
-#         key: cache-edx-platform-{{ .Branch }}-{{ checksum "requirements/edx/base.txt" }}
-#     - restore_cache:
-#         name: Restores cache if the Branch key template or github.txt file have not changed since the previous run
-#         key: cache-edx-platform-{{ .Branch }}-{{ checksum "requirements/edx/github.txt" }}
-#     - restore_cache:
-#         name: Restores cache if the Branch key template or local.txt file have not changed since the previous run
-#         key: cache-edx-platform-{{ .Branch }}-{{ checksum "requirements/edx/local.txt" }}
-#     - restore_cache:
-#         name: Restores cache if the Branch key template or custom.txt file have not changed since the previous run
-#         key: cache-edx-platform-{{ .Branch }}-{{ checksum "requirements/edx/custom.txt" }}
-#     - restore_cache:
-#         name: Restores cache if the Branch key template or paver.txt file have not changed since the previous run
-#         key: cache-edx-platform-{{ .Branch }}-{{ checksum "requirements/edx/paver.txt" }}
+   #
      - restore_cache:
-         name: Restores cache if the Branch key template or package.json file have not changed since the previous run
-         key: v1-edx-platform-{{ .Branch }}-{{ checksum "package.json" }}
+         name: Restores cache if the package.json file have not changed since the previous run
+         key: cache-edx-platform-{{ checksum "package.json" }}
 
      - run:
          name: Installing requirements
@@ -104,8 +88,6 @@ jobs:
            pip install --upgrade --force-reinstall git+https://github.com/edx/django-rest-framework.git@3c72cb5ee5baebc4328947371195eae2077197b0#egg=djangorestframework==3.2.3
            pip freeze
 
-
-   # Install custom sqlite 3.14
      - run:
          name: Installing custom sqlite 3.14
          command: |
@@ -119,37 +101,8 @@ jobs:
            cd ./pysqlite-2.8.3 && python setup.py build_static install
            rm -rf 2.8.3.tar.gz sqlite-autoconf-3140100.tar.gz pysqlite-2.8.3 sqlite-autoconf-3140100
 
-#     - save_cache:
-#         key: cache-edx-platform-{{ .Branch }}-{{ checksum "requirements/edx/local.txt" }}
-#         paths:
-#            - ~/store_cache
-#
-#     - save_cache:
-#         key: cache-edx-platform-{{ .Branch }}-{{ checksum "requirements/edx/pre.txt" }}
-#         paths:
-#            - ~/store_cache
-#
-#     - save_cache:
-#         key: cache-edx-platform-{{ .Branch }}-{{ checksum "requirements/edx/custom.txt" }}
-#         paths:
-#            - ~/store_cache
-#
-#     - save_cache:
-#         key: cache-edx-platform-{{ .Branch }}-{{ checksum "requirements/edx/github.txt" }}
-#         paths:
-#            - ~/store_cache
-#
-#     - save_cache:
-#         key: cache-edx-platform-{{ .Branch }}-{{ checksum "requirements/edx/base.txt" }}
-#         paths:
-#            - ~/store_cache
-#
-#     - save_cache:
-#         key: cache-edx-platform-{{ .Branch }}-{{ checksum "requirements/edx/paver.txt" }}
-#         paths:
-#            - ~/store_cache
      - save_cache:
-         key: v1-edx-platform-{{ .Branch }}
+         key: cache-edx-platform
            -{{ checksum "requirements/edx/pre.txt" }}
            -{{ checksum "requirements/edx/base.txt" }}
            -{{ checksum "requirements/edx/github.txt" }}
@@ -160,7 +113,7 @@ jobs:
             - ~/virtualenvs/venv-2.7.10
 
      - save_cache:
-         key: v1-edx-platform-{{ .Branch }}-{{ checksum "package.json" }}
+         key: cache-edx-platform-{{ checksum "package.json" }}
          paths:
             - node_modules
 
@@ -171,12 +124,12 @@ jobs:
       # to understand how multiple containers can be used to
       # run subsets of tests in parallel.
       # if a command runs 900 seconds without output, kill it
-#     - run:
-#         name: Running Tests
-#         command: |
-#           source ~/virtualenvs/venv-2.7.10/bin/activate
-#           ./scripts/all-tests.sh
-#         no_output_timeout: 15m
+     - run:
+         name: Running Tests
+         command: |
+           source ~/virtualenvs/venv-2.7.10/bin/activate
+           ./scripts/all-tests.sh
+         no_output_timeout: 15m
 
      # If you have enabled coveralls for your repo, configure your COVERALLS_REPO_TOKEN
      # as an Environment Variable in the Project Settings on CircleCI, and coverage
@@ -185,15 +138,11 @@ jobs:
      # print a message but not affect the pass/fail status of the build.
      - run:
          name: Generate report
-
          command: |
            source ~/virtualenvs/venv-2.7.10/bin/activate
-           if [ $(find reports -type f | wc -l) -gt 0 ]; then cp -r reports/. circleci-test-results/junit; fi
+           if [ $(find reports -type f | wc -l) -gt 0 ]; then cp -r reports/. circleci-test-results/artifacts/junit; fi
            if [ -z $COVERALLS_REPO_TOKEN ]; then echo "Coveralls token not defined."; else coveralls; fi
 
      - store_artifacts:
-         path: circleci-test-results
+         path: circleci-test-results/artifacts
          destination: junit
-
-#     - store_test_results:
-#         path: circleci-test-results/junit
