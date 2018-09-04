@@ -18,7 +18,6 @@ jobs:
           command: |
            mkdir -p ~/python_2.7.10 ~/sqlite_3.14
            mkdir -p circleci-test-results/artifacts/junit
-           echo "Artifacts file" > circleci-test-results/artifacts/junit/artifacts
 
      - run:
           name: Installing Python v2.7.10
