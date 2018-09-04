@@ -5,6 +5,8 @@ jobs:
    machine:
      enabled: true
      image: circleci/classic:latest
+     environment:
+       CIRCLE_TEST_REPORTS: "./circleci-test-results/"
 
    parallelism: 4
 
@@ -44,7 +46,6 @@ jobs:
            sudo apt-get install -y nodejs
            sudo npm install -g n
            sudo n 6.11.1
-           npm install
 
       #Mirror what paver install_prereqs does.
       #After a successful build, CircleCI will
@@ -58,31 +59,41 @@ jobs:
             bash ./scripts/install-system-req.sh
 
      - restore_cache:
-         name: Restores cache if the Branch key template or pre.txt file have not changed since the previous run
-         key: cache-edx-platform-{{ .Branch }}-{{ checksum "requirements/edx/pre.txt" }}
-     - restore_cache:
-         name: Restores cache if the Branch key template or base.txt file have not changed since the previous run
-         key: cache-edx-platform-{{ .Branch }}-{{ checksum "requirements/edx/base.txt" }}
-     - restore_cache:
-         name: Restores cache if the Branch key template or github.txt file have not changed since the previous run
-         key: cache-edx-platform-{{ .Branch }}-{{ checksum "requirements/edx/github.txt" }}
-     - restore_cache:
-         name: Restores cache if the Branch key template or local.txt file have not changed since the previous run
-         key: cache-edx-platform-{{ .Branch }}-{{ checksum "requirements/edx/local.txt" }}
-     - restore_cache:
-         name: Restores cache if the Branch key template or custom.txt file have not changed since the previous run
-         key: cache-edx-platform-{{ .Branch }}-{{ checksum "requirements/edx/custom.txt" }}
-     - restore_cache:
-         name: Restores cache if the Branch key template or paver.txt file have not changed since the previous run
-         key: cache-edx-platform-{{ .Branch }}-{{ checksum "requirements/edx/paver.txt" }}
+              name: Restores cache if the Branch key template or pre.txt file have not changed since the previous run
+              key: v1-edx-platform-{{ .Branch }}
+                   -{{ checksum "requirements/edx/pre.txt" }}
+                   -{{ checksum "requirements/edx/base.txt" }}
+                   -{{ checksum "requirements/edx/github.txt" }}
+                   -{{ checksum "requirements/edx/local.txt" }}
+                   -{{ checksum "requirements/edx/custom.txt" }}
+                   -{{ checksum "requirements/edx/paver.txt" }}
+   #     - restore_cache:
+#         name: Restores cache if the Branch key template or pre.txt file have not changed since the previous run
+#         key: cache-edx-platform-{{ .Branch }}-{{ checksum "requirements/edx/pre.txt" }}
+#     - restore_cache:
+#         name: Restores cache if the Branch key template or base.txt file have not changed since the previous run
+#         key: cache-edx-platform-{{ .Branch }}-{{ checksum "requirements/edx/base.txt" }}
+#     - restore_cache:
+#         name: Restores cache if the Branch key template or github.txt file have not changed since the previous run
+#         key: cache-edx-platform-{{ .Branch }}-{{ checksum "requirements/edx/github.txt" }}
+#     - restore_cache:
+#         name: Restores cache if the Branch key template or local.txt file have not changed since the previous run
+#         key: cache-edx-platform-{{ .Branch }}-{{ checksum "requirements/edx/local.txt" }}
+#     - restore_cache:
+#         name: Restores cache if the Branch key template or custom.txt file have not changed since the previous run
+#         key: cache-edx-platform-{{ .Branch }}-{{ checksum "requirements/edx/custom.txt" }}
+#     - restore_cache:
+#         name: Restores cache if the Branch key template or paver.txt file have not changed since the previous run
+#         key: cache-edx-platform-{{ .Branch }}-{{ checksum "requirements/edx/paver.txt" }}
      - restore_cache:
          name: Restores cache if the Branch key template or package.json file have not changed since the previous run
-         key: cache-edx-platform-{{ .Branch }}-{{ checksum "package.json" }}
+         key: v1-edx-platform-{{ .Branch }}-{{ checksum "package.json" }}
 
      - run:
          name: Installing requirements
          command: |
            source ~/virtualenvs/venv-2.7.10/bin/activate
+           npm install
            pip install google-compute-engine
            pip install --exists-action w -r requirements/edx/pre.txt
            pip install --exists-action w -r requirements/edx/base.txt
@@ -111,40 +122,50 @@ jobs:
            cd ./pysqlite-2.8.3 && python setup.py build_static install
            rm -rf 2.8.3.tar.gz sqlite-autoconf-3140100.tar.gz pysqlite-2.8.3 sqlite-autoconf-3140100
 
+#     - save_cache:
+#         key: cache-edx-platform-{{ .Branch }}-{{ checksum "requirements/edx/local.txt" }}
+#         paths:
+#            - ~/store_cache
+#
+#     - save_cache:
+#         key: cache-edx-platform-{{ .Branch }}-{{ checksum "requirements/edx/pre.txt" }}
+#         paths:
+#            - ~/store_cache
+#
+#     - save_cache:
+#         key: cache-edx-platform-{{ .Branch }}-{{ checksum "requirements/edx/custom.txt" }}
+#         paths:
+#            - ~/store_cache
+#
+#     - save_cache:
+#         key: cache-edx-platform-{{ .Branch }}-{{ checksum "requirements/edx/github.txt" }}
+#         paths:
+#            - ~/store_cache
+#
+#     - save_cache:
+#         key: cache-edx-platform-{{ .Branch }}-{{ checksum "requirements/edx/base.txt" }}
+#         paths:
+#            - ~/store_cache
+#
+#     - save_cache:
+#         key: cache-edx-platform-{{ .Branch }}-{{ checksum "requirements/edx/paver.txt" }}
+#         paths:
+#            - ~/store_cache
      - save_cache:
-         key: cache-edx-platform-{{ .Branch }}-{{ checksum "requirements/edx/local.txt" }}
+         key: v1-edx-platform-{{ .Branch }}
+           -{{ checksum "requirements/edx/pre.txt" }}
+           -{{ checksum "requirements/edx/base.txt" }}
+           -{{ checksum "requirements/edx/github.txt" }}
+           -{{ checksum "requirements/edx/local.txt" }}
+           -{{ checksum "requirements/edx/custom.txt" }}
+           -{{ checksum "requirements/edx/paver.txt" }}
          paths:
-            - ~/store_cache
+            - ~/virtualenvs/venv-2.7.10
 
      - save_cache:
-         key: cache-edx-platform-{{ .Branch }}-{{ checksum "requirements/edx/pre.txt" }}
+         key: v1-edx-platform-{{ .Branch }}-{{ checksum "package.json" }}
          paths:
-            - ~/store_cache
-
-     - save_cache:
-         key: cache-edx-platform-{{ .Branch }}-{{ checksum "requirements/edx/custom.txt" }}
-         paths:
-            - ~/store_cache
-
-     - save_cache:
-         key: cache-edx-platform-{{ .Branch }}-{{ checksum "requirements/edx/github.txt" }}
-         paths:
-            - ~/store_cache
-
-     - save_cache:
-         key: cache-edx-platform-{{ .Branch }}-{{ checksum "requirements/edx/base.txt" }}
-         paths:
-            - ~/store_cache
-
-     - save_cache:
-         key: cache-edx-platform-{{ .Branch }}-{{ checksum "requirements/edx/paver.txt" }}
-         paths:
-            - ~/store_cache
-
-     - save_cache:
-         key: cache-edx-platform-{{ .Branch }}-{{ checksum "package.json" }}
-         paths:
-            - ~/store_cache
+            - node_modules
 
       # Run tests for the system.
       # all-tests.sh is the entry point for determining
@@ -170,12 +191,12 @@ jobs:
 
          command: |
            source ~/virtualenvs/venv-2.7.10/bin/activate
-           if [ $(find reports -type f | wc -l) -gt 0 ]; then cp -r reports/. circleci-test-results/artifacts; else echo "No reports found"; fi
+           if [ $(find reports -type f | wc -l) -gt 0 ]; then cp -r reports/. $CIRCLE_TEST_REPORTS/artifacts; else echo "No reports found"; fi
            if [ -z $COVERALLS_REPO_TOKEN ]; then echo "Coveralls token not defined."; else coveralls; fi
 
      - store_artifacts:
-         path: circleci-test-results/artifacts
+         path: $CIRCLE_TEST_REPORTS/artifacts
          destination: artifacts
 
      - store_test_results:
-         path: circleci-test-results/artifacts
+         path: $CIRCLE_TEST_REPORTS/artifacts
