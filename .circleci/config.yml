@@ -191,12 +191,12 @@ jobs:
 
          command: |
            source ~/virtualenvs/venv-2.7.10/bin/activate
-           if [ $(find reports -type f | wc -l) -gt 0 ]; then cp -r reports/. $CIRCLE_TEST_REPORTS/artifacts; else echo "No reports found"; fi
+           if [ $(find reports -type f | wc -l) -gt 0 ]; then cp -r reports/. circleci-test-results/artifacts; else echo "No reports found"; fi
            if [ -z $COVERALLS_REPO_TOKEN ]; then echo "Coveralls token not defined."; else coveralls; fi
 
      - store_artifacts:
-         path: $CIRCLE_TEST_REPORTS/artifacts
-         destination: artifacts
+         path: circleci-test-results/artifacts
+         destination: test_root/log
 
      - store_test_results:
-         path: $CIRCLE_TEST_REPORTS/artifacts
+         path: circleci-test-results/artifacts
