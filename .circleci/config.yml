@@ -5,8 +5,6 @@ jobs:
    machine:
      enabled: true
      image: circleci/classic:latest
-     environment:
-       CIRCLE_TEST_REPORTS: "./circleci-test-results/"
 
    parallelism: 4
 
@@ -60,8 +58,7 @@ jobs:
 
      - restore_cache:
               name: Restores cache if the Branch key template or pre.txt file have not changed since the previous run
-              key: |
-                v1-edx-platform-{{ .Branch }}
+              key: v1-edx-platform-{{ .Branch }}
                 -{{ checksum "requirements/edx/pre.txt" }}
                 -{{ checksum "requirements/edx/base.txt" }}
                 -{{ checksum "requirements/edx/github.txt" }}
@@ -153,8 +150,7 @@ jobs:
 #         paths:
 #            - ~/store_cache
      - save_cache:
-         key: |
-           v1-edx-platform-{{ .Branch }}
+         key: v1-edx-platform-{{ .Branch }}
            -{{ checksum "requirements/edx/pre.txt" }}
            -{{ checksum "requirements/edx/base.txt" }}
            -{{ checksum "requirements/edx/github.txt" }}
