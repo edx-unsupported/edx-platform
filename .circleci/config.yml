@@ -160,6 +160,13 @@ jobs:
            ./scripts/all-tests.sh
          no_output_timeout: 15m
 
+     - store_artifacts:
+         path: circleci-test-results/artifacts
+         destination: artifacts
+
+     - store_test_results:
+         path: circleci-test-results/artifacts
+
      # If you have enabled coveralls for your repo, configure your COVERALLS_REPO_TOKEN
      # as an Environment Variable in the Project Settings on CircleCI, and coverage
      # data will automatically be sent to coveralls. See https://coveralls.io/
@@ -172,10 +179,3 @@ jobs:
            source ~/virtualenvs/venv-2.7.10/bin/activate
            if [ $(find reports -type f | wc -l) -gt 0 ]; then cp -r reports/. circleci-test-results/artifacts; else echo "No reports found"; fi
            if [ -z $COVERALLS_REPO_TOKEN ]; then echo "Coveralls token not defined."; else coveralls; fi
-
-     - store_artifacts:
-              path: circleci-test-results/artifacts
-              destination: artifacts
-
-     - store_test_results:
-         path: circleci-test-results
