@@ -175,7 +175,7 @@ jobs:
 
      - store_artifacts:
          path: circleci-test-results/artifacts
-           destination: artifacts
+         destination: artifacts
 
      - store_test_results:
          path: circleci-test-results/artifacts
