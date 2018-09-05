@@ -17,7 +17,7 @@ jobs:
           name: Creating directories and files
           command: |
            mkdir -p ~/python_2.7.10 ~/sqlite_3.14
-           mkdir -p circleci-test-results/artifacts
+           mkdir -p circleci-test-results/artifacts/test_root/log
 
      - run:
           name: Installing Python v2.7.10
@@ -154,6 +154,10 @@ jobs:
 
      - store_artifacts:
          path: circleci-test-results/artifacts
+
+     - store_artifacts:
+         path: circleci-test-results/artifacts/test_root
+         destination: log
 
      - store_test_results:
          path: circleci-test-results/artifacts
