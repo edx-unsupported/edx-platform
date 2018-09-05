@@ -6,3 +6,4 @@ path.py==8.2.1
 watchdog==0.7.1
 python-memcached
 libsass==0.10.0
+google-compute-engine
