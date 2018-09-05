@@ -125,12 +125,12 @@ jobs:
       # to understand how multiple containers can be used to
       # run subsets of tests in parallel.
       # if a command runs 900 seconds without output, kill it
-#     - run:
-#         name: Running Tests
-#         command: |
-#           source ~/virtualenvs/venv-2.7.10/bin/activate
-#           ./scripts/all-tests.sh
-#         no_output_timeout: 15m
+     - run:
+         name: Running Tests
+         command: |
+           source ~/virtualenvs/venv-2.7.10/bin/activate
+           ./scripts/all-tests.sh
+         no_output_timeout: 15m
 
      # If you have enabled coveralls for your repo, configure your COVERALLS_REPO_TOKEN
      # as an Environment Variable in the Project Settings on CircleCI, and coverage
