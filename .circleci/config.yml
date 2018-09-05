@@ -57,7 +57,7 @@ jobs:
 
      - restore_cache:
               name: Restores cache if any of the requirements file have not changed since the previous run
-              key: ?|-
+              key: >-
                 cache-edx-platform
                 -{{ checksum "requirements/edx/pre.txt" }}
                 -{{ checksum "requirements/edx/base.txt" }}
@@ -102,7 +102,7 @@ jobs:
            rm -rf 2.8.3.tar.gz sqlite-autoconf-3140100.tar.gz pysqlite-2.8.3 sqlite-autoconf-3140100
 
      - save_cache:
-         key: ?|-
+         key: >-
            cache-edx-platform
            -{{ checksum "requirements/edx/pre.txt" }}
            -{{ checksum "requirements/edx/base.txt" }}
