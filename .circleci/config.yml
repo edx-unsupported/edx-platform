@@ -58,18 +58,22 @@ jobs:
      - restore_cache:
               name: Restores cache if any of the requirements file have not changed since the previous run
               key: >-
-                cache-edx-platform
+                edx-platform-cache-v1
                 -{{ checksum "requirements/edx/pre.txt" }}
                 -{{ checksum "requirements/edx/base.txt" }}
                 -{{ checksum "requirements/edx/github.txt" }}
                 -{{ checksum "requirements/edx/local.txt" }}
                 -{{ checksum "requirements/edx/custom.txt" }}
                 -{{ checksum "requirements/edx/paver.txt" }}
-   #
+                -{{ checksum "requirements/edx/post.txt" }}
+
      - restore_cache:
          name: Restores cache if the package.json file have not changed since the previous run
-         key: cache-edx-platform-{{ checksum "package.json" }}
+         key: edx-platform-cache-v1-{{ checksum "package.json" }}
 
+     # Note: If coveralls or django-rest-framework version is changed below, update/increment the
+     # cache version as well under 'restore_cache' and 'save_cache' commands
+     # i.e edx-platform-cache-v{x} => edx-platform-cache-v{x+1}
      - run:
          name: Installing requirements
          command: |
@@ -88,6 +92,8 @@ jobs:
            pip install --upgrade --force-reinstall git+https://github.com/edx/django-rest-framework.git@3c72cb5ee5baebc4328947371195eae2077197b0#egg=djangorestframework==3.2.3
            pip freeze
 
+     # Note: If sqlite version is changed below, update/increment the cache version as well under
+     # 'restore_cache' and 'save_cache' commands i.e edx-platform-cache-v{x} => edx-platform-cache-v{x+1}
      - run:
          name: Installing custom sqlite 3.14
          command: |
@@ -103,18 +109,20 @@ jobs:
 
      - save_cache:
          key: >-
-           cache-edx-platform
+           edx-platform-cache-v1
            -{{ checksum "requirements/edx/pre.txt" }}
            -{{ checksum "requirements/edx/base.txt" }}
            -{{ checksum "requirements/edx/github.txt" }}
            -{{ checksum "requirements/edx/local.txt" }}
            -{{ checksum "requirements/edx/custom.txt" }}
            -{{ checksum "requirements/edx/paver.txt" }}
+           -{{ checksum "requirements/edx/post.txt" }}
+
          paths:
             - ~/virtualenvs/venv-2.7.10
 
      - save_cache:
-         key: cache-edx-platform-{{ checksum "package.json" }}
+         key: edx-platform-cache-v1-{{ checksum "package.json" }}
          paths:
             - node_modules
 
