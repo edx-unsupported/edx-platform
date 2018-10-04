@@ -404,7 +404,7 @@ def _get_course_with_access(request, course_key_string, action='staff'):
     """
     Fetching a course with expected permission level
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key_string)
+    course_key = CourseKey.from_string(course_key_string)
     return course_key, get_course_with_access(request.user, action, course_key)
 
 
