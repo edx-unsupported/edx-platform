@@ -561,7 +561,7 @@ class CohortHandler(DeveloperErrorViewMixin, APIPermissions):
                 cohorts.set_assignment_type(cohort, assignment_type)
             except ValueError as e:
                 self.api_error(status.HTTP_400_BAD_REQUEST, str(e), 'last-random-cohort')
-            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class CohortUsers(DeveloperErrorViewMixin, APIPermissions):
