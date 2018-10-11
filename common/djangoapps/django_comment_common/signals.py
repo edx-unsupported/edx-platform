@@ -22,6 +22,7 @@ comment_edited = Signal(providing_args=['user', 'post'])
 comment_voted = Signal(providing_args=['user', 'post', 'undo'])
 comment_deleted = Signal(providing_args=['user', 'post', 'involved_users'])
 comment_endorsed = Signal(providing_args=['user', 'post'])
+thread_or_comment_flagged = Signal(providing_args=['user', 'post', 'undo'])
 
 
 @receiver(post_save, sender=CourseCohortsSettings)
