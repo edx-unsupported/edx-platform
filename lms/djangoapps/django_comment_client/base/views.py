@@ -44,6 +44,7 @@ from django_comment_common.signals import (
     comment_voted,
     comment_deleted,
     comment_endorsed,
+    thread_or_comment_flagged,
 )
 from django_comment_common.utils import ThreadContext
 from django_comment_client.utils import (
@@ -834,6 +835,7 @@ def flag_abuse_for_thread(request, course_id, thread_id):
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
     thread.flagAbuse(user, thread)
+    thread_or_comment_flagged.send(sender=None, user=request.user, post=thread)
 
     return JsonResponse(prepare_content(thread.to_dict(), course_key))
 
@@ -855,6 +857,7 @@ def un_flag_abuse_for_thread(request, course_id, thread_id):
         has_access(request.user, 'staff', course)
     )
     thread.unFlagAbuse(user, thread, remove_all)
+    thread_or_comment_flagged.send(sender=None, user=request.user, post=thread, undo=True)
 
     return JsonResponse(prepare_content(thread.to_dict(), course_key))
 
@@ -871,6 +874,8 @@ def flag_abuse_for_comment(request, course_id, comment_id):
     user = cc.User.from_django_user(request.user)
     comment = cc.Comment.find(comment_id)
     comment.flagAbuse(user, comment)
+    thread_or_comment_flagged.send(sender=None, user=request.user, post=comment)
+
     return JsonResponse(prepare_content(comment.to_dict(), course_key))
 
 
@@ -891,6 +896,8 @@ def un_flag_abuse_for_comment(request, course_id, comment_id):
     )
     comment = cc.Comment.find(comment_id)
     comment.unFlagAbuse(user, comment, remove_all)
+    thread_or_comment_flagged.send(sender=None, user=request.user, post=comment, undo=True)
+
     return JsonResponse(prepare_content(comment.to_dict(), course_key))
 
 
