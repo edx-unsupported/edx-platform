@@ -18,6 +18,8 @@ from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponse
 from django.test.utils import override_settings
 from django.contrib.auth.models import AnonymousUser
+from django.middleware.csrf import get_token
+from django.test.client import RequestFactory
 from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
 from edx_proctoring.api import create_exam, create_exam_attempt, update_attempt_status
 from edx_proctoring.runtime import set_runtime_service
@@ -30,6 +32,7 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from progress.models import CourseModuleCompletion
 from pyquery import PyQuery
+from unittest import skip
 from xblock.core import XBlock, XBlockAside
 from xblock.field_data import FieldData
 from xblock.fields import ScopeIds
@@ -493,6 +496,41 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         # because mock uses `name` to name the mock itself
         mock_file.name = name
         return mock_file
+
+    def test_invalid_csrf_token(self):
+        """
+        Verify that invalid CSRF token is rejected.
+        """
+        request = RequestFactory().post('dummy_url', data={'position': 1})
+        csrf_token = get_token(request)
+        request._post = {'csrfmiddlewaretoken': '{}-dummy'.format(csrf_token)}  # pylint: disable=protected-access
+        request.user = self.mock_user
+        response = render.handle_xblock_callback(
+            request,
+            self.course_key.to_deprecated_string(),
+            quote_slashes(self.location.to_deprecated_string()),
+            'xmodule_handler',
+            'goto_position',
+        )
+        self.assertEqual(403, response.status_code)
+
+    @skip("This will work in Django 1.11.")
+    def test_valid_csrf_token(self):
+        """
+        Verify that valid CSRF token is accepted.
+        """
+        request = RequestFactory().post('dummy_url', data={'position': 1})
+        csrf_token = get_token(request)
+        request._post = {'csrfmiddlewaretoken': csrf_token}  # pylint: disable=protected-access
+        request.user = self.mock_user
+        response = render.handle_xblock_callback(
+            request,
+            self.course_key.to_deprecated_string(),
+            quote_slashes(self.location.to_deprecated_string()),
+            'xmodule_handler',
+            'goto_position',
+        )
+        self.assertEqual(200, response.status_code)
 
     def test_invalid_location(self):
         request = self.request_factory.post('dummy_url', data={'position': 1})

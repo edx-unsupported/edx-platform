@@ -29,7 +29,6 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from requests.auth import HTTPBasicAuth
 from rest_framework.exceptions import APIException
-from rest_framework.permissions import SAFE_METHODS
 from xblock.core import XBlock
 from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xblock.exceptions import NoSuchHandlerError, NoSuchViewError
@@ -986,7 +985,7 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
         suffix (str)
 
     Raises:
-        HttpResponseForbidden: If the request method is not in SAFE_METHODS and user is not authenticated.
+        HttpResponseForbidden: If the request method is not `GET` and user is not authenticated.
         Http404: If the course is not found in the modulestore.
     """
     # In this case, we are using Session based authentication, so we need to check CSRF token.
@@ -1011,9 +1010,9 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
                     request.user, _ = user_auth_tuple
                     break
 
-    # NOTE (CCB): Allow anonymous SAFE_METHOD calls (e.g. for transcripts). Modifying this view is simpler than updating
+    # NOTE (CCB): Allow anonymous GET calls (e.g. for transcripts). Modifying this view is simpler than updating
     # the XBlocks to use `handle_xblock_callback_noauth`, which is practically identical to this view.
-    if not (request.method in SAFE_METHODS or request.user and request.user.is_authenticated()):
+    if request.method != 'GET' and not (request.user and request.user.is_authenticated):
         return HttpResponseForbidden()
 
     request.user.known = request.user.is_authenticated()
