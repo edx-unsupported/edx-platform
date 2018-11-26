@@ -1949,7 +1949,7 @@ RECALCULATE_GRADES_ROUTING_KEY = LOW_PRIORITY_QUEUE
 
 ####################### Persistent Social Engagement ##############################
 
-# Queue to use for updating persistent grades
+# Queue to use for updating persistent social engagements
 RECALCULATE_SOCIAL_ENGAGEMENT_ROUTING_KEY = LOW_PRIORITY_QUEUE
 
 ############################# Email Opt In ####################################
