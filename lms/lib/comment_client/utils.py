@@ -106,7 +106,7 @@ def perform_request(method, url, data_or_params=None, raw=False,
         u"status_code={status_code}".format(
             url=url,
             status_code=response.status_code,
-            text=response.text[:100]
+            text=str(response.text)[:100]
         )
     )
 
