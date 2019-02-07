@@ -107,7 +107,9 @@ class TestCourseHomePage(SharedModuleStoreTestCase):
         Verify that the view's query count doesn't regress.
         """
 
-        #deletes course updates block to avoid extra call(s) to mongo db
+        # NOTE: This change is only for edx-solutions and will pick Open edX changes when
+        # rebasing to Hawthorn release.
+        # Deletes course updates block to avoid extra call(s) to mongo db.
         updates_usage_key = get_course_info_usage_key(self.course, 'updates')
         try:
             modulestore().delete_item(updates_usage_key, self.user.id)
