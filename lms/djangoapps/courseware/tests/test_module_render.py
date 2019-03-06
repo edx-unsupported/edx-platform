@@ -134,6 +134,16 @@ class StubCompletableXBlock(CompletableXBlockMixin):
     """
 
     @XBlock.json_handler
+    def grade(self, json_data, suffix):  # pylint: disable=unused-argument
+        """
+        Submit a grade to mark the block complete.
+        """
+        return self.runtime.publish(self, 'grade', {
+            'value': json_data['grade'],
+            'max_value': 1.0,
+        })
+
+    @XBlock.json_handler
     def complete(self, json_data, suffix):  # pylint: disable=unused-argument
         """
         Mark the block's completion value using the completion API.
@@ -159,6 +169,16 @@ class XBlockWithoutCompletionAPI(XBlock):
     This XBlock exists to test completion storage for xblocks
     that don't support completion API but do emit progress signal.
     """
+
+    @XBlock.json_handler
+    def grade(self, json_data, suffix):  # pylint: disable=unused-argument
+        """
+        Submit a grade to mark the block complete.
+        """
+        return self.runtime.publish(self, 'grade', {
+            'value': json_data['grade'],
+            'max_value': 1.0,
+        })
 
     @XBlock.json_handler
     def progress(self, json_data, suffix):  # pylint: disable=unused-argument
@@ -741,6 +761,49 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         )
         self.assertEquals(student_module.grade, 0.75)
         self.assertEquals(student_module.max_grade, 1)
+
+    @XBlock.register_temp_plugin(XBlockWithoutCompletionAPI, identifier='no_comp')
+    def test_grade_event_with_completion_disabled(self):
+        with completion_waffle.waffle().override(completion_waffle.ENABLE_COMPLETION_TRACKING, True):
+            course = CourseFactory.create()
+            block = ItemFactory.create(category='no_comp', parent=course)
+            request = self.request_factory.post(
+                '/',
+                data=json.dumps({'grade': 0.5}),
+                content_type='application/json',
+            )
+            request.user = self.mock_user
+            response = render.handle_xblock_callback(
+                request,
+                unicode(course.id),
+                quote_slashes(unicode(block.scope_ids.usage_id)),
+                'grade',
+                '',
+            )
+            self.assertEqual(response.status_code, 200)
+            self.assertFalse(BlockCompletion.objects.filter(block_key=block.scope_ids.usage_id).exists())
+
+    @XBlock.register_temp_plugin(StubCompletableXBlock, identifier='comp')
+    def test_grade_event(self):
+        with completion_waffle.waffle().override(completion_waffle.ENABLE_COMPLETION_TRACKING, True):
+            course = CourseFactory.create()
+            block = ItemFactory.create(category='comp', parent=course)
+            request = self.request_factory.post(
+                '/',
+                data=json.dumps({'grade': 0.5}),
+                content_type='application/json',
+            )
+            request.user = self.mock_user
+            response = render.handle_xblock_callback(
+                request,
+                unicode(course.id),
+                quote_slashes(unicode(block.scope_ids.usage_id)),
+                'grade',
+                '',
+            )
+        self.assertEqual(response.status_code, 200)
+        completion = BlockCompletion.objects.get(block_key=block.scope_ids.usage_id)
+        self.assertEqual(completion.completion, 1.0)
 
     @ddt.data(
         ('complete', {'completion': 0.625}),

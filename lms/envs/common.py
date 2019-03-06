@@ -340,9 +340,6 @@ FEATURES = {
     # The block types to disable need to be specified in "x block disable config" in django admin.
     'ENABLE_DISABLING_XBLOCK_TYPES': True,
 
-    # Whether an xBlock publishing a 'grade' event should be considered a 'progress' event as well
-    'MARK_PROGRESS_ON_GRADING_EVENT': False,
-
     # Enable the edx-notifications subssytem
     'ENABLE_NOTIFICATIONS': False,
 
@@ -740,12 +737,6 @@ USAGE_ID_PATTERN = r'(?P<usage_id>(?:i4x://?[^/]+/[^/]+/[^/]+/[^@]+(?:@[^/]+)?)|
 # in the AccountCreationForm and the user_api through the ENABLE_UNICODE_USERNAME feature flag.
 USERNAME_REGEX_PARTIAL = r'[\w .@_+-]+'
 USERNAME_PATTERN = r'(?P<username>{regex})'.format(regex=USERNAME_REGEX_PARTIAL)
-
-
-# Verticals having children with any of these categories would be excluded from progress calculations
-PROGRESS_DETACHED_VERTICAL_CATEGORIES = ['discussion-course', 'group-project', 'gp-v2-project', 'eoc-journal']
-# Modules having these categories would be excluded from progress calculations
-PROGRESS_DETACHED_CATEGORIES = PROGRESS_DETACHED_VERTICAL_CATEGORIES + ['discussion-forum']
 
 ############################## HEARTBEAT ######################################
 

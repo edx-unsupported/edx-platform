@@ -81,7 +81,6 @@ from openedx.core.lib.xblock_utils import (
     get_aside_from_xblock,
 )
 from openedx.features.course_duration_limits.access import course_expiration_wrapper
-from progress.models import CourseModuleCompletion
 from student.models import anonymous_id_for_user, user_by_anonymous_id
 from student.roles import CourseBetaTesterRole
 from track import contexts
@@ -591,11 +590,6 @@ def get_module_system_for_user(
             block_key=block.scope_ids.usage_id,
             completion=event['completion'],
         )
-        CourseModuleCompletion.objects.get_or_create(
-            user_id=user.id,
-            course_id=course_id,
-            content_id=unicode(block.scope_ids.usage_id),
-        )
 
     def handle_grade_event(block, event):
         """
@@ -620,11 +614,6 @@ def get_module_system_for_user(
             grader_response=event.get('grader_response')
         )
 
-        # we can treat a grading event as a indication that a user
-        # "completed" an xBlock
-        if settings.FEATURES.get('MARK_PROGRESS_ON_GRADING_EVENT', False):
-            handle_deprecated_progress_event(block, event)
-
     def handle_deprecated_progress_event(block, event):
         """
         DEPRECATED: Submit a completion for the block represented by the
@@ -641,20 +630,15 @@ def get_module_system_for_user(
             if course.end is not None and now > course.end:
                 return
 
-        user_id = event.get('user_id', user.id)
-        if not user_id:
-            return
-
-        CourseModuleCompletion.objects.get_or_create(
-            user_id=user_id,
-            course_id=course_id,
-            content_id=unicode(descriptor.location)
-        )
         if not completion_waffle.waffle().is_enabled(completion_waffle.ENABLE_COMPLETION_TRACKING):
             raise Http404
         else:
-            if user_id != user.id:
-                log.warning("{} tried to submit a completion on behalf of {}".format(user, user_id))
+            requested_user_id = event.get('user_id', user.id)
+            if requested_user_id != user.id:
+                log.warning(u"{} tried to submit a completion on behalf of {}".format(user, requested_user_id))
+                return
+
+            if not requested_user_id:
                 return
 
             # If blocks explicitly declare support for the new completion API,
