@@ -586,9 +586,11 @@ def delete_users(users):
     user_ids = users.values_list('id', flat=True)
     notification_admin.purge_user_data(user_ids)
 
-    # Delete notifications that mention the users, e.g. group work
-    for username in usernames:
-        payload = '"action_username": "{}"'.format(username)
+    for user in users:
+        # Delete CourseModuleCompletion
+        user.course_completions.all().delete()
+        # Delete notifications that mention the users, e.g. group work
+        payload = '"action_username": "{}"'.format(user.username)
         notification_admin.purge_notifications_with_payload(payload)
 
     # Finally delete user and related models
