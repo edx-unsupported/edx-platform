@@ -216,6 +216,9 @@ FEATURES = {
     # Turn off account locking if failed login attempts exceeds a limit
     'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': True,
 
+    # Max no. of bad requests after which ratelimitier backend will block IP's access
+    'RATE_LIMIT_BACKEND_MAX_REQUESTS': 30,
+
     # Hide any Personally Identifiable Information from application logs
     'SQUELCH_PII_IN_LOGS': True,
 
