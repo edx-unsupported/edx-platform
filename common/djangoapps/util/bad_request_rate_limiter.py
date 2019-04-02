@@ -11,7 +11,7 @@ class BadRequestRateLimiter(RateLimitMixin):
     """
     Use the 3rd party RateLimitMixin to help do rate limiting on the Password Reset flows
     """
-    requests = settings.FEATURES.get('RATE_LIMIT_BACKEND_MAX_REQUESTS', 30)
+    requests = settings.RATE_LIMIT_BACKEND_MAX_REQUESTS
 
     def is_rate_limit_exceeded(self, request):
         """

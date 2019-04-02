@@ -216,9 +216,6 @@ FEATURES = {
     # Turn off account locking if failed login attempts exceeds a limit
     'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': True,
 
-    # Max no. of bad requests after which ratelimitier backend will block IP's access
-    'RATE_LIMIT_BACKEND_MAX_REQUESTS': 30,
-
     # Hide any Personally Identifiable Information from application logs
     'SQUELCH_PII_IN_LOGS': True,
 
@@ -3396,3 +3393,6 @@ COMPLETION_AGGREGATOR_BLOCK_TYPES = {
 ############### Settings for user-state-client ##################
 # Maximum number of rows to fetch in XBlockUserStateClient calls. Adjust for performance
 USER_STATE_BATCH_SIZE = 5000
+
+# Max no. of bad requests after which ratelimitier backend will block IP's access
+RATE_LIMIT_BACKEND_MAX_REQUESTS = 30
