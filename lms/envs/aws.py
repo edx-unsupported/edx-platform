@@ -1181,5 +1181,5 @@ COMPLETION_VIDEO_COMPLETE_PERCENTAGE = ENV_TOKENS.get(
 # Max no. of bad requests after which ratelimitier backend will block IP's access
 RATE_LIMIT_BACKEND_MAX_REQUESTS = ENV_TOKENS.get(
     'RATE_LIMIT_BACKEND_MAX_REQUESTS',
-    30
+    RATE_LIMIT_BACKEND_MAX_REQUESTS
 )
