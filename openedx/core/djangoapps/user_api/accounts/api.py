@@ -4,20 +4,25 @@ Programmatic integration point for User API Accounts sub-application
 from django.utils.translation import override as override_language, ugettext as _
 from django.db import transaction, IntegrityError
 import datetime
+
 from pytz import UTC
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from django.core.validators import validate_email, ValidationError
 from django.http import HttpResponseForbidden
+from openedx.core.djangoapps.profile_images.tasks import delete_profile_images
 from openedx.core.djangoapps.user_api.preferences.api import update_user_preferences
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.errors import PreferenceValidationError
+from openedx.core.lib.api.view_utils import add_serializer_errors
 
 from student.models import User, UserProfile, Registration
 from student import forms as student_forms
 from student import views as student_views
 from util.model_utils import emit_setting_changed_event
-
-from openedx.core.lib.api.view_utils import add_serializer_errors
+from lms.lib.comment_client.user import User as CCUser
+from lms.lib.comment_client.utils import CommentClientRequestError
+from edx_notifications.lib import admin as notification_admin
 
 from ..errors import (
     AccountUpdateError, AccountValidationError, AccountUsernameInvalid, AccountPasswordInvalid,
@@ -35,7 +40,6 @@ from .serializers import (
     AccountLegacyProfileSerializer, AccountUserSerializer,
     UserReadOnlySerializer, _visible_fields  # pylint: disable=invalid-name
 )
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
 # Public access point for this function.
@@ -533,3 +537,65 @@ def _validate_email(email):
         raise AccountEmailInvalid(
             u"Email '{email}' format is not valid".format(email=email)
         )
+
+
+def retire_user_comments(user):
+    """
+    Retire the user's discussion comments
+    """
+    try:
+        CCUser.from_django_user(user).retire('Deleted user')
+    except CommentClientRequestError as e:
+        # Ignore error if discussion user does not exist
+        if e.status_code != 404:
+            raise
+
+
+@intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])
+def delete_users(users):
+    """
+    Delete the users and their data in related records.
+
+    Related records include the following:
+    1. models with a ForeignKey relationship to User (with on_delete=CASCADE).
+    2. models with indirect relationship to User (i.e. through another model, or with on_delete other than CASCADE)
+    3. files belonging to the user.
+    4. user notifications in edx-notification models
+
+    Arguments:
+        users: An iterable of 'User' objects.
+
+    Returns:
+        results array of dictionaries with user email and error message or None in case of success
+
+    Raises:
+        UserAPIInternalError
+    """
+    failed = {}
+    for user in users:
+        try:
+            retire_user_comments(user)
+        except Exception as e:
+            failed[user.email] = str(e)
+
+    # Delete user profile images in background task
+    usernames = list(users.values_list('username', flat=True))
+    delete_profile_images.delay(usernames)
+
+    # Delete notifications
+    user_ids = users.values_list('id', flat=True)
+    notification_admin.purge_user_data(user_ids)
+
+    # Delete notifications that mention the users, e.g. group work
+    for username in usernames:
+        payload = '"action_username": "{}"'.format(username)
+        notification_admin.purge_notifications_with_payload(payload)
+
+    # Finally delete user and related models
+    for user in users.exclude(email__in=failed):
+        try:
+            user.delete()
+        except Exception as e:
+            failed[user.email] = str(e)
+
+    return failed
