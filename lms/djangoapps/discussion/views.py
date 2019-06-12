@@ -212,6 +212,9 @@ def get_threads(request, course, user_info, discussion_id=None, per_page=THREADS
 
     for thread in threads:
         # patch for backward compatibility to comments service
+        if thread.get('user_id'):
+            user = User.objects.filter(id=thread['user_id'])
+            thread['username'] = user[0].username
         if 'pinned' not in thread:
             thread['pinned'] = False
 
@@ -332,7 +335,7 @@ def single_thread(request, course_key, discussion_id, thread_id):
         thread = _find_thread(request, course, discussion_id=discussion_id, thread_id=thread_id)
         if not thread:
             raise Http404
-
+        update_user_name(thread)
         with newrelic_function_trace("get_annotated_content_infos"):
             annotated_content_info = utils.get_annotated_content_infos(
                 course_key,
@@ -438,6 +441,7 @@ def _create_discussion_board_context(request, course_key, discussion_id=None, th
         thread = _find_thread(request, course, discussion_id=discussion_id, thread_id=thread_id)
         if not thread:
             raise Http404
+        update_user_name(thread)
 
         # Since we're in page render mode, and the discussions UI will request the thread list itself,
         # we need only return the thread information for this one.
@@ -905,3 +909,23 @@ def get_divided_discussions(course, discussion_settings):
             divided_inline_discussions.append(divided_discussion_id)
 
     return divided_course_wide_discussions, divided_inline_discussions
+
+def update_user_name(thread):
+    """
+    Update the username in all discussions thread
+    :param thread:
+    :return: thread with updated username
+    """
+    thread_dict = thread.__dict__['attributes']
+    if thread_dict.get('user_id'):
+        post_username = User.objects.filter(id=thread_dict['user_id'])
+        thread_dict['username'] = post_username[0].username
+
+    for thr in thread_dict['children']:
+        if thr.get('user_id'):
+            new_user = User.objects.filter(id=thr['user_id'])
+            thr['username'] = new_user[0].username
+            if 'children' in thr:
+                for child_thr in thr['children']:
+                    user = User.objects.filter(id=child_thr['user_id'])
+                    child_thr['username'] = user[0].username
