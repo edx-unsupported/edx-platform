@@ -1,6 +1,8 @@
 <div class="discussion-article view-discussion-home">
   <% if (window.ENABLE_DISCUSSION_HOME_PANEL) { %>
-
+      <%
+      // TODO: Need to cleanup this code after moving to new UI entirely.
+      %>
       <% if (window.isNewUI && window.isNewUI()) { %>
         <h1><%- gettext("Discussions") %></h1>
         <h3 class="sub-heading"><%- gettext("How to use discussions") %></h3>
