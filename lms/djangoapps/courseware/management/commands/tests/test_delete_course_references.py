@@ -29,6 +29,7 @@ class DeleteCourseReferencesTests(ModuleStoreTestCase):
     """
     Test suite for course reference deletion script
     """
+    ENABLED_SIGNALS = ['course_deleted']
 
     def setUp(self):
         super(DeleteCourseReferencesTests, self).setUp()

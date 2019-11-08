@@ -11,7 +11,7 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from util.prompt import query_yes_no
-from util.signals import course_deleted
+from xmodule.modulestore.django import SignalHandler
 
 
 class Command(BaseCommand):
@@ -41,7 +41,7 @@ class Command(BaseCommand):
             print('Note: There is a corresponding CMS command you must run BEFORE this command.')
 
             if hasattr(settings, 'TEST_ROOT'):
-                course_deleted.send(sender=None, course_key=course_key)
+                SignalHandler.course_deleted.send(sender=None, course_key=course_key)
             else:
 
                 if query_yes_no("Deleting ALL records with references to course {0}. Confirm?".format(course_key), default="no"):
@@ -49,6 +49,6 @@ class Command(BaseCommand):
 
                         # Broadcast the deletion event to CMS listeners
                         print 'Notifying LMS system components...'
-                        course_deleted.send(sender=None, course_key=course_key)
+                        SignalHandler.course_deleted.send(sender=None, course_key=course_key)
 
                         print 'LMS Course Cleanup Complete!'

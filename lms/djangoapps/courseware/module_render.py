@@ -7,11 +7,11 @@ import hashlib
 import json
 import logging
 import textwrap
+import pytz
 from collections import OrderedDict
 from functools import partial
 from datetime import datetime
-from django.utils.timezone import utc as UTC
-
+from django.utils.timezone import utc
 from completion.models import BlockCompletion
 from completion import waffle as completion_waffle
 from django.conf import settings
@@ -581,7 +581,7 @@ def get_module_system_for_user(
         elif not settings.FEATURES.get("ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE", True):
             # if a course has ended, don't register progress events
             course = modulestore().get_course(course_id, depth=0)
-            now = datetime.now(UTC())
+            now = datetime.utcnow()
             if course.end is not None and now > course.end:
                 return
 
@@ -605,7 +605,7 @@ def get_module_system_for_user(
         if not settings.FEATURES.get("ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE", True):
             # if a course has ended, don't register grading events
             course = modulestore().get_course(course_id, depth=0)
-            now = datetime.now(UTC())
+            now = datetime.now(pytz.UTC)
             if course.end is not None and now > course.end:
                 return
 
@@ -637,7 +637,7 @@ def get_module_system_for_user(
         if not settings.FEATURES.get("ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE", True):
             # if a course has ended, don't register progress events
             course = modulestore().get_course(course_id, depth=0)
-            now = datetime.now(UTC())
+            now = datetime.utcnow()
             if course.end is not None and now > course.end:
                 return
 

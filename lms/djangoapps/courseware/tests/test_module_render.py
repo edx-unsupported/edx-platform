@@ -10,6 +10,8 @@ from functools import partial
 import ddt
 import pytz
 from bson import ObjectId
+from completion.models import BlockCompletion
+from completion import waffle as completion_waffle
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.middleware.csrf import get_token
@@ -50,7 +52,7 @@ from courseware.masquerade import CourseMasquerade
 from courseware.model_data import FieldDataCache
 from courseware.models import StudentModule
 from courseware.module_render import get_module_for_descriptor, hash_resource
-from courseware.tests.factories import GlobalStaffFactory, StudentModuleFactory, UserFactory
+from courseware.tests.factories import GlobalStaffFactory, StudentModuleFactory, UserFactory, RequestFactoryNoCsrf
 from courseware.tests.test_submitting_problems import TestSubmittingProblems
 from courseware.tests.tests import LoginEnrollmentTestCase
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
