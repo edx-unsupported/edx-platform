@@ -2,10 +2,8 @@
 
 """
 Unit tests for LMS instructor-initiated background tasks helper functions.
-
 - Tests that CSV grade report generation works with unicode emails.
 - Tests all of the existing reports.
-
 """
 
 import os
@@ -341,7 +339,6 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
         Verifies that whether a learner has a failing grade in the database or the grade is
         calculated on the fly, a failing grade will result in a Certificate Eligibility of
         "N" in the report.
-
         Also confirms that a persisted passing grade will result in a Certificate Eligibility
         of "Y" incase of verified learners and "N" incase of audit laerners.
         """
@@ -518,7 +515,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         student_data, _ = ProblemResponses._build_student_data(
             user_id=self.instructor.id,
             course_key=self.course.id,
-            usage_key_str_list=[str(self.course.location)],
+            usage_key_str=str(self.course.location),
         )
 
         self.assertEquals(len(student_data), 4)
@@ -567,7 +564,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         student_data, _ = ProblemResponses._build_student_data(
             user_id=self.instructor.id,
             course_key=self.course.id,
-            usage_key_str_list=[str(self.course.location)],
+            usage_key_str=str(self.course.location),
         )
         self.assertEquals(len(student_data), 2)
         self.assertDictContainsSubset({
@@ -629,7 +626,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         ProblemResponses._build_student_data(
             user_id=self.instructor.id,
             course_key=self.course.id,
-            usage_key_str_list=[str(problem.location)],
+            usage_key_str=str(problem.location),
         )
         mock_generate_report_data.assert_called_with(ANY, ANY)
         mock_list_problem_responses.assert_called_with(self.course.id, ANY, ANY)
@@ -1032,7 +1029,6 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
     def test_problem_grade_report(self):
         """
         Test that we generate the correct grade report when dealing with A/B tests.
-
         In order to verify that the behavior of the grade report is correct, we submit answers for problems
         that the student won't have access to. A/B tests won't restrict access to the problems, but it should
         not show up in that student's course tree when generating the grade report, hence the Not Available's
@@ -1786,7 +1782,6 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
         A CSV file may be malformed and lack traling commas at the end of a row.
         In this case, those cells take on the value None by the CSV parser.
         Make sure we handle None values appropriately.
-
         i.e.:
             header_1,header_2,header_3
             val_1,val_2,val_3  <- good row
