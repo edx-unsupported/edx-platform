@@ -1,6 +1,6 @@
 <li data-id="<%- id %>" class="forum-nav-thread<% if (!hideReadState && neverRead) { %> never-read<% } %>">
   <% if (!hideReadState && neverRead) { %>
-    <span class="sr">Never Read</span>
+    <span class="sr"><%- gettext("Never Read") %></span>
   <% } %>
   <a href="<%- threadUrl %>" class="forum-nav-thread-link">
     <div class="forum-nav-thread-wrapper-0">
