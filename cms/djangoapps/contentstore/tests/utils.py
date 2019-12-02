@@ -20,6 +20,7 @@ from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.utils import ProceduralCourseTestMixin
 from xmodule.modulestore.xml_importer import import_course_from_xml
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
