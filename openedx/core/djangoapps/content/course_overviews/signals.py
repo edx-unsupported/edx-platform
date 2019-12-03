@@ -17,7 +17,7 @@ COURSE_PACING_CHANGED = Signal(providing_args=["updated_course_overview", "previ
 
 
 @receiver(SignalHandler.course_published, dispatch_uid='openedx.core.djangoapps.content.course_overviews')
-def listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=unused-argument
+def _listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable=unused-argument
     """
     Catches the signal that a course has been published in Studio and
     updates the corresponding CourseOverview cache entry.
