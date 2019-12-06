@@ -7,6 +7,7 @@ and task submission logic, including handling the Celery backend.
 import hashlib
 import json
 import logging
+import datetime
 
 from celery.result import AsyncResult
 from celery.states import FAILURE, READY_STATES, REVOKED, SUCCESS
@@ -29,8 +30,11 @@ class AlreadyRunningError(Exception):
 
 def _task_is_running(course_id, task_type, task_key):
     """Checks if a particular task is already running"""
+
+    # Checking out the task till a day as probably on one will take time longer than a day.
+    yesterday = datetime.date.today() - datetime.timedelta(days=1)
     running_tasks = InstructorTask.objects.filter(
-        course_id=course_id, task_type=task_type, task_key=task_key
+        course_id=course_id, task_type=task_type, task_key=task_key, created__gt=yesterday
     )
     # exclude states that are "ready" (i.e. not "running", e.g. failure, success, revoked):
     for state in READY_STATES:
