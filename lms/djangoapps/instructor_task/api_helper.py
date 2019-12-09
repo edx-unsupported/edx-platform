@@ -31,7 +31,7 @@ class AlreadyRunningError(Exception):
 def _task_is_running(course_id, task_type, task_key):
     """Checks if a particular task is already running"""
 
-    # Filtering out a task till the last day as probably on one will take time longer than a day to be completed.
+    # Filtering out a task till the last day as probably no one will take time longer than a day to be completed.
     last_day = datetime.date.today() - datetime.timedelta(days=1)
     running_tasks = InstructorTask.objects.filter(
         course_id=course_id, task_type=task_type, task_key=task_key, created__gt=last_day
