@@ -193,7 +193,7 @@ class User(models.Model):
 def get_user_social_stats(user_id, course_id, end_date=None, thread_type=None, thread_ids=None):
     """ Queries cs_comments_service for social_stats """
     if not course_id:
-        raise CommentClientRequestError("Must provide course_id when retrieving social stats for the user")
+        raise utils.CommentClientRequestError("Must provide course_id when retrieving social stats for the user")
 
     url = _url_for_user_social_stats(user_id)
     params = {'course_id': course_id}
@@ -204,7 +204,7 @@ def get_user_social_stats(user_id, course_id, end_date=None, thread_type=None, t
     if thread_ids:
         params.update({'thread_ids': ",".join(thread_ids)})
 
-    response = perform_request(
+    response = utils.perform_request(
         'get',
         url,
         params

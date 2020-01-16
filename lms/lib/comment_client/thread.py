@@ -227,7 +227,7 @@ class Thread(models.Model):
             params = {
                 'exclude_user_id': self.user_id
             }
-        response = perform_request(
+        response = utils.perform_request(
             'get',
             url,
             params
@@ -240,7 +240,7 @@ def get_course_thread_stats(course_id):
     Helper method to get threads stats by course
     """
     url = _url_for_course_thread_stats(course_id)
-    response = perform_request(
+    response = utils.perform_request(
         'get',
         url
     )

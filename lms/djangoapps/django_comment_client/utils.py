@@ -28,7 +28,7 @@ from django_comment_common.models import (
     Role
 )
 from django_comment_common.utils import get_course_discussion_settings
-from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id, get_cohort_names, is_course_cohorted
+from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id, get_cohort_names, is_course_cohorted, get_cohort_by_id
 from openedx.core.lib.cache_utils import request_cached
 from student.models import get_user_by_username_or_email
 from student.roles import GlobalStaff

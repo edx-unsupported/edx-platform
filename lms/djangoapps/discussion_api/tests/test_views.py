@@ -219,7 +219,7 @@ class RetireViewTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         headers = self.build_jwt_headers(self.superuser)
         data = {'username': self.user.username}
         response = self.client.post(self.url, data, **headers)
-        self.assert_response_correct(response, 500, '"Server error"')
+        self.assert_response_correct(response, 500, '"Internal Server Error: Server error"')
 
     def test_nonexistent_user(self):
         """

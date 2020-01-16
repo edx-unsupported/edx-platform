@@ -86,7 +86,7 @@ class UtilityTests(TestCase):
         """ Tests get_user_social_stats utility function """
         expected_data['course_id'] = course_id
         with mock.patch("lms.lib.comment_client.user._url_for_user_social_stats") as patched_url_for_social_stats, \
-                mock.patch("lms.lib.comment_client.user.perform_request") as patched_perform_request:
+                mock.patch("lms.lib.comment_client.utils.perform_request") as patched_perform_request:
             patched_perform_request.return_value = expected_result
             patched_url_for_social_stats.return_value = expected_url
             result = get_user_social_stats(user_id, course_id, end_date=end_date, thread_type=thread_type)
