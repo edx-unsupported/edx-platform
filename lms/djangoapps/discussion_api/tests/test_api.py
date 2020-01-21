@@ -31,7 +31,6 @@ from discussion_api.api import (
     update_comment,
     update_thread
 )
-from discussion_api.exceptions import CommentNotFoundError, DiscussionDisabledError, ThreadNotFoundError
 from discussion_api.tests.utils import (
     CommentsServiceMockMixin,
     make_minimal_cs_comment,
@@ -46,6 +45,7 @@ from django_comment_common.models import (
     FORUM_ROLE_STUDENT,
     Role
 )
+from lms.djangoapps.discussion_api.exceptions import CommentNotFoundError, DiscussionDisabledError, ThreadNotFoundError
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.lib.exceptions import CourseNotFoundError, PageNotFoundError

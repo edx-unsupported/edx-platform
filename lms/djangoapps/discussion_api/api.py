@@ -15,7 +15,6 @@ from opaque_keys.edx.locator import CourseKey
 from rest_framework.exceptions import PermissionDenied
 
 from courseware.courses import get_course_with_access
-from discussion_api.exceptions import CommentNotFoundError, DiscussionDisabledError, ThreadNotFoundError
 from discussion_api.forms import CommentActionsForm, ThreadActionsForm
 from discussion_api.permissions import (
     can_delete,
@@ -40,6 +39,7 @@ from django_comment_common.signals import (
 )
 from django_comment_common.utils import get_course_discussion_settings
 from lms.djangoapps.courseware.exceptions import CourseAccessRedirect
+from lms.djangoapps.discussion_api.exceptions import CommentNotFoundError, DiscussionDisabledError, ThreadNotFoundError
 from lms.djangoapps.discussion_api.pagination import DiscussionAPIPagination
 from lms.lib.comment_client.comment import Comment
 from lms.lib.comment_client.thread import Thread
