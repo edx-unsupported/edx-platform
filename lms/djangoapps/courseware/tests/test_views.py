@@ -1204,7 +1204,8 @@ class ProgressPageBaseTests(ModuleStoreTestCase):
         self.course = CourseFactory.create(
             start=datetime(2013, 9, 16, 7, 17, 28),
             grade_cutoffs={u'çü†øƒƒ': 0.75, 'Pass': 0.5},
-            end=datetime.now(),
+            # timedelta add for mcka Custom change
+            end=datetime.now(UTC) + timedelta(days=30),
             certificate_available_date=datetime.now(UTC),
             **options
         )
