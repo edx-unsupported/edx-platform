@@ -21,6 +21,8 @@ MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {})
 class InstructorReceiversTests(ModuleStoreTestCase):
     """ Test suite for signal receivers """
 
+    ENABLED_SIGNALS = ['course_deleted']
+
     def setUp(self):
         super(InstructorReceiversTests, self).setUp()
         # Create a course to work with
