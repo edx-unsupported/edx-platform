@@ -539,17 +539,13 @@ def get_module_system_for_user(
     def get_event_handler(event_type):
         """
         Return an appropriate function to handle the event.
-
         Returns None if no special processing is required.
         """
         handlers = {
+            'completion': handle_completion_event,
             'grade': handle_grade_event,
+            'progress': handle_deprecated_progress_event,
         }
-        if completion_waffle.waffle().is_enabled(completion_waffle.ENABLE_COMPLETION_TRACKING):
-            handlers.update({
-                'completion': handle_completion_event,
-                'progress': handle_deprecated_progress_event,
-            })
         return handlers.get(event_type)
 
     def publish(block, event_type, event):
@@ -596,7 +592,6 @@ def get_module_system_for_user(
             course_id=course_id,
             content_id=unicode(block.scope_ids.usage_id),
         )
-
     def handle_grade_event(block, event):  # pylint: disable=unused-argument
         """
         Manages the workflow for recording and updating of student module grade state
