@@ -7,7 +7,7 @@
         <div class="field-help" id="field_help_title">
             <%- gettext("Add a clear and descriptive title to encourage participation. (Required)") %>
         </div>
-        <input aria-describedby="field_help_title" type="text" class="edit-post-title field-input" name="title" value="<%- title %>">
+        <input type="text" class="edit-post-title field-input" name="title" value="<%- title %>">
     </label>
 </div>
 <div class="form-row post-field">

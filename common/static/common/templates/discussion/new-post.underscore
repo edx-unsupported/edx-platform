@@ -37,7 +37,7 @@
                 <%- gettext("Add a clear and descriptive title to encourage participation. (Required)") %>
             </div>
             <div>
-                <input aria-describedby="field_help_title" type="text" class="js-post-title field-input" name="title">
+                <input type="text" class="js-post-title field-input" name="title">
             </div>
         </label>
     </div>
