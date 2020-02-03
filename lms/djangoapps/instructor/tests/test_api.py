@@ -2972,8 +2972,10 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             submit_task_function.side_effect = error
             response = self.client.post(url, {})
             res_json = json.loads(response.content)
+
+            self.assertEqual(response.status_code, 200)
             self.assertIn('status', res_json)
-            self.assertIn('already in progress', res_json['status'])
+            self.assertIn('A problem responses report generation task is already in progress.', res_json['status'])
 
     def test_get_students_features(self):
         """
