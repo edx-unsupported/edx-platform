@@ -2966,15 +2966,14 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             'api_instructor:get_problem_responses',
             kwargs={'course_id': unicode(self.course.id)}
         )
-        task_type = 'problem_responses_csv'
-        already_running_status = generate_already_running_error_message(task_type)
+
         with patch('lms.djangoapps.instructor_task.api.submit_calculate_problem_responses_csv') as submit_task_function:
-            error = AlreadyRunningError(already_running_status)
+            error = AlreadyRunningError()
             submit_task_function.side_effect = error
             response = self.client.post(url, {})
-
-        self.assertEqual(response.status_code, 400)
-        self.assertIn(already_running_status, response.content)
+            res_json = json.loads(response.content)
+            self.assertIn('status', res_json)
+            self.assertIn('already in progress', res_json['status'])
 
     def test_get_students_features(self):
         """
