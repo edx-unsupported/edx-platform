@@ -694,26 +694,26 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
     def test_bad_xmodule_dispatch(self):
         request = self.request_factory.post('dummy_url')
         request.user = self.mock_user
-        with self.assertRaises(Http404):
-            render.handle_xblock_callback(
-                request,
-                text_type(self.course_key),
-                quote_slashes(text_type(self.location)),
-                'xmodule_handler',
-                'bad_dispatch',
-            )
+        resp = render.handle_xblock_callback(
+            request,
+            text_type(self.course_key),
+            quote_slashes(text_type(self.location)),
+            'xmodule_handler',
+            'bad_dispatch',
+        )
+        self.assertEquals(resp.status_code, 404)
 
     def test_missing_handler(self):
         request = self.request_factory.post('dummy_url')
         request.user = self.mock_user
-        with self.assertRaises(Http404):
-            render.handle_xblock_callback(
-                request,
-                text_type(self.course_key),
-                quote_slashes(text_type(self.location)),
-                'bad_handler',
-                'bad_dispatch',
-            )
+        resp = render.handle_xblock_callback(
+            request,
+            text_type(self.course_key),
+            quote_slashes(text_type(self.location)),
+            'bad_handler',
+            'bad_dispatch',
+        )
+        self.assertEquals(resp.status_code, 404)
 
     @XBlock.register_temp_plugin(GradedStatelessXBlock, identifier='stateless_scorer')
     def test_score_without_student_state(self):
