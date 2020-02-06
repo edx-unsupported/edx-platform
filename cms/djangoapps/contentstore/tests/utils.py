@@ -12,7 +12,7 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import AssetLocation
 
 from contentstore.utils import reverse_url
-from lms import startup
+from edx_notifications import apps
 from student.models import Registration
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore import ModuleStoreEnum
@@ -91,7 +91,7 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
         self.course = CourseFactory.create()
 
         # initialize the Notification subsystem
-        startup.startup_notification_subsystem()
+        apps.startup_notification_subsystem()
 
     def create_non_staff_authed_user_client(self, authenticate=True):
         """
