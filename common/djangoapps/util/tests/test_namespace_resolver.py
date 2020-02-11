@@ -2,8 +2,6 @@
 Unit tests for namespace_resolver.py
 """
 
-from django.test import TestCase
-
 from datetime import datetime
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 

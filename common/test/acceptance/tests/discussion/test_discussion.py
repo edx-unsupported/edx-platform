@@ -863,7 +863,8 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
         view = SingleThreadViewFixture(Thread(id="comment_edit_test_thread", commentable_id=self.discussion_id))
         view.addResponse(
             Response(id="response1"),
-            [Comment(id="comment_other_author", user_id="other"), Comment(id="comment_self_author", user_id=self.user_id)])
+            [Comment(id="comment_other_author", user_id="other"),
+             Comment(id="comment_self_author", user_id=self.user_id)])
         view.push()
 
     def edit_comment(self, page, comment_id):

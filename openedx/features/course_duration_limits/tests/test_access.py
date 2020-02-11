@@ -5,7 +5,6 @@ import itertools
 
 from course_modes.models import CourseMode
 from course_modes.tests.factories import CourseModeFactory
-from django.test import RequestFactory
 from django.utils import timezone
 from courseware.models import DynamicUpgradeDeadlineConfiguration
 from mock import patch

@@ -263,7 +263,8 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         """
         vertical = self.course_fixture.get_nested_xblocks(category="vertical")[number]
         if group_configuration_metadata:
-            split_test = XBlockFixtureDesc('split_test', 'Test Content Experiment', metadata=group_configuration_metadata)
+            split_test = XBlockFixtureDesc(
+                'split_test', 'Test Content Experiment', metadata=group_configuration_metadata)
         else:
             split_test = XBlockFixtureDesc('split_test', 'Test Content Experiment')
         self.course_fixture.create_xblock(vertical.locator, split_test)
@@ -741,7 +742,8 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
 
     def test_group_configuration_non_empty_usage(self):
         """
-        Scenario: When group configuration is used, ensure that the links to units using a group configuration work correctly.
+        Scenario: When group configuration is used,
+        ensure that the links to units using a group configuration work correctly.
         Given I have a course without group configurations
         And I create new group configuration with 2 default groups
         And I create a unit and assign the newly created group configuration
@@ -976,7 +978,8 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         """
 
         # Create group configuration and associated experiment
-        config, _ = self.create_group_configuration_experiment([Group("0", "Group A"), Group("1", "Group B"), Group("2", "Group C")], True)
+        config, _ = self.create_group_configuration_experiment(
+            [Group("0", "Group A"), Group("1", "Group B"), Group("2", "Group C")], True)
 
         # Display details view
         config.toggle()
@@ -1062,7 +1065,8 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         And it is rendered correctly
         """
 
-        config, split_test = self.create_group_configuration_experiment([Group("0", "Group A"), Group("1", "Group B"), Group("2", "Group C")], True)
+        config, split_test = self.create_group_configuration_experiment(
+            [Group("0", "Group A"), Group("1", "Group B"), Group("2", "Group C")], True)
         container = ContainerPage(self.browser, split_test.locator)
 
         # render in LMS correctly

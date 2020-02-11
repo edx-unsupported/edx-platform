@@ -460,4 +460,5 @@ class VideoEditorTest(CMSVideoBaseTest):
             unicode_text = lang_text.decode('utf-8')
             self.assertIn(unicode_text, self.video.captions_text)
 
-        self.assertEqual(self.video.caption_languages, {'zh_HANS': 'Simplified Chinese', 'zh_HANT': 'Traditional Chinese'})
+        self.assertEqual(self.video.caption_languages,
+                         {'zh_HANS': 'Simplified Chinese', 'zh_HANT': 'Traditional Chinese'})

@@ -15,7 +15,7 @@ from completion_aggregator.models import Aggregator
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from student.models import CourseEnrollment
-from student.tests.factories import AdminFactory, UserFactory
+from student.tests.factories import AdminFactory
 
 
 class AggregationRequestTestCase(SharedModuleStoreTestCase):

@@ -182,7 +182,8 @@ def verify_setting_entry(setting, display_name, value, explicitly_set):
         list_value = ', '.join(ele.value for ele in setting.find_by_css('.list-settings-item'))
         assert_equal(value, list_value)
     elif setting.has_class('metadata-videolist-enum'):
-        list_value = ', '.join(ele.find_by_css('input')[0].value for ele in setting.find_by_css('.videolist-settings-item'))
+        list_value = ', '.join(ele.find_by_css('input')[0].value
+                               for ele in setting.find_by_css('.videolist-settings-item'))
         assert_equal(value, list_value)
     else:
         assert_equal(value, setting.find_by_id(label_for).value)

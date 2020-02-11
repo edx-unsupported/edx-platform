@@ -61,7 +61,7 @@ from event_transformers import ForumThreadViewedEventTransformer
 from openedx.core.djangoapps.course_groups.cohorts import add_cohort, add_user_to_cohort
 from openedx.core.djangoapps.course_groups.models import CourseCohort
 
-from edx_notifications.lib.consumer import get_notifications_for_user, get_notifications_count_for_user
+from edx_notifications.lib.consumer import get_notifications_count_for_user
 from edx_notifications.startup import initialize as initialize_notifications
 
 from social_engagement.models import StudentSocialEngagementScore
@@ -1611,7 +1611,9 @@ class UpdateThreadUnicodeTestCase(
             "user_id": str(self.student.id),
             "closed": False,
         })
-        request = RequestFactory().post("dummy_url", {"body": text, "title": text, "thread_type": "question", "commentable_id": "test_commentable"})
+        request = RequestFactory().post(
+            "dummy_url",
+            {"body": text, "title": text, "thread_type": "question", "commentable_id": "test_commentable"})
         request.user = self.student
         request.view_name = "update_thread"
         response = views.update_thread(request, course_id=unicode(self.course.id), thread_id="dummy_thread_id")

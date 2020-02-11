@@ -412,7 +412,8 @@ class PayAndVerifyTest(EventsTestMixin, UniqueCourseTest):
         super(PayAndVerifyTest, self).setUp()
 
         self.payment_and_verification_flow = PaymentAndVerificationFlow(self.browser, self.course_id)
-        self.immediate_verification_page = PaymentAndVerificationFlow(self.browser, self.course_id, entry_point='verify-now')
+        self.immediate_verification_page = PaymentAndVerificationFlow(
+            self.browser, self.course_id, entry_point='verify-now')
         self.upgrade_page = PaymentAndVerificationFlow(self.browser, self.course_id, entry_point='upgrade')
         self.fake_payment_page = FakePaymentPage(self.browser, self.course_id)
         self.dashboard_page = DashboardPage(self.browser)
@@ -429,7 +430,8 @@ class PayAndVerifyTest(EventsTestMixin, UniqueCourseTest):
         ModeCreationPage(self.browser, self.course_id).visit()
 
         # Add a verified mode to the course
-        ModeCreationPage(self.browser, self.course_id, mode_slug=u'verified', mode_display_name=u'Verified Certificate', min_price=10, suggested_prices='10,20').visit()
+        ModeCreationPage(self.browser, self.course_id, mode_slug=u'verified',
+                         mode_display_name=u'Verified Certificate', min_price=10, suggested_prices='10,20').visit()
 
     def test_deferred_verification_enrollment(self):
         # Create a user and log them in
@@ -758,10 +760,12 @@ class VisibleToStaffOnlyTest(UniqueCourseTest):
             XBlockFixtureDesc('chapter', 'Test Section').add_children(
                 XBlockFixtureDesc('sequential', 'Subsection With Locked Unit').add_children(
                     XBlockFixtureDesc('vertical', 'Locked Unit', metadata={'visible_to_staff_only': True}).add_children(
-                        XBlockFixtureDesc('html', 'Html Child in locked unit', data="<html>Visible only to staff</html>"),
+                        XBlockFixtureDesc('html', 'Html Child in locked unit',
+                                          data="<html>Visible only to staff</html>"),
                     ),
                     XBlockFixtureDesc('vertical', 'Unlocked Unit').add_children(
-                        XBlockFixtureDesc('html', 'Html Child in unlocked unit', data="<html>Visible only to all</html>"),
+                        XBlockFixtureDesc('html', 'Html Child in unlocked unit',
+                                          data="<html>Visible only to all</html>"),
                     )
                 ),
                 XBlockFixtureDesc('sequential', 'Unlocked Subsection').add_children(
@@ -769,7 +773,8 @@ class VisibleToStaffOnlyTest(UniqueCourseTest):
                         XBlockFixtureDesc('html', 'Html Child in visible unit', data="<html>Visible to all</html>"),
                     )
                 ),
-                XBlockFixtureDesc('sequential', 'Locked Subsection', metadata={'visible_to_staff_only': True}).add_children(
+                XBlockFixtureDesc('sequential', 'Locked Subsection',
+                                  metadata={'visible_to_staff_only': True}).add_children(
                     XBlockFixtureDesc('vertical', 'Test Unit').add_children(
                         XBlockFixtureDesc(
                             'html', 'Html Child in locked subsection', data="<html>Visible only to staff</html>"

@@ -43,7 +43,6 @@ CSRF cookie.
 """
 
 import logging
-import urlparse
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, MiddlewareNotUsed

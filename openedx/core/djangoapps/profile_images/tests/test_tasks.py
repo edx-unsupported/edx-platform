@@ -1,8 +1,6 @@
 """
 Test cases for image processing Celery tasks
 """
-import os
-
 from django.test import TestCase
 from django.test.utils import override_settings
 import ddt

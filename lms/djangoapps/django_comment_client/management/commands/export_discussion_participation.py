@@ -1,7 +1,6 @@
 import csv
 import dateutil
 from datetime import datetime
-from optparse import make_option
 
 from django.core.management.base import BaseCommand, CommandError
 import os
@@ -91,7 +90,7 @@ class Command(BaseCommand):
             '--thread-type',
             action='store',
             type='choice',
-            dest=THREAD_TYPE_PARAMETER,
+            dest=self.THREAD_TYPE_PARAMETER,
             choices=('discussion', 'question'),
             default=None,
             help='Filter threads, comments and replies by thread type'
@@ -100,20 +99,20 @@ class Command(BaseCommand):
             '--end-date',
             action='store',
             type='string',
-            dest=END_DATE_PARAMETER,
+            dest=self.END_DATE_PARAMETER,
             default=None,
             help='Include threads, comments and replies created before the supplied date (iso8601 format)'
         ),
         parser.add_argument(
             '--all',
             action='store_true',
-            dest=ALL_PARAMETER,
+            dest=self.ALL_PARAMETER,
             default=False,
         ),
         parser.add_argument(
             '--cohorted_only',
             action='store_true',
-            dest=COHORTED_ONLY_PARAMETER,
+            dest=self.COHORTED_ONLY_PARAMETER,
             default=False,
         )
 

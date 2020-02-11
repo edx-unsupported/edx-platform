@@ -25,7 +25,7 @@ class Command(BaseCommand):
             return
 
         roles = user.roles.all()
-        print('{} has %d roles:'.format(user, len(roles)))
+        print('{} has {} roles:'.format(user, len(roles)))
         for role in roles:
             print('\t{}'.format(role))
 

@@ -183,8 +183,10 @@ class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
             And The Notification message should read 'File is not attached.'
         """
         self.auto_enroll_section.click_upload_file_button()
-        self.assertTrue(self.auto_enroll_section.is_notification_displayed(section_type=self.auto_enroll_section.NOTIFICATION_ERROR))
-        self.assertEqual(self.auto_enroll_section.first_notification_message(section_type=self.auto_enroll_section.NOTIFICATION_ERROR), "File is not attached.")
+        self.assertTrue(self.auto_enroll_section.is_notification_displayed(
+            section_type=self.auto_enroll_section.NOTIFICATION_ERROR))
+        self.assertEqual(self.auto_enroll_section.first_notification_message(
+            section_type=self.auto_enroll_section.NOTIFICATION_ERROR), "File is not attached.")
 
     def test_uploading_correct_csv_file_results_in_success(self):
         """
@@ -194,7 +196,8 @@ class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
             Then I should be shown a Success Notification.
         """
         self.auto_enroll_section.upload_correct_csv_file()
-        self.assertTrue(self.auto_enroll_section.is_notification_displayed(section_type=self.auto_enroll_section.NOTIFICATION_SUCCESS))
+        self.assertTrue(self.auto_enroll_section.is_notification_displayed(
+            section_type=self.auto_enroll_section.NOTIFICATION_SUCCESS))
 
     def test_uploading_csv_file_with_bad_data_results_in_errors_and_warnings(self):
         """
@@ -207,10 +210,16 @@ class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
             And a corresponding Warning Message.
         """
         self.auto_enroll_section.upload_csv_file_with_errors_warnings()
-        self.assertTrue(self.auto_enroll_section.is_notification_displayed(section_type=self.auto_enroll_section.NOTIFICATION_ERROR))
-        self.assertEqual(self.auto_enroll_section.first_notification_message(section_type=self.auto_enroll_section.NOTIFICATION_ERROR), "Data in row #2 must have exactly four columns: email, username, full name, and country")
-        self.assertTrue(self.auto_enroll_section.is_notification_displayed(section_type=self.auto_enroll_section.NOTIFICATION_WARNING))
-        self.assertEqual(self.auto_enroll_section.first_notification_message(section_type=self.auto_enroll_section.NOTIFICATION_WARNING), "ename (d@a.com): (An account with email d@a.com exists but the provided username ename is different. Enrolling anyway with d@a.com.)")
+        self.assertTrue(self.auto_enroll_section.is_notification_displayed(
+            section_type=self.auto_enroll_section.NOTIFICATION_ERROR))
+        self.assertEqual(self.auto_enroll_section.first_notification_message(
+            section_type=self.auto_enroll_section.NOTIFICATION_ERROR),
+            "Data in row #2 must have exactly four columns: email, username, full name, and country")
+        self.assertTrue(self.auto_enroll_section.is_notification_displayed(
+            section_type=self.auto_enroll_section.NOTIFICATION_WARNING))
+        self.assertEqual(self.auto_enroll_section.first_notification_message(
+            section_type=self.auto_enroll_section.NOTIFICATION_WARNING),
+            "ename (d@a.com): (An account with email d@a.com exists but the provided username ename is different. Enrolling anyway with d@a.com.)")
 
     def test_uploading_non_csv_file_results_in_error(self):
         """
@@ -221,8 +230,11 @@ class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
             And The Notification message should read 'Make sure that the file you upload is in CSV..'
         """
         self.auto_enroll_section.upload_non_csv_file()
-        self.assertTrue(self.auto_enroll_section.is_notification_displayed(section_type=self.auto_enroll_section.NOTIFICATION_ERROR))
-        self.assertEqual(self.auto_enroll_section.first_notification_message(section_type=self.auto_enroll_section.NOTIFICATION_ERROR), "Make sure that the file you upload is in CSV format with no extraneous characters or rows.")
+        self.assertTrue(self.auto_enroll_section.is_notification_displayed(
+            section_type=self.auto_enroll_section.NOTIFICATION_ERROR))
+        self.assertEqual(self.auto_enroll_section.first_notification_message(
+            section_type=self.auto_enroll_section.NOTIFICATION_ERROR),
+            "Make sure that the file you upload is in CSV format with no extraneous characters or rows.")
 
     @attr('a11y')
     def test_auto_enroll_csv_a11y(self):

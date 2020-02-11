@@ -45,7 +45,6 @@ from openedx.core.djangolib.oauth2_retirement_utils import retire_dot_oauth2_mod
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.api.parsers import MergePatchParser
 from student.models import (
-    CourseEnrollment,
     ManualEnrollmentAudit,
     PendingNameChange,
     CourseEnrollmentAllowed,
@@ -56,8 +55,7 @@ from student.models import (
     UserProfile,
     get_potentially_retired_user_by_username,
     get_retired_email_by_email,
-    get_retired_username_by_username,
-    is_username_retired
+    get_retired_username_by_username
 )
 from ..errors import AccountUpdateError, AccountValidationError, UserNotAuthorized, UserNotFound
 from ..models import (

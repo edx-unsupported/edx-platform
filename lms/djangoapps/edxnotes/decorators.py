@@ -20,7 +20,8 @@ def edxnotes(cls):
         Returns raw html for the component.
         """
         # Import is placed here to avoid model import at project startup.
-        from edxnotes.helpers import generate_uid, get_edxnotes_id_token, get_public_endpoint, get_token_url, is_feature_enabled
+        from edxnotes.helpers import (
+            generate_uid, get_edxnotes_id_token, get_public_endpoint, get_token_url, is_feature_enabled)
         is_studio = getattr(self.system, "is_author_mode", False)
         course = self.descriptor.runtime.modulestore.get_course(self.runtime.course_id)
 

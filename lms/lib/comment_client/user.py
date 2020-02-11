@@ -190,6 +190,7 @@ class User(models.Model):
             metric_tags=self._metric_tags
         )
 
+
 def get_user_social_stats(user_id, course_id, end_date=None, thread_type=None, thread_ids=None):
     """ Queries cs_comments_service for social_stats """
     if not course_id:
@@ -227,6 +228,7 @@ def get_course_social_stats(course_id, end_date=None):
         params
     )
     return response
+
 
 def _url_for_vote_comment(comment_id):
     return "{prefix}/comments/{comment_id}/votes".format(prefix=settings.PREFIX, comment_id=comment_id)

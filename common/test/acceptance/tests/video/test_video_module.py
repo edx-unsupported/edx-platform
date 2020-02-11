@@ -757,7 +757,8 @@ class YouTubeVideoTest(VideoBaseTest):
             self.assertIn(unicode_text, self.video.captions_text)
             self.assertTrue(self.video.downloaded_transcript_contains_text('srt', unicode_text))
 
-        self.assertEqual(self.video.caption_languages, {'zh_HANS': 'Simplified Chinese', 'zh_HANT': 'Traditional Chinese'})
+        self.assertEqual(self.video.caption_languages,
+                         {'zh_HANS': 'Simplified Chinese', 'zh_HANT': 'Traditional Chinese'})
 
 
 @attr(shard=13)

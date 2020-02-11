@@ -9,7 +9,6 @@ from django.test.client import RequestFactory
 
 from django_comment_client import base
 from django_comment_common.models import Role, ForumsConfig
-from django_comment_common.utils import seed_permissions_roles
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
 from xmodule.modulestore import ModuleStoreEnum

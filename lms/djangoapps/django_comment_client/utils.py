@@ -28,7 +28,8 @@ from django_comment_common.models import (
     Role
 )
 from django_comment_common.utils import get_course_discussion_settings
-from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id, get_cohort_names, is_course_cohorted, get_cohort_by_id
+from openedx.core.djangoapps.course_groups.cohorts import (
+    get_cohort_id, get_cohort_names, is_course_cohorted, get_cohort_by_id)
 from openedx.core.lib.cache_utils import request_cached
 from student.models import get_user_by_username_or_email
 from student.roles import GlobalStaff
@@ -163,7 +164,8 @@ def get_discussion_id_map_entry(xblock):
         xblock.discussion_id,
         {
             "location": xblock.location,
-            "title": xblock.discussion_category.split("/")[-1].strip() + (" / " + xblock.discussion_target if xblock.discussion_target else "")
+            "title": xblock.discussion_category.split("/")[-1].strip() +
+                     (" / " + xblock.discussion_target if xblock.discussion_target else "")
         }
     )
 
@@ -275,7 +277,8 @@ def _filter_unstarted_categories(category_map, course):
                         if key != "start_date":
                             filtered_map["entries"][child][key] = unfiltered_map["entries"][child][key]
                 else:
-                    log.debug(u"Filtering out:%s with start_date: %s", child, unfiltered_map["entries"][child]["start_date"])
+                    log.debug(u"Filtering out:%s with start_date: %s",
+                              child, unfiltered_map["entries"][child]["start_date"])
             else:
                 if course.self_paced or unfiltered_map["subcategories"][child]["start_date"] < now:
                     filtered_map["children"].append((child, c_type))
@@ -572,7 +575,12 @@ def get_ability(course_id, content, user):
             user_group_id,
             content_user_group_id
         ),
-        'can_reply': check_permissions_by_view(user, course_id, content, "create_comment" if content['type'] == 'thread' else "create_sub_comment"),
+        'can_reply': check_permissions_by_view(
+            user,
+            course_id,
+            content,
+            "create_comment" if content['type'] == 'thread' else "create_sub_comment"
+        ),
         'can_delete': check_permissions_by_view(
             user,
             course_id,
