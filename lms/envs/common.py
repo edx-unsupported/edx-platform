@@ -3396,3 +3396,8 @@ USER_STATE_BATCH_SIZE = 5000
 
 # Max no. of bad requests after which ratelimitier backend will block IP's access
 RATE_LIMIT_BACKEND_MAX_REQUESTS = 30
+
+############### Settings for Assets access by using an access token ###############
+ASSETS_ACCESS_BY_TOKEN = True
+ASSETS_TOKEN_ENCRYPTION_KEY = 'secret'
+ASSETS_TOKEN_TTL = 600

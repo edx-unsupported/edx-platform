@@ -9,10 +9,15 @@ try:
     import newrelic.agent
 except ImportError:
     newrelic = None  # pylint: disable=invalid-name
+from cryptography.fernet import Fernet, InvalidToken
+
 from django.http import (
     HttpResponse, HttpResponseNotModified, HttpResponseForbidden,
     HttpResponseBadRequest, HttpResponseNotFound, HttpResponsePermanentRedirect)
 from student.models import CourseEnrollment
+from django.conf import settings
+from django.contrib.auth import SESSION_KEY
+from django.utils.importlib import import_module
 
 from xmodule.assetstore.assetmgr import AssetManager
 from xmodule.contentstore.content import StaticContent, XASSET_LOCATION_TAG
@@ -252,6 +257,20 @@ class StaticContentServer(object):
         """
         if not self.is_content_locked(content):
             return True
+
+        # use token based auth if a token is passed and feature is enabled
+        if request.GET.get('access_token') and settings.ASSETS_ACCESS_BY_TOKEN:
+            access_token = request.GET.get('access_token')
+            encryption_key = Fernet(settings.ASSETS_TOKEN_ENCRYPTION_KEY)
+
+            try:
+                session_id = encryption_key.decrypt(bytes(access_token), settings.ASSETS_TOKEN_TTL)
+            except (InvalidToken, TypeError):
+                return False
+            else:
+                engine = import_module(settings.SESSION_ENGINE)
+                session = engine.SessionStore(session_id)
+                return not (session is None or SESSION_KEY not in session)
 
         if not hasattr(request, "user") or not request.user.is_authenticated():
             return False
