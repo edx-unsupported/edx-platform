@@ -900,6 +900,7 @@ def retire_user_comments(user):
         if e.status_code != 404:
             raise
 
+
 @helpers.intercept_errors(errors.UserAPIInternalError, ignore_errors=[errors.UserAPIRequestError])
 def delete_users(users):
     """
