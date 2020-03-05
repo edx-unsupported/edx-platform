@@ -54,10 +54,10 @@ else
             #echo "Finding PEP 8 violations and storing report..."
             #paver run_pep8 > pep8.log || { cat pep8.log; EXIT=1; }
 
-            echo "Finding pylint violations and storing in report..."
+#            echo "Finding pylint violations and storing in report..."
             # HACK: we need to print something to the console, otherwise circleci
             # fails and aborts the job because nothing is displayed for > 10 minutes.
-            paver run_pylint -l $LOWER_PYLINT_THRESHOLD:$UPPER_PYLINT_THRESHOLD | tee pylint.log || EXIT=1
+#            paver run_pylint -l $LOWER_PYLINT_THRESHOLD:$UPPER_PYLINT_THRESHOLD | tee pylint.log || EXIT=1
 
             #mkdir -p reports
             #PATH=$PATH:node_modules/.bin
@@ -76,25 +76,25 @@ else
 
             #exit $EXIT
             ;;
-
-        1)  # run all of the lms unit tests
-            paver test_system -s lms --cov-args="-p" --disable-migrations
-            ;;
-
-        2)  # run all of the cms unit tests
-            paver test_system -s cms --cov-args="-p" --disable-migrations
-            ;;
-
-        3)  # run the commonlib and solutions apps unit tests
-            paver test_lib
-            paver test_system -s lms --pyargs -t edx_solutions_api_integration --disable-migrations
-            paver test_system -s lms --pyargs -t edx_solutions_organizations --disable-migrations
-            paver test_system -s lms --pyargs -t edx_solutions_projects --disable-migrations
-            paver test_system -s lms --pyargs -t gradebook --disable-migrations
-            paver test_system -s lms --pyargs -t social_engagement --disable-migrations
-            paver test_system -s lms --pyargs -t course_metadata --disable-migrations
-            paver test_system -s lms --pyargs -t mobileapps --disable-migrations
-            ;;
+#
+#        1)  # run all of the lms unit tests
+#            paver test_system -s lms --cov-args="-p" --disable-migrations
+#            ;;
+#
+#        2)  # run all of the cms unit tests
+#            paver test_system -s cms --cov-args="-p" --disable-migrations
+#            ;;
+#
+#        3)  # run the commonlib and solutions apps unit tests
+#            paver test_lib
+#            paver test_system -s lms --pyargs -t edx_solutions_api_integration --disable-migrations
+#            paver test_system -s lms --pyargs -t edx_solutions_organizations --disable-migrations
+#            paver test_system -s lms --pyargs -t edx_solutions_projects --disable-migrations
+#            paver test_system -s lms --pyargs -t gradebook --disable-migrations
+#            paver test_system -s lms --pyargs -t social_engagement --disable-migrations
+#            paver test_system -s lms --pyargs -t course_metadata --disable-migrations
+#            paver test_system -s lms --pyargs -t mobileapps --disable-migrations
+#            ;;
 
         *)
             echo "No tests were executed in this container."
