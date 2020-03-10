@@ -261,7 +261,7 @@ class StaticContentServer(object):
         # use token based auth if a token is passed and feature is enabled
         if request.GET.get('access_token') and settings.ASSETS_ACCESS_BY_TOKEN:
             access_token = request.GET.get('access_token')
-            encryption_key = Fernet(settings.ASSETS_TOKEN_ENCRYPTION_KEY)
+            encryption_key = Fernet(bytes(settings.ASSETS_TOKEN_ENCRYPTION_KEY))
 
             try:
                 session_id = encryption_key.decrypt(bytes(access_token), settings.ASSETS_TOKEN_TTL)
