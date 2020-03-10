@@ -762,9 +762,9 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
         self.assertEquals(student_module.grade, 0.75)
         self.assertEquals(student_module.max_grade, 1)
 
-    @XBlock.register_temp_plugin(XBlockWithoutCompletionAPI, identifier='no_comp')
+    @XBlock.register_temp_plugin(StubCompletableXBlock, identifier='no_comp')
     def test_grade_event_with_completion_disabled(self):
-        with completion_waffle.waffle().override(completion_waffle.ENABLE_COMPLETION_TRACKING, True):
+        with completion_waffle.waffle().override(completion_waffle.ENABLE_COMPLETION_TRACKING, False):
             course = CourseFactory.create()
             block = ItemFactory.create(category='no_comp', parent=course)
             request = self.request_factory.post(
@@ -783,7 +783,7 @@ class TestHandleXBlockCallback(SharedModuleStoreTestCase, LoginEnrollmentTestCas
             self.assertEqual(response.status_code, 200)
             self.assertFalse(BlockCompletion.objects.filter(block_key=block.scope_ids.usage_id).exists())
 
-    @XBlock.register_temp_plugin(StubCompletableXBlock, identifier='comp')
+    @XBlock.register_temp_plugin(XBlockWithoutCompletionAPI, identifier='comp')
     def test_grade_event(self):
         with completion_waffle.waffle().override(completion_waffle.ENABLE_COMPLETION_TRACKING, True):
             course = CourseFactory.create()
