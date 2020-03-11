@@ -52,5 +52,5 @@ git+https://github.com/edx-solutions/organizations-edx-platform-extensions.git@r
 git+https://github.com/edx-solutions/course-edx-platform-extensions.git@rebase-ironwood
 git+https://github.com/edx-solutions/api-integration.git@rebase-ironwood
 -e git+https://github.com/mckinseyacademy/xblock-diagnosticfeedback.git@shafqat/rebase-ironwood#egg=xblock-diagnostic-feedback==0.2.4
-git+https://github.com/edx-solutions/progress-edx-platform-extensions.git@attiya/ironwood-rebase
+#git+https://github.com/edx-solutions/progress-edx-platform-extensions.git@attiya/ironwood-rebase
 -e git+https://github.com/edx/edx-notifications.git@rebase-ironwood#egg=edx-notifications==0.9.0

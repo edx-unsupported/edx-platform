@@ -19,7 +19,6 @@ from edx_solutions_api_integration.models import (
 )
 from edx_solutions_projects import models as project_models
 from gradebook import models as gradebook_models
-from progress import models as progress_models
 
 MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {})
 
