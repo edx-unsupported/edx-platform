@@ -136,6 +136,7 @@ def get_required_parameters(dictionary, additional_params=None):
     additional_params = additional_params or []
     for key in REQUIRED_PARAMETERS + additional_params:
         if key not in dictionary:
+            log.error('Required LTI parameter %s not found', key)
             return None
         params[key] = dictionary[key]
     return params
