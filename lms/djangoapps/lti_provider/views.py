@@ -76,20 +76,18 @@ def lti_launch(request, course_id, usage_id):
         )
     except LtiConsumer.DoesNotExist:
         log.error(
-            'LTI Consumer not found for course %s, usage_id %s and consumer key %s.',
+            'LTI Consumer not found for course %s, usage_id %s.',
             course_id,
             usage_id,
-            params['oauth_consumer_key'],
         )
         return HttpResponseForbidden()
 
     # Check the OAuth signature on the message
     if not SignatureValidator(lti_consumer).verify(request):
         log.error(
-            'LTI Consumer not valid for course %s, usage_id %s and consumer key %s.',
+            'LTI Consumer not valid for course %s, usage_id %s',
             course_id,
             usage_id,
-            params['oauth_consumer_key'],
         )
         return HttpResponseForbidden()
 
