@@ -27,8 +27,8 @@ def course_image_url(course, image_key='course_image'):
         else:
             url += '/images/' + image_key + '.jpg'
     elif not getattr(course, image_key):
-        # if image_key is empty, use the default image url from settings
-        url = settings.STATIC_URL + settings.DEFAULT_COURSE_ABOUT_IMAGE_URL
+        # if image_key is empty, set empty url by default
+        url = ""
     else:
         loc = StaticContent.compute_location(course.id, getattr(course, image_key))
         url = StaticContent.serialize_asset_key_with_slash(loc)
