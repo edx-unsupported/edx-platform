@@ -608,7 +608,7 @@ class CourseOverviewImageSetTestCase(ModuleStoreTestCase):
         """
         # Because we're sending None and '', we expect to get the generic
         # fallback URL for course images.
-        fallback_url = settings.STATIC_URL + settings.DEFAULT_COURSE_ABOUT_IMAGE_URL
+        fallback_url = ''
         course_overview = self._assert_image_urls_all_default(modulestore_type, course_image, fallback_url)
 
         # Even though there was no source image to generate, we should still

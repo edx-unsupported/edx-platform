@@ -62,7 +62,7 @@ class CourseImageTestCase(ModuleStoreTestCase):
         """
         course = CourseFactory.create(course_image='', default_store=default_store)
         self.assertEquals(
-            'static/test.png',
+            '',
             course_image_url(course),
         )
 
