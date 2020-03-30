@@ -49,16 +49,15 @@ from openedx.core.djangolib.markup import HTML
         lang="${course.language}"
       % endif
     >
-        <div class="discussion-body layout layout-1t2t">
-            <aside class="forum-nav layout-col layout-col-a" role="complementary" aria-label="${_("Discussion thread list")}">
+        <div class="discussion-body">
+            <main id="main" class="discussion-column" aria-label="Content" tabindex="-1">
+                <article class="new-post-article is-hidden" style="display: none" tabindex="-1" aria-label="${_("New topic form")}"></article>
+                <div class="forum-content"></div>
+            </main>
+            <aside class="forum-nav" role="complementary" aria-label="${_("Discussion thread list")}">
                 <%include file="_filter_dropdown.html" />
                 <div class="discussion-thread-list-container"></div>
             </aside>
-
-            <main id="main" aria-label="Content" class="discussion-column layout-col layout-col-b">
-                <article class="new-post-article is-hidden" style="display: none" aria-label="${_("New topic form")}"></article>
-                <div class="forum-content"></div>
-            </main>
         </div>
     </div>
 </section>
