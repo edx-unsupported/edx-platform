@@ -580,7 +580,7 @@ def get_module_system_for_user(
         elif not settings.FEATURES.get("ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE", True):
             # if a course has ended, don't register progress events
             course = modulestore().get_course(course_id, depth=0)
-            now = datetime.utcnow()
+            now = datetime.now(pytz.UTC)
             if course.end is not None and now > course.end:
                 return
 
