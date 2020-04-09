@@ -874,6 +874,7 @@ class VideoDescriptorIndexingTestCase(unittest.TestCase):
             "content_type": "Video"
         })
 
+    @unittest.skip('Content no longer on youtube')
     def test_video_with_youtube_subs_index_dictionary(self):
         """
         Test index dictionary of a video module with YouTube subtitles.
@@ -892,7 +893,6 @@ class VideoDescriptorIndexingTestCase(unittest.TestCase):
               <handout src="http://www.example.com/handout"/>
             </video>
         '''
-
         descriptor = instantiate_descriptor(data=xml_data_sub)
         download_youtube_subs('OEoXaMPEzfM', descriptor, settings)
         self.assertEqual(descriptor.index_dictionary(), {
@@ -903,6 +903,7 @@ class VideoDescriptorIndexingTestCase(unittest.TestCase):
             "content_type": "Video"
         })
 
+    @unittest.skip('Content no longer on youtube')
     def test_video_with_subs_and_transcript_index_dictionary(self):
         """
         Test index dictionary of a video module with
