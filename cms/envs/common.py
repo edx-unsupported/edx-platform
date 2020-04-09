@@ -1440,3 +1440,6 @@ COURSEGRAPH_JOB_QUEUE = LOW_PRIORITY_QUEUE
 
 # Max no. of bad requests after which ratelimitier backend will block IP's access
 RATE_LIMIT_BACKEND_MAX_REQUESTS = 30
+
+######### Settings for Course Assets locking #########
+ASSETS_LOCKED_BY_DEFAULT = True

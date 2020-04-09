@@ -547,3 +547,6 @@ PARENTAL_CONSENT_AGE_LIMIT = ENV_TOKENS.get(
 # completion aggregation data asynchronously using the run_aggregator_service
 # management command.
 COMPLETION_AGGREGATOR_ASYNC_AGGREGATION = ENV_TOKENS.get('COMPLETION_AGGREGATOR_ASYNC_AGGREGATION', False)
+
+######### Settings for Course Assets locking #########
+ASSETS_LOCKED_BY_DEFAULT = ENV_TOKENS.get('ASSETS_LOCKED_BY_DEFAULT', ASSETS_LOCKED_BY_DEFAULT)

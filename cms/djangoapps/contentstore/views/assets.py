@@ -275,7 +275,9 @@ def _upload_asset(request, course_key):
         content.thumbnail_location = thumbnail_location
 
     # lock assets by default
-    setattr(content, 'locked', True)
+    if settings.ASSETS_LOCKED_BY_DEFAULT:
+        setattr(content, 'locked', True)
+
     # then commit the content
     contentstore().save(content)
     del_cached_content(content.location)
