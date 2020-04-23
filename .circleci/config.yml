@@ -39,7 +39,7 @@ jobs:
            rm -rf ~/virtualenvs/
            virtualenv --python=`which python` --no-wheel --no-setuptools ~/virtualenvs/venv-2.7.12
            source ~/virtualenvs/venv-2.7.12/bin/activate
-           curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+           cd && curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
            python get-pip.py pip==9.0.3 wheel==0.33.4 setuptools==41.0.1
 
      - run:

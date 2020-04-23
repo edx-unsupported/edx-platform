@@ -49,15 +49,15 @@ else
     case $CIRCLE_NODE_INDEX in
         0)  # run the quality metrics
             echo "Finding fixme's and storing report..."
-            #paver find_fixme > fixme.log || { cat fixme.log; EXIT=1; }
+            paver find_fixme > fixme.log || { cat fixme.log; EXIT=1; }
 
             echo "Finding PEP 8 violations and storing report..."
             paver run_pep8 > pep8.log || { cat pep8.log; EXIT=1; }
 
-            #echo "Finding pylint violations and storing in report..."
+            echo "Finding pylint violations and storing in report..."
             # HACK: we need to print something to the console, otherwise circleci
             # fails and aborts the job because nothing is displayed for > 10 minutes.
-            #paver run_pylint -l $LOWER_PYLINT_THRESHOLD:$UPPER_PYLINT_THRESHOLD | tee pylint.log || EXIT=1
+            paver run_pylint -l $LOWER_PYLINT_THRESHOLD:$UPPER_PYLINT_THRESHOLD | tee pylint.log || EXIT=1
 
             #mkdir -p reports
             #PATH=$PATH:node_modules/.bin
@@ -74,7 +74,7 @@ else
             #echo "Running code complexity report (python)."
             #paver run_complexity > reports/code_complexity.log || echo "Unable to calculate code complexity. Ignoring error."
 
-            #exit $EXIT
+            exit $EXIT
             ;;
 
         1)  # run all of the lms unit tests
