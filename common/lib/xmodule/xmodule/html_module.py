@@ -76,7 +76,9 @@ class HtmlBlock(object):
         """
         Return a fragment that contains the html for the student view
         """
-        return Fragment(self.get_html())
+        fragment = Fragment(self.get_html())
+        fragment.add_javascript_url(settings.STATIC_URL + 'bundles/commons.js')
+        return fragment
 
     @XBlock.supports("multi_device")
     def public_view(self, context):
