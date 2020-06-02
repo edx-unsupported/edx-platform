@@ -1314,11 +1314,14 @@ def xblock_view(request, course_id, usage_id, view_name):
         for resource in fragment.resources:
             hashed_resources[hash_resource(resource)] = resource
 
-        return JsonResponse({
+        csrf_token = csrf(request)['csrf_token']
+        response = JsonResponse({
             'html': fragment.content,
             'resources': hashed_resources.items(),
-            'csrf_token': unicode(csrf(request)['csrf_token']),
+            'csrf_token': unicode(csrf_token),
         })
+        request.META['CSRF_COOKIE'] = csrf_token
+        return response
 
 
 def _check_files_limits(files):
