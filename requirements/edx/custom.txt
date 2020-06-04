@@ -25,12 +25,12 @@ git+https://github.com/edx-solutions/xblock-group-project.git@0.1.3#egg=xblock-g
 git+https://github.com/mckinseyacademy/openedx-user-manager-api@v1.2.0#egg=openedx-user-manager-api==1.2.0
 openedx-completion-aggregator==2.2.0
 
-git+https://github.com/edx-solutions/gradebook-edx-platform-extensions.git@rebase-ironwood
-git+https://github.com/edx-solutions/projects-edx-platform-extensions.git@rebase-ironwood
-git+https://github.com/edx-solutions/mobileapps-edx-platform-extensions.git@rebase-ironwood
-git+https://github.com/edx-solutions/discussion-edx-platform-extensions.git@rebase-ironwood
-git+https://github.com/edx-solutions/organizations-edx-platform-extensions.git@rebase-ironwood
-git+https://github.com/edx-solutions/course-edx-platform-extensions.git@rebase-ironwood
-git+https://github.com/edx-solutions/api-integration.git@rebase-ironwood
+git+https://github.com/edx-solutions/gradebook-edx-platform-extensions.git@rebase-ironwood#egg=gradebook-edx-platform-extensions==1.1.15
+git+https://github.com/edx-solutions/projects-edx-platform-extensions.git@rebase-ironwood#egg=projects-edx-platform-extensions==1.1.11
+git+https://github.com/edx-solutions/mobileapps-edx-platform-extensions.git@rebase-ironwood#egg=mobileapps-edx-platform-extensions==1.3.0
+git+https://github.com/edx-solutions/discussion-edx-platform-extensions.git@rebase-ironwood#egg=discussion-edx-platform-extensions==1.2.14
+git+https://github.com/edx-solutions/organizations-edx-platform-extensions.git@rebase-ironwood#egg=organizations-edx-platform-extensions==1.3.4
+git+https://github.com/edx-solutions/course-edx-platform-extensions.git@rebase-ironwood#egg=course-edx-platform-extensions==2.0.0
+git+https://github.com/edx-solutions/api-integration.git@rebase-ironwood#egg=api-integration==3.1.53
 #git+https://github.com/edx-solutions/progress-edx-platform-extensions.git@attiya/ironwood-rebase
 -e git+https://github.com/edx/edx-notifications.git@rebase-ironwood#egg=edx-notifications==0.9.0

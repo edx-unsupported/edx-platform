@@ -64,13 +64,13 @@ jobs:
      - restore_cache:
               name: Restores cache if any of the requirements file have not changed since the previous run
               key: >-
-                virtual-environment-cache-v7
+                virtual-environment-cache-v8
                 -{{ checksum "requirements/edx/development.txt" }}
                 -{{ checksum "requirements/edx/custom.txt" }}
 
      - restore_cache:
          name: Restores cache if the package.json file have not changed since the previous run
-         key: virtual-environment-cache-v7-{{ checksum "package.json" }}
+         key: virtual-environment-cache-v8-{{ checksum "package.json" }}
 
      # Mirror what paver install_prereqs does.
      # After a successful build, CircleCI will
@@ -112,7 +112,7 @@ jobs:
 
      - save_cache:
          key: >-
-           virtual-environment-cache-v7
+           virtual-environment-cache-v8
            -{{ checksum "requirements/edx/development.txt" }}
            -{{ checksum "requirements/edx/custom.txt" }}
 
@@ -120,7 +120,7 @@ jobs:
             - ~/virtualenvs/venv-2.7.12
 
      - save_cache:
-         key: virtual-environment-cache-v7-{{ checksum "package.json" }}
+         key: virtual-environment-cache-v8-{{ checksum "package.json" }}
          paths:
             - node_modules
 
