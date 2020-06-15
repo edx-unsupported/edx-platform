@@ -20,7 +20,7 @@
             <li><span class="icon fa-flag" aria-hidden="true"></span><%- gettext("Report abuse") %></li>
             <li><span class="icon fa fa-star" aria-hidden="true"></span><%- gettext("Follow or unfollow posts") %></li>
           </ul>
-          <p><%- gettext("Earn points for your engagement by adding a new post of responding to an existing post.") %></p>
+          <p><%- gettext("Earn points for your engagement by adding a new post or responding to an existing post.") %></p>
           <hr>
         </div>
       <% } else { %>
