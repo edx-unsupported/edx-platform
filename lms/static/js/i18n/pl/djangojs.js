@@ -53,7 +53,7 @@
     "Discussions": "Dyskusje", 
     "Discussions are unified; all learners interact with posts from other learners, regardless of the group they are in.": "Dyskusje s\u0105 ujednolicone. Ka\u017cdy ucze\u0144 mo\u017ce reagowa\u0107 na posty dowolnego innego ucznia, bez wzgl\u0119du na podzia\u0142y grupowe.", 
     "Divided": "Rozdzielono", 
-    "Earn points for your engagement by adding a new post of responding to an existing post.": "Zwi\u0119ksz swoj\u0105 punktacj\u0119 \u201ePoziomu zaanga\u017cowania\u201d, publikuj\u0105c nowe posty lub odpowiedzi do ju\u017c istniej\u0105cych.", 
+    "Earn points for your engagement by adding a new post or responding to an existing post.": "Zwi\u0119ksz swoj\u0105 punktacj\u0119 \u201ePoziomu zaanga\u017cowania\u201d, publikuj\u0105c nowe posty lub odpowiedzi do ju\u017c istniej\u0105cych.", 
     "Edit": "Edytuj", 
     "Edit your post below.": "Edytuj post poni\u017cej", 
     "Editing comment": "Edytowanie komentarza", 
