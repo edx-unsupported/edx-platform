@@ -9964,7 +9964,7 @@ msgstr "좋은 게시글 및 응답에 투표"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid ""
-"Earn points for your engagement by adding a new post of responding to an "
+"Earn points for your engagement by adding a new post or responding to an "
 "existing post."
 msgstr "기존 게시글에 응답하는 새로운 게시물을 추가하여 참여 점수를 취득할 수 있습니다."
 
