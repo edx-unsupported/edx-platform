@@ -10058,7 +10058,7 @@ msgstr "Vous allez supprimer un article. Veuillez confirmer."
 #: lms/templates/wiki/includes/article_menu.html wiki/templates/wiki/edit.html
 #: wiki/templates/wiki/includes/article_menu.html
 msgid "Edit"
-msgstr "Éditer"
+msgstr "Modifier"
 
 #: lms/templates/wiki/edit.html lms/templates/ccx/schedule.html
 #: wiki/templates/wiki/edit.html wiki/templates/wiki/settings.html
@@ -17428,18 +17428,18 @@ msgstr "Filtre :"
 #. Translators: This is a menu option for showing all forum threads unfiltered
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Show all posts"
-msgstr "Tous"
+msgstr "Afficher tous les messages"
 
 #. Translators: This is a menu option for showing only unread forum threads
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Unread posts"
-msgstr "Non lus"
+msgstr "Messages non lus"
 
 #. Translators: This is a menu option for showing only unanswered forum
 #. question threads
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Unanswered posts"
-msgstr "Non répondu"
+msgstr "Messages sans réponse"
 
 #. Translators: This is a menu option for showing only forum threads flagged
 #. for abuse

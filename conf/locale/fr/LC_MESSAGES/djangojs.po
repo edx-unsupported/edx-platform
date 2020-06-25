@@ -2459,7 +2459,7 @@ msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "No posts matched your query."
-msgstr "Aucun message ne correspond à votre requête."
+msgstr "Aucun message ne correspond à votre recherche."
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "Show posts by {username}."
@@ -2593,8 +2593,8 @@ msgstr "environ une minute"
 #, javascript-format
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d minute"
+msgstr[1] "%d minutes"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about an hour"
@@ -2604,8 +2604,8 @@ msgstr "environ une heure"
 #, javascript-format
 msgid "about %d hour"
 msgid_plural "about %d hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "environ %d heure"
+msgstr[1] "environ %d heures"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "a day"
@@ -2615,8 +2615,8 @@ msgstr "un jour"
 #, javascript-format
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d jour"
+msgstr[1] "%d jours"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a month"
@@ -2626,8 +2626,8 @@ msgstr "environ un mois"
 #, javascript-format
 msgid "%d month"
 msgid_plural "%d months"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d mois"
+msgstr[1] "%d mois"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a year"
@@ -2637,8 +2637,8 @@ msgstr "environ un an"
 #, javascript-format
 msgid "%d year"
 msgid_plural "%d years"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d an"
+msgstr[1] "%d ans"
 
 #: lms/djangoapps/instructor/static/instructor/ProblemBrowser/components/Main/Main.jsx
 msgid "Select a section or problem"
@@ -3466,7 +3466,7 @@ msgstr "Prévisualisation HTML de l'article"
 #: lms/static/js/customwmd.js
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "Your question or idea (required)"
-msgstr "Votre question ou message (requis)"
+msgstr "Votre question ou idée (obligatoire)"
 
 #: lms/static/js/dashboard/donation.js
 msgid "Please enter a valid donation amount."
@@ -7139,7 +7139,7 @@ msgstr ""
 
 #: common/static/common/templates/discussion/post-user-display.underscore
 msgid "(Staff)"
-msgstr "(Equipe pédagogique)"
+msgstr "(Équipe)"
 
 #: common/static/common/templates/discussion/profile-thread.underscore
 #: common/static/common/templates/discussion/thread.underscore
@@ -7235,12 +7235,12 @@ msgstr "Mettre à jour la réponse"
 #: common/static/common/templates/discussion/thread-response-show.underscore
 #, python-format
 msgid "marked as answer %(time_ago)s by %(user)s"
-msgstr "marqué comme réponse %(time_ago)s par %(user)s"
+msgstr "marqué comme réponse il y a %(time_ago)s par %(user)s"
 
 #: common/static/common/templates/discussion/thread-response-show.underscore
 #, python-format
 msgid "marked as answer %(time_ago)s"
-msgstr "marqué comme réponse %(time_ago)s"
+msgstr "marqué comme réponse il y a %(time_ago)s"
 
 #: common/static/common/templates/discussion/thread-response-show.underscore
 #, python-format
@@ -7271,7 +7271,7 @@ msgstr "discussion publiée il y a %(time_ago)s par %(author)s"
 #: common/static/common/templates/discussion/thread-show.underscore
 #, python-format
 msgid "question posted %(time_ago)s by %(author)s"
-msgstr "question posée il y a %(time_ago)s par %(author)s"
+msgstr "question publiée il y a %(time_ago)s par %(author)s"
 
 #: common/static/common/templates/discussion/thread-show.underscore
 msgid "Closed"
@@ -7327,8 +7327,7 @@ msgstr "Sujet"
 #: common/static/common/templates/discussion/topic.underscore
 msgid "Add your post to a relevant topic to help others find it. (Required)"
 msgstr ""
-"Ajoutez votre message au sujet de discussion qui convient pour aider les "
-"autres participants à le trouver. (Requis)"
+"Ajoutez votre message à un sujet pertinent pour aider les autres à le trouver. (Obligatoire)"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Discussion Home"
@@ -7350,7 +7349,7 @@ msgstr "Utilisez le menu 'Tous les sujets' pour trouver un sujet spécific"
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 #: lms/djangoapps/discussion/static/discussion/templates/search.underscore
 msgid "Search all posts"
-msgstr "Rechercher un sujet"
+msgstr "Rechercher tous les messages"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Filter and sort topics"
