@@ -230,10 +230,6 @@
                     this.convertMath($content);
                     this.$('.forum-nav-thread-list').append($content);
                 }
-                if (this.$('.forum-nav-thread-list li').length === 0) {
-                    this.clearSearchAlerts();
-                    this.addSearchAlert(gettext('There are no posts in this topic yet.'));
-                }
                 this.showMetadataAccordingToSort();
                 this.renderMorePages();
                 if (this.hideRefineBar) {
@@ -476,8 +472,7 @@
 
             DiscussionThreadListView.prototype.retrieveFirstPage = function(event) {
                 this.collection.current_page = 0;
-                this.$('.forum-nav-thread-list').empty();
-                this.collection.models = [];
+                this.collection.reset();
                 return this.loadMorePages(event);
             };
 
@@ -534,7 +529,6 @@
                         var message, noResponseMsg;
                         if (textStatus === 'success') {
                             self.collection.reset(response.discussion_data);
-                            self.clearSearchAlerts();
                             Content.loadContentInfos(response.annotated_content_info);
                             self.collection.current_page = response.page;
                             self.collection.pages = response.num_pages;
@@ -561,11 +555,8 @@
                                 self.addSearchAlert(message);
                             } else if (response.discussion_data.length === 0) {
                                 self.addSearchAlert(gettext('No posts matched your query.'));
-                                self.displayedCollection.models = [];
                             }
-                            if (self.collection.models.length !== 0) {
-                                self.displayedCollection.reset(self.collection.models);
-                            }
+                            self.displayedCollection.reset(self.collection.models);
                             if (text) {
                                 return self.searchForUser(text);
                             }
