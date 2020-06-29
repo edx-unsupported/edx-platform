@@ -7235,12 +7235,12 @@ msgstr "Mettre à jour la réponse"
 #: common/static/common/templates/discussion/thread-response-show.underscore
 #, python-format
 msgid "marked as answer %(time_ago)s by %(user)s"
-msgstr "marqué comme réponse il y a %(time_ago)s par %(user)s"
+msgstr "marqué comme réponse %(time_ago)s par %(user)s"
 
 #: common/static/common/templates/discussion/thread-response-show.underscore
 #, python-format
 msgid "marked as answer %(time_ago)s"
-msgstr "marqué comme réponse il y a %(time_ago)s"
+msgstr "marqué comme réponse %(time_ago)s"
 
 #: common/static/common/templates/discussion/thread-response-show.underscore
 #, python-format
@@ -7266,12 +7266,12 @@ msgstr "Ajouter un commentaire"
 #: common/static/common/templates/discussion/thread-show.underscore
 #, python-format
 msgid "discussion posted %(time_ago)s by %(author)s"
-msgstr "discussion publiée il y a %(time_ago)s par %(author)s"
+msgstr "discussion publiée %(time_ago)s par %(author)s"
 
 #: common/static/common/templates/discussion/thread-show.underscore
 #, python-format
 msgid "question posted %(time_ago)s by %(author)s"
-msgstr "question publiée il y a %(time_ago)s par %(author)s"
+msgstr "question publiée %(time_ago)s par %(author)s"
 
 #: common/static/common/templates/discussion/thread-show.underscore
 msgid "Closed"

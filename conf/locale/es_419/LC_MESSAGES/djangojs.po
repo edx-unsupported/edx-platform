@@ -7419,12 +7419,12 @@ msgstr "Actualizar respuesta"
 #: common/static/common/templates/discussion/thread-response-show.underscore
 #, python-format
 msgid "marked as answer %(time_ago)s by %(user)s"
-msgstr "marcó como respuesta hace %(time_ago)s por %(user)s"
+msgstr "lo marcó como respuesta %(time_ago)s por %(user)s"
 
 #: common/static/common/templates/discussion/thread-response-show.underscore
 #, python-format
 msgid "marked as answer %(time_ago)s"
-msgstr "marcó como respuesta hace %(time_ago)s"
+msgstr "lo marcó como respuesta %(time_ago)s"
 
 #: common/static/common/templates/discussion/thread-response-show.underscore
 #, python-format
