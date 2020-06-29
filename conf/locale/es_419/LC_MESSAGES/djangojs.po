@@ -2587,7 +2587,7 @@ msgstr "menos de un minuto"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a minute"
-msgstr "cerca de un minuto"
+msgstr "unas un minuto"
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
@@ -2598,14 +2598,14 @@ msgstr[1] "%d minutos"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about an hour"
-msgstr "cerca de una hora"
+msgstr "unas una hora"
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "about %d hour"
 msgid_plural "about %d hours"
-msgstr[0] "cerca de %d hora"
-msgstr[1] "cerca de %d horas"
+msgstr[0] "unas %d hora"
+msgstr[1] "unas %d horas"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "a day"
@@ -2620,7 +2620,7 @@ msgstr[1] "%d días"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a month"
-msgstr "cerca de un mes"
+msgstr "unas un mes"
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
@@ -2631,7 +2631,7 @@ msgstr[1] "%d meses"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a year"
-msgstr "cerca de un año"
+msgstr "unas un año"
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
@@ -3478,7 +3478,7 @@ msgstr "previsiualización en HTML"
 #: lms/static/js/customwmd.js
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "Your question or idea (required)"
-msgstr "Su pregunta o idea (requerido)"
+msgstr "Tu pregunta o idea (obligatoria)"
 
 #: lms/static/js/dashboard/donation.js
 msgid "Please enter a valid donation amount."
@@ -7279,7 +7279,7 @@ msgstr "Esta publicación sera visible para todos."
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "Add a Post"
-msgstr "Añadir una publicación"
+msgstr "Agregar una publicación"
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "Visible to"
@@ -7303,8 +7303,7 @@ msgstr "Todos los Grupos"
 msgid ""
 "Add a clear and descriptive title to encourage participation. (Required)"
 msgstr ""
-"Agregar un título claro y descriptivo para fomentar la participación. "
-"(Requerido)"
+"Agrega un título claro y descriptivo para fomentar la participación. (Obligatorio)"
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "follow this post"
@@ -7420,12 +7419,12 @@ msgstr "Actualizar respuesta"
 #: common/static/common/templates/discussion/thread-response-show.underscore
 #, python-format
 msgid "marked as answer %(time_ago)s by %(user)s"
-msgstr "marcado como respuesta hace %(time_ago)s por %(user)s"
+msgstr "marcó como respuesta hace %(time_ago)s por %(user)s"
 
 #: common/static/common/templates/discussion/thread-response-show.underscore
 #, python-format
 msgid "marked as answer %(time_ago)s"
-msgstr "marcado como respuesta hace %(time_ago)s"
+msgstr "marcó como respuesta hace %(time_ago)s"
 
 #: common/static/common/templates/discussion/thread-response-show.underscore
 #, python-format
@@ -7451,12 +7450,12 @@ msgstr "Añadir un comentario"
 #: common/static/common/templates/discussion/thread-show.underscore
 #, python-format
 msgid "discussion posted %(time_ago)s by %(author)s"
-msgstr "discusión publicada hace %(time_ago)s por %(author)s"
+msgstr "discusión publicada %(time_ago)s por %(author)s"
 
 #: common/static/common/templates/discussion/thread-show.underscore
 #, python-format
 msgid "question posted %(time_ago)s by %(author)s"
-msgstr "pregunta publicada hace %(time_ago)s por %(author)s"
+msgstr "pregunta publicada %(time_ago)s por %(author)s"
 
 #: common/static/common/templates/discussion/thread-show.underscore
 msgid "Closed"
@@ -7511,8 +7510,7 @@ msgstr "Área Temática"
 #: common/static/common/templates/discussion/topic.underscore
 msgid "Add your post to a relevant topic to help others find it. (Required)"
 msgstr ""
-"Agregar tu publicación a un tema relevante para que los demás la puedan "
-"encontrar. (Requisito)"
+"Agrega tu publicación a un tema relevante para ayudar a otros a encontrarla. (Obligatorio)"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Discussion Home"

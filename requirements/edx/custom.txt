@@ -2,35 +2,34 @@
 
 # When updating a hash of an XBlock that uses xblock-utils, please update its version hash in github.txt.
 -e git+https://github.com/edx-solutions/xblock-mentoring.git@0.2#egg=xblock-mentoring==0.2
--e git+https://github.com/edx-solutions/xblock-image-explorer.git@v1.1.17#egg=xblock-image-explorer==1.1.17
+-e git+https://github.com/edx-solutions/xblock-image-explorer.git@v1.1.18#egg=xblock-image-explorer==1.1.18
 -e git+https://github.com/edx-solutions/xblock-drag-and-drop.git@92ee2055a16899090a073e1df81e35d5293ad767#egg=xblock-drag-and-drop
 # FIXME: temp hash, until (https://github.com/edx-solutions/xblock-drag-and-drop-v2/pull/207 is merged into `master`)
--e git+https://github.com/edx-solutions/xblock-drag-and-drop-v2.git@3eb69db97634a30fc3d0b1588104f499d92c0f8e#egg=xblock-drag-and-drop-v2==2.2.9
+-e git+https://github.com/edx-solutions/xblock-drag-and-drop-v2.git@77dde12fc405ca65964f32ad93849504aa53ad8d#egg=xblock-drag-and-drop-v2==2.2.9
 # This is required for A2E courses that were created with the temporary (xblock-drag-and-drop-v2-new) DnDv2 branch to continue to work.
 # FIXME: bump version to 2.1.6 when https://github.com/edx-solutions/xblock-drag-and-drop-v2/pull/154 merged and tagged
 -e git+https://github.com/open-craft/xblock-drag-and-drop-v2.git@82c9dc5e16d10793e8b79e60661e1a78893fce25#egg=xblock-drag-and-drop-v2-new
--e git+https://github.com/edx-solutions/xblock-ooyala.git@v3.0.1#egg=xblock-ooyala==3.0.1
+-e git+https://github.com/edx-solutions/xblock-ooyala.git@v4.0.3#egg=xblock-ooyala==4.0.3
 git+https://github.com/edx-solutions/xblock-group-project.git@0.1.3#egg=xblock-group-project==0.1.3
 -e git+https://github.com/edx-solutions/xblock-adventure.git@0.2#egg=xblock-adventure==0.2
--e git+https://github.com/open-craft/xblock-poll.git@v1.9.3#egg=xblock-poll==1.9.3
--e git+https://github.com/open-craft/problem-builder.git@v3.4.16#egg=xblock-problem-builder==3.4.16
+-e git+https://github.com/open-craft/xblock-poll.git@v1.9.9#egg=xblock-poll==1.9.9
+-e git+https://github.com/open-craft/problem-builder.git@v3.4.20#egg=xblock-problem-builder==3.4.20
 -e git+https://github.com/OfficeDev/xblock-officemix.git@86238f5968a08db005717dbddc346808f1ed3716#egg=xblock-officemix
--e git+https://github.com/open-craft/xblock-chat.git@v0.2.6#egg=xblock-chat==0.2.6
+-e git+https://github.com/open-craft/xblock-chat.git@v0.2.7#egg=xblock-chat==0.2.7
 -e git+https://github.com/open-craft/xblock-eoc-journal.git@v0.5#egg=xblock-eoc-journal==0.5
 -e git+https://github.com/mckinseyacademy/xblock-scorm.git@v2.0.31#egg=xblock-scorm==2.0.31
 -e git+https://github.com/mckinseyacademy/xblock-diagnosticfeedback.git@v0.2.5#egg=xblock-diagnostic-feedback==0.2.5
 -e git+https://github.com/open-craft/xblock-group-project-v2.git@0.7.2#egg=xblock-group-project-v2==0.7.2
--e git+https://github.com/open-craft/xblock-virtualreality.git@v0.1.1#egg=xblock-virtualreality==0.1.1
+-e git+https://github.com/open-craft/xblock-virtualreality.git@v0.1.3#egg=xblock-virtualreality==0.1.3
+-e git+https://github.com/edx/edx-notifications.git@2.0.0#egg=edx-notifications==2.0.0
+
+git+https://github.com/edx-solutions/gradebook-edx-platform-extensions.git@2.0.1#egg=gradebook-edx-platform-extensions==2.0.1
+git+https://github.com/edx-solutions/mobileapps-edx-platform-extensions.git@v2.0.0#egg=mobileapps-edx-platform-extensions==2.0.0
+git+https://github.com/edx-solutions/discussion-edx-platform-extensions.git@v2.0.1#egg=discussion-edx-platform-extensions==2.0.1
+git+https://github.com/edx-solutions/organizations-edx-platform-extensions.git@v2.0.1#egg=organizations-edx-platform-extensions==2.0.1
+git+https://github.com/edx-solutions/course-edx-platform-extensions.git@v3.0.0#egg=course-edx-platform-extensions==3.0.0
+git+https://github.com/edx-solutions/projects-edx-platform-extensions.git@v2.0.2#egg=projects-edx-platform-extensions==2.0.2
+git+https://github.com/edx-solutions/api-integration.git@v4.0.3#egg=api-integration==4.0.3
 
 git+https://github.com/mckinseyacademy/openedx-user-manager-api@v1.2.0#egg=openedx-user-manager-api==1.2.0
-openedx-completion-aggregator==2.2.0
-
-git+https://github.com/edx-solutions/gradebook-edx-platform-extensions.git@rebase-ironwood#egg=gradebook-edx-platform-extensions==1.1.15
-git+https://github.com/edx-solutions/projects-edx-platform-extensions.git@rebase-ironwood#egg=projects-edx-platform-extensions==1.1.11
-git+https://github.com/edx-solutions/mobileapps-edx-platform-extensions.git@rebase-ironwood#egg=mobileapps-edx-platform-extensions==1.3.0
-git+https://github.com/edx-solutions/discussion-edx-platform-extensions.git@rebase-ironwood#egg=discussion-edx-platform-extensions==1.2.14
-git+https://github.com/edx-solutions/organizations-edx-platform-extensions.git@rebase-ironwood#egg=organizations-edx-platform-extensions==1.3.8
-git+https://github.com/edx-solutions/course-edx-platform-extensions.git@rebase-ironwood#egg=course-edx-platform-extensions==2.0.0
-git+https://github.com/edx-solutions/api-integration.git@rebase-ironwood#egg=api-integration==3.1.53
-#git+https://github.com/edx-solutions/progress-edx-platform-extensions.git@attiya/ironwood-rebase
--e git+https://github.com/edx/edx-notifications.git@rebase-ironwood#egg=edx-notifications==0.9.0
+openedx-completion-aggregator==2.2.1

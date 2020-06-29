@@ -847,7 +847,7 @@ msgstr ""
 #: lms/static/js/discussions_management/views/divided_discussions_inline.js
 #: lms/static/js/views/fields.js
 msgid "Your changes have been saved."
-msgstr "변경사항이 저장되었습니다."
+msgstr "변경 사항이 저장되었습니다."
 
 #: cms/static/js/views/video/transcripts/file_uploader.js
 #: common/static/bundles/commons.js
@@ -1552,7 +1552,7 @@ msgstr ""
 #: cms/templates/js/xblock-string-field-editor.underscore
 #: common/static/common/templates/discussion/forum-action-edit.underscore
 msgid "Edit"
-msgstr ""
+msgstr "수정"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -3152,15 +3152,6 @@ msgid "The more you tell us, the more quickly and helpfully we can respond!"
 msgstr ""
 
 #: common/static/bundles/SingleSupportForm.js
-#: lms/djangoapps/support/static/support/jsx/logged_in_user.jsx
-#: common/static/common/templates/discussion/new-post.underscore
-#: common/static/common/templates/discussion/thread-response.underscore
-#: common/static/common/templates/discussion/thread.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Submit"
-msgstr ""
-
-#: common/static/bundles/SingleSupportForm.js
 #: lms/djangoapps/support/static/support/jsx/logged_out_user.jsx
 msgid "Sign in to {platform} so we can help you better."
 msgstr ""
@@ -3447,108 +3438,19 @@ msgstr ""
 
 #: common/static/common/js/discussion/utils.js
 msgid "Loading content"
-msgstr "콘텐츠 로딩중"
-
-#: common/static/common/js/discussion/utils.js
-msgid "Your request could not be processed. Refresh the page and try again."
-msgstr ""
+msgstr "콘텐츠 로드 중"
 
 #: common/static/common/js/discussion/utils.js
 msgid "…"
 msgstr "…"
 
-#: common/static/common/js/discussion/utils.js
-msgid "Some images in this post have been omitted"
-msgstr ""
-
-#: common/static/common/js/discussion/utils.js
-msgid "image omitted"
-msgstr ""
-
-#: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "there is currently {numVotes} vote"
-msgid_plural "there are currently {numVotes} votes"
-msgstr[0] ""
-
-#: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "{numVotes} Vote"
-msgid_plural "{numVotes} Votes"
-msgstr[0] ""
-
-#: common/static/common/js/discussion/views/discussion_content_view.js
-msgid ""
-"You could not be subscribed to this post. Refresh the page and try again."
-msgstr ""
-
-#: common/static/common/js/discussion/views/discussion_content_view.js
-msgid ""
-"You could not be unsubscribed from this post. Refresh the page and try "
-"again."
-msgstr ""
-
-#: common/static/common/js/discussion/views/discussion_content_view.js
-msgid ""
-"This response could not be marked as an answer. Refresh the page and try "
-"again."
-msgstr ""
-
-#: common/static/common/js/discussion/views/discussion_content_view.js
-msgid ""
-"This response could not be unmarked as an answer. Refresh the page and try "
-"again."
-msgstr ""
-
-#: common/static/common/js/discussion/views/discussion_content_view.js
-msgid ""
-"This response could not be marked as endorsed. Refresh the page and try "
-"again."
-msgstr ""
-
-#: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "This response could not be unendorsed. Refresh the page and try again."
-msgstr ""
-
-#: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "This vote could not be processed. Refresh the page and try again."
-msgstr ""
-
-#: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "This post could not be pinned. Refresh the page and try again."
-msgstr ""
-
-#: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "This post could not be unpinned. Refresh the page and try again."
-msgstr ""
-
-#: common/static/common/js/discussion/views/discussion_content_view.js
-msgid ""
-"This post could not be flagged for abuse. Refresh the page and try again."
-msgstr ""
-
-#: common/static/common/js/discussion/views/discussion_content_view.js
-msgid ""
-"This post could not be unflagged for abuse. Refresh the page and try again."
-msgstr ""
-
-#: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "This post could not be closed. Refresh the page and try again."
-msgstr ""
-
-#: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "This post could not be reopened. Refresh the page and try again."
-msgstr ""
-
 #: common/static/common/js/discussion/views/discussion_inline_view.js
 msgid "Hide Discussion"
-msgstr "게시판 감추기"
-
-#: common/static/common/js/discussion/views/discussion_inline_view.js
-msgid "This discussion could not be loaded. Refresh the page and try again."
-msgstr ""
+msgstr "토론 숨김"
 
 #: common/static/common/js/discussion/views/discussion_inline_view.js
 msgid "Show Discussion"
-msgstr "게시판  보기"
+msgstr "토론 표시"
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "There are no posts in this topic yet."
@@ -3556,81 +3458,27 @@ msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "Loading more threads"
-msgstr "다른 게시물 추가 로딩중"
-
-#: common/static/common/js/discussion/views/discussion_thread_list_view.js
-msgid "Additional posts could not be loaded. Refresh the page and try again."
-msgstr ""
+msgstr "추가 스레드 로드 중"
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "Current conversation"
 msgstr "현재 대화"
 
-#: common/static/common/js/discussion/views/discussion_thread_list_view.js
-msgid "Loading posts list"
-msgstr ""
-
-#: common/static/common/js/discussion/views/discussion_thread_list_view.js
-msgid ""
-"No results found for {original_query}. Showing results for "
-"{suggested_query}."
-msgstr ""
-
-#: common/static/common/js/discussion/views/discussion_thread_list_view.js
-msgid "No posts matched your query."
-msgstr ""
-
-#: common/static/common/js/discussion/views/discussion_thread_list_view.js
-msgid "Show posts by {username}."
-msgstr ""
-
-#: common/static/common/js/discussion/views/discussion_thread_view.js
-msgid "The post you selected has been deleted."
-msgstr ""
-
-#: common/static/common/js/discussion/views/discussion_thread_view.js
-msgid "Responses could not be loaded. Refresh the page and try again."
-msgstr ""
-
-#: common/static/common/js/discussion/views/discussion_thread_view.js
-msgid ""
-"Additional responses could not be loaded. Refresh the page and try again."
-msgstr ""
-
-#: common/static/common/js/discussion/views/discussion_thread_view.js
-msgid "{numResponses} other response"
-msgid_plural "{numResponses} other responses"
-msgstr[0] ""
-
-#: common/static/common/js/discussion/views/discussion_thread_view.js
-msgid "{numResponses} response"
-msgid_plural "{numResponses} responses"
-msgstr[0] ""
-
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "Showing all responses"
-msgstr "모든 답변 보여주기"
-
-#: common/static/common/js/discussion/views/discussion_thread_view.js
-msgid "Showing first response"
-msgid_plural "Showing first {numResponses} responses"
-msgstr[0] ""
+msgstr "모든 응답 표시 중"
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "Load all responses"
-msgstr "모든 답변 로드하기"
-
-#: common/static/common/js/discussion/views/discussion_thread_view.js
-msgid "Load next {numResponses} responses"
-msgstr ""
+msgstr "모든 응답 로드"
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "Are you sure you want to delete this post?"
-msgstr "이 게시물을 삭제하시겠습니까?"
+msgstr "이 게시글을 삭제하시겠습니까?"
 
 #: common/static/common/js/discussion/views/new_post_view.js
 msgid "Your post will be discarded."
-msgstr "게시물이 삭제됩니다."
+msgstr "게시글이 폐기됩니다."
 
 #: common/static/common/js/discussion/views/response_comment_show_view.js
 msgid "anonymous"
@@ -3640,13 +3488,9 @@ msgstr "익명"
 msgid "Are you sure you want to delete this comment?"
 msgstr "이 댓글을 삭제하시겠습니까?"
 
-#: common/static/common/js/discussion/views/response_comment_view.js
-msgid "This comment could not be deleted. Refresh the page and try again."
-msgstr ""
-
 #: common/static/common/js/discussion/views/thread_response_view.js
 msgid "Are you sure you want to delete this response?"
-msgstr "이 답변을 삭제하시겠습니까?"
+msgstr "이 응답을 삭제하시겠습니까?"
 
 #: common/static/common/js/utils/edx.utils.validate.js
 msgid "The email address you've provided isn't formatted correctly."
@@ -3903,20 +3747,6 @@ msgid ""
 " the available spot."
 msgstr ""
 
-#: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
-msgid "Delete this team?"
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
-msgid ""
-"Deleting a team is permanent and cannot be undone. All members are removed "
-"from the team, and team discussions can no longer be accessed."
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
-msgid "Team \"{team}\" successfully deleted."
-msgstr ""
-
 #: lms/djangoapps/teams/static/teams/js/views/my_teams.js
 msgid "You are not currently a member of any team."
 msgstr ""
@@ -3944,12 +3774,6 @@ msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 msgid "Leave this team?"
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/js/views/team_profile.js
-msgid ""
-"If you leave, you can no longer post in this team's discussions. Your place "
-"will be available to another learner."
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
@@ -4053,11 +3877,6 @@ msgid "Search teams"
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
-#: lms/djangoapps/discussion/static/discussion/templates/fake-breadcrumbs.underscore
-msgid "All Topics"
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "The page \"{route}\" could not be found."
 msgstr ""
 
@@ -4096,10 +3915,6 @@ msgid ""
 "{search_span_start}search teams{span_end} in this topic. If you still can't "
 "find a team to join, {create_span_start}create a new team in this "
 "topic{span_end}."
-msgstr ""
-
-#: lms/djangoapps/teams/static/teams/js/views/topics.js
-msgid "All topics"
 msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
@@ -4431,11 +4246,6 @@ msgstr "적게"
 msgid "HTML preview of post"
 msgstr ""
 
-#: lms/static/js/customwmd.js
-#: common/static/common/templates/discussion/new-post.underscore
-msgid "Your question or idea (required)"
-msgstr ""
-
 #: lms/static/js/dashboard/donation.js
 msgid "Please enter a valid donation amount."
 msgstr "유효한 기부 금액을 입력하십시오."
@@ -4497,66 +4307,13 @@ msgstr "\"%s\"를 찾을 수 없습니다. "
 msgid "There was an error, try searching again."
 msgstr "오류가 발생했습니다. 다시 검색하세요."
 
-#: lms/static/js/discussions_management/views/discussions.js
-msgid "Not divided"
-msgstr ""
-
-#: lms/static/js/discussions_management/views/discussions.js
-msgid ""
-"Discussions are unified; all learners interact with posts from other "
-"learners, regardless of the group they are in."
-msgstr ""
-
-#: lms/static/js/discussions_management/views/discussions.js
-msgid "Enrollment Tracks"
-msgstr ""
-
-#: lms/static/js/discussions_management/views/discussions.js
-msgid ""
-"Use enrollment tracks as the basis for dividing discussions. All learners, "
-"regardless of their enrollment track, see the same discussion topics, but "
-"within divided topics, only learners who are in the same enrollment track "
-"see and respond to each others’ posts."
-msgstr ""
-
-#: lms/static/js/discussions_management/views/discussions.js
-msgid "Cohorts"
-msgstr ""
-
-#: lms/static/js/discussions_management/views/discussions.js
-msgid ""
-"Use cohorts as the basis for dividing discussions. All learners, regardless "
-"of cohort, see the same discussion topics, but within divided topics, only "
-"members of the same cohort see and respond to each others’ posts. "
-msgstr ""
-
-#: lms/static/js/discussions_management/views/discussions.js
-msgid "Discussion topics in the course are not divided."
-msgstr ""
-
-#: lms/static/js/discussions_management/views/discussions.js
-msgid "Any divided discussion topics are divided based on enrollment track."
-msgstr ""
-
-#: lms/static/js/discussions_management/views/discussions.js
-msgid "Any divided discussion topics are divided based on cohort."
-msgstr ""
-
-#: lms/static/js/discussions_management/views/discussions.js
-msgid "Your changes have been saved. {details}"
-msgstr ""
-
-#: lms/static/js/discussions_management/views/discussions.js
-msgid "We have encountered an error. Refresh your browser and then try again."
-msgstr ""
-
 #: lms/static/js/discussions_management/views/divided_discussions.js
 #: lms/static/js/discussions_management/views/divided_discussions_course_wide.js
 #: lms/static/js/discussions_management/views/divided_discussions_inline.js
 #: lms/static/js/groups/views/cohort_form.js
 #: lms/static/js/groups/views/cohorts.js
 msgid "We've encountered an error. Refresh your browser and then try again."
-msgstr "오류가 발생했습니다. 페이지를 새로고침한 후, 다시 시도하세요. "
+msgstr "오류가 발생했습니다. 브라우저를 새로고침한 다음 다시 시도해 보십시오."
 
 #: lms/static/js/edxnotes/views/notes_visibility_factory.js
 #: lms/static/js/edxnotes/views/search_box.js
@@ -6218,7 +5975,7 @@ msgstr ""
 #: cms/static/js/factories/manage_users.js
 #: cms/static/js/factories/manage_users_lib.js
 msgid "Staff"
-msgstr "운영팀"
+msgstr "직원"
 
 #: cms/static/js/factories/manage_users.js
 #: cms/static/js/factories/manage_users_lib.js
@@ -6999,12 +6756,6 @@ msgstr ""
 msgid "Date"
 msgstr "날짜"
 
-#: cms/templates/js/paging-header.underscore
-#: common/static/common/templates/components/paging-footer.underscore
-#: common/static/common/templates/discussion/pagination.underscore
-msgid "Previous"
-msgstr ""
-
 #: cms/templates/js/previous-video-upload-list.underscore
 #: lms/djangoapps/support/static/support/templates/manage_user.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
@@ -7049,359 +6800,10 @@ msgstr ""
 msgid "Search"
 msgstr ""
 
-#: common/static/common/templates/discussion/forum-action-answer.underscore
-msgid "Mark as Answer"
-msgstr ""
-
-#: common/static/common/templates/discussion/forum-action-answer.underscore
-msgid "Unmark as Answer"
-msgstr ""
-
-#: common/static/common/templates/discussion/forum-action-close.underscore
-msgid "Open"
-msgstr ""
-
-#: common/static/common/templates/discussion/forum-action-endorse.underscore
-msgid "Endorse"
-msgstr ""
-
-#: common/static/common/templates/discussion/forum-action-endorse.underscore
-msgid "Unendorse"
-msgstr ""
-
-#: common/static/common/templates/discussion/forum-action-follow.underscore
-msgid "Follow"
-msgstr ""
-
-#: common/static/common/templates/discussion/forum-action-follow.underscore
-msgid "Unfollow"
-msgstr ""
-
-#: common/static/common/templates/discussion/forum-action-pin.underscore
-msgid "Pin"
-msgstr ""
-
-#: common/static/common/templates/discussion/forum-action-pin.underscore
-msgid "Unpin"
-msgstr ""
-
-#: common/static/common/templates/discussion/forum-action-report.underscore
-msgid "Report abuse"
-msgstr ""
-
-#: common/static/common/templates/discussion/forum-action-report.underscore
-msgid "Report"
-msgstr ""
-
-#: common/static/common/templates/discussion/forum-action-report.underscore
-msgid "Unreport"
-msgstr ""
-
-#: common/static/common/templates/discussion/forum-action-vote.underscore
-msgid "Vote for this post,"
-msgstr ""
-
-#: common/static/common/templates/discussion/nav-load-more-link.underscore
-msgid "Load more"
-msgstr ""
-
-#: common/static/common/templates/discussion/new-post-alert.underscore
-msgid "Error posting your message."
-msgstr ""
-
-#: common/static/common/templates/discussion/new-post-visibility.underscore
-#, python-format
-msgid "This post will be visible only to %(group_name)s."
-msgstr ""
-
-#: common/static/common/templates/discussion/new-post-visibility.underscore
-msgid "This post will be visible to everyone."
-msgstr ""
-
-#: common/static/common/templates/discussion/new-post.underscore
-msgid "Add a Post"
-msgstr ""
-
-#: common/static/common/templates/discussion/new-post.underscore
-msgid "Visible to"
-msgstr ""
-
-#: common/static/common/templates/discussion/new-post.underscore
-msgid ""
-"Discussion admins, moderators, and TAs can make their posts visible to all "
-"students or specify a single group."
-msgstr ""
-
-#: common/static/common/templates/discussion/new-post.underscore
-msgid "All Groups"
-msgstr ""
-
-#: common/static/common/templates/discussion/new-post.underscore
-#: common/static/common/templates/discussion/thread-edit.underscore
-msgid ""
-"Add a clear and descriptive title to encourage participation. (Required)"
-msgstr ""
-
-#: common/static/common/templates/discussion/new-post.underscore
-msgid "follow this post"
-msgstr ""
-
-#: common/static/common/templates/discussion/new-post.underscore
-msgid "post anonymously"
-msgstr ""
-
-#: common/static/common/templates/discussion/new-post.underscore
-msgid "post anonymously to classmates"
-msgstr ""
-
-#: common/static/common/templates/discussion/post-user-display.underscore
-msgid "(Community TA)"
-msgstr ""
-
-#: common/static/common/templates/discussion/post-user-display.underscore
-msgid "(Staff)"
-msgstr ""
-
-#: common/static/common/templates/discussion/profile-thread.underscore
-#: common/static/common/templates/discussion/thread.underscore
-msgid "This thread is closed."
-msgstr ""
-
-#: common/static/common/templates/discussion/profile-thread.underscore
-msgid "View discussion"
-msgstr ""
-
-#: common/static/common/templates/discussion/response-comment-edit.underscore
-msgid "Editing comment"
-msgstr ""
-
-#: common/static/common/templates/discussion/response-comment-edit.underscore
-msgid "Update comment"
-msgstr ""
-
-#: common/static/common/templates/discussion/response-comment-show.underscore
-#, python-format
-msgid "posted %(time_ago)s by %(author)s"
-msgstr ""
-
-#: common/static/common/templates/discussion/response-comment-show.underscore
-#: common/static/common/templates/discussion/thread-response-show.underscore
-#: common/static/common/templates/discussion/thread-show.underscore
-msgid "Reported"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-edit.underscore
-msgid "Editing post"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-edit.underscore
-msgid "Edit your post below."
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-edit.underscore
-msgid "Update post"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "discussion"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "answered question"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "unanswered question"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-#: common/static/common/templates/discussion/thread-show.underscore
-msgid "Pinned"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "Following"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "Community TA"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "{unread_comments_count} new"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-#, python-format
-msgid ""
-"%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s "
-"unread comments)%(span_close)s"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-#, python-format
-msgid "%(comments_count)s %(span_sr_open)scomments %(span_close)s"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-response-edit.underscore
-msgid "Editing response"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-response-edit.underscore
-msgid "Update response"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-response-show.underscore
-#, python-format
-msgid "marked as answer %(time_ago)s by %(user)s"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-response-show.underscore
-#, python-format
-msgid "marked as answer %(time_ago)s"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-response-show.underscore
-#, python-format
-msgid "endorsed %(time_ago)s by %(user)s"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-response-show.underscore
-#, python-format
-msgid "endorsed %(time_ago)s"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-response.underscore
-#, python-format
-msgid "Show Comment (%(num_comments)s)"
-msgid_plural "Show Comments (%(num_comments)s)"
-msgstr[0] ""
-
-#: common/static/common/templates/discussion/thread-response.underscore
-msgid "Add a comment"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-show.underscore
-#, python-format
-msgid "discussion posted %(time_ago)s by %(author)s"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-show.underscore
-#, python-format
-msgid "question posted %(time_ago)s by %(author)s"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-show.underscore
-msgid "Closed"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-show.underscore
-#, python-format
-msgid "Related to: %(courseware_title_linked)s"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-show.underscore
-#, python-format
-msgid "This post is visible only to %(group_name)s."
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-show.underscore
-msgid "This post is visible to everyone."
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-type.underscore
-msgid "Post type"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-type.underscore
-msgid ""
-"Questions raise issues that need answers. Discussions share ideas and start "
-"conversations. (Required)"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-type.underscore
-msgid "Question"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-type.underscore
-msgid "Discussion"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread.underscore
-msgid "Add a Response"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread.underscore
-msgid "Add a response:"
-msgstr ""
-
-#: common/static/common/templates/discussion/topic.underscore
-msgid "Topic area"
-msgstr ""
-
-#: common/static/common/templates/discussion/topic.underscore
-msgid "Add your post to a relevant topic to help others find it. (Required)"
-msgstr ""
-
-#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
-msgid "Discussion Home"
-msgstr ""
-
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 #, python-format
 msgid "How to use %(platform_name)s discussions"
-msgstr "%(platform_name)s 게시판 사용법"
-
-#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
-msgid "Find discussions"
-msgstr ""
-
-#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
-msgid "Use the All Topics menu to find specific topics."
-msgstr ""
-
-#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
-#: lms/djangoapps/discussion/static/discussion/templates/search.underscore
-msgid "Search all posts"
-msgstr ""
-
-#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
-msgid "Filter and sort topics"
-msgstr ""
-
-#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
-msgid "Engage with posts"
-msgstr ""
-
-#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
-msgid "Vote for good posts and responses"
-msgstr ""
-
-#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
-msgid "Report abuse, topics, and responses"
-msgstr ""
-
-#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
-msgid "Follow or unfollow posts"
-msgstr ""
-
-#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
-msgid "Receive updates"
-msgstr ""
-
-#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
-msgid "Toggle Notifications Setting"
-msgstr ""
-
-#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
-msgid ""
-"Check this box to receive an email digest once a day notifying you about "
-"new, unread activity from posts you are following."
-msgstr ""
-
-#: lms/djangoapps/discussion/static/discussion/templates/user-profile.underscore
-msgid "All Posts"
-msgstr ""
+msgstr "%(platform_name)s 토론 사용 방법"
 
 #: lms/djangoapps/support/static/support/templates/certificates.underscore
 msgid "username or email"
@@ -8035,10 +7437,6 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Remove from List"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-subcategory.underscore
-msgid "Divided"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
@@ -10813,3 +10211,851 @@ msgstr ""
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 msgid "Use Current Transcript"
 msgstr ""
+
+#: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+#: lms/djangoapps/discussion/static/discussion/templates/fake-breadcrumbs.underscore
+#: test_root/staticfiles/discussion/templates/fake-breadcrumbs.underscore
+msgid "All Topics"
+msgstr "모든 주제"
+
+#: lms/static/js/discussions_management/views/discussions.js
+msgid "Not divided"
+msgstr "미구분"
+
+#: lms/static/js/discussions_management/views/discussions.js
+msgid ""
+"Discussions are unified; all learners interact with posts from other "
+"learners, regardless of the group they are in."
+msgstr "토론이 통합되어 있으며 모든 수강자가 자신이 속한 그룹에 관계없이 다른 수강자의 게시글에 참여할 수 있습니다."
+
+#: lms/static/js/discussions_management/views/discussions.js
+msgid "Enrollment Tracks"
+msgstr "등록 트랙"
+
+#: lms/static/js/discussions_management/views/discussions.js
+msgid ""
+"Use enrollment tracks as the basis for dividing discussions. All learners, "
+"regardless of their enrollment track, see the same discussion topics, but "
+"within divided topics, only learners who are in the same enrollment track "
+"see and respond to each others’ posts."
+msgstr "등록 트랙을 토론을 구분하는 기준으로 사용합니다. 모든 수강자가 자신의 등록 트랙에 관계없이 동일한 토론 주제를 볼 수 있지만 구분된 주제 내에서는 동일한 등록 트랙에 속한 수강자만 다른 수강자의 게시글을 보고 답변할 수 있습니다."
+
+#: lms/static/js/discussions_management/views/discussions.js
+msgid "Cohorts"
+msgstr "집단"
+
+#: lms/static/js/discussions_management/views/discussions.js
+msgid ""
+"Use cohorts as the basis for dividing discussions. All learners, regardless "
+"of cohort, see the same discussion topics, but within divided topics, only "
+"members of the same cohort see and respond to each others’ posts. "
+msgstr "집단을 토론을 구분하는 기준으로 사용합니다. 모든 수강자가 집단에 관계없이 동일한 토론 주제를 볼 수 있지만 구분된 주제 내에서는 동일한 집단에 속한 구성원만 서로의 게시글을 보고 답변할 수 있습니다. "
+
+#: lms/static/js/discussions_management/views/discussions.js
+msgid "Discussion topics in the course are not divided."
+msgstr "강의의 토론 주제가 구분되지 않았습니다."
+
+#: lms/static/js/discussions_management/views/discussions.js
+msgid "Any divided discussion topics are divided based on enrollment track."
+msgstr "구분된 토론 주제가 모두 등록 트랙을 기준으로 구분됩니다."
+
+#: lms/static/js/discussions_management/views/discussions.js
+msgid "Any divided discussion topics are divided based on cohort."
+msgstr "구분된 토론 주제가 모두 집단을 기준으로 구분됩니다."
+
+#: lms/static/js/discussions_management/views/discussions.js
+msgid "Your changes have been saved. {details}"
+msgstr "변경 사항이 저장되었습니다. {details}"
+
+#: lms/static/js/discussions_management/views/discussions.js
+msgid "We have encountered an error. Refresh your browser and then try again."
+msgstr "오류가 발생했습니다. 브라우저를 새로고침한 다음 다시 시도해 보십시오."
+
+#: cms/templates/js/paging-header.underscore
+#: common/static/common/templates/components/paging-footer.underscore
+#: common/static/common/templates/discussion/pagination.underscore
+#: test_root/staticfiles/common/templates/components/paging-footer.underscore
+#: test_root/staticfiles/common/templates/discussion/pagination.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/components/paging-footer.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/pagination.underscore
+msgid "Previous"
+msgstr "이전"
+
+#: common/static/common/templates/discussion/forum-action-answer.underscore
+#: test_root/staticfiles/common/templates/discussion/forum-action-answer.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-answer.underscore
+msgid "Mark as Answer"
+msgstr "답변으로 표시"
+
+#: common/static/common/templates/discussion/forum-action-answer.underscore
+#: test_root/staticfiles/common/templates/discussion/forum-action-answer.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-answer.underscore
+msgid "Unmark as Answer"
+msgstr "답변 표시 해제"
+
+#: common/static/common/templates/discussion/forum-action-close.underscore
+#: test_root/staticfiles/common/templates/discussion/forum-action-close.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-close.underscore
+msgid "Open"
+msgstr "열기"
+
+#: common/static/common/templates/discussion/forum-action-endorse.underscore
+#: test_root/staticfiles/common/templates/discussion/forum-action-endorse.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-endorse.underscore
+msgid "Endorse"
+msgstr "인증"
+
+#: common/static/common/templates/discussion/forum-action-endorse.underscore
+#: test_root/staticfiles/common/templates/discussion/forum-action-endorse.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-endorse.underscore
+msgid "Unendorse"
+msgstr "인증 취소"
+
+#: common/static/common/templates/discussion/forum-action-follow.underscore
+#: test_root/staticfiles/common/templates/discussion/forum-action-follow.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-follow.underscore
+msgid "Follow"
+msgstr "팔로우"
+
+#: common/static/common/templates/discussion/forum-action-follow.underscore
+#: test_root/staticfiles/common/templates/discussion/forum-action-follow.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-follow.underscore
+msgid "Unfollow"
+msgstr "팔로우 취소"
+
+#: common/static/common/templates/discussion/forum-action-pin.underscore
+#: test_root/staticfiles/common/templates/discussion/forum-action-pin.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-pin.underscore
+msgid "Pin"
+msgstr "고정"
+
+#: common/static/common/templates/discussion/forum-action-pin.underscore
+#: test_root/staticfiles/common/templates/discussion/forum-action-pin.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-pin.underscore
+msgid "Unpin"
+msgstr "고정 취소"
+
+#: common/static/common/templates/discussion/forum-action-report.underscore
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+#: test_root/staticfiles/common/templates/discussion/forum-action-report.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-report.underscore
+msgid "Report abuse"
+msgstr "남용 신고"
+
+#: common/static/common/templates/discussion/forum-action-report.underscore
+#: test_root/staticfiles/common/templates/discussion/forum-action-report.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-report.underscore
+msgid "Report"
+msgstr "신고"
+
+#: common/static/common/templates/discussion/forum-action-report.underscore
+#: test_root/staticfiles/common/templates/discussion/forum-action-report.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-report.underscore
+msgid "Unreport"
+msgstr "신고 취소"
+
+#: common/static/common/templates/discussion/forum-action-vote.underscore
+#: test_root/staticfiles/common/templates/discussion/forum-action-vote.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-vote.underscore
+msgid "Vote for this post,"
+msgstr "이 게시글에 투표,"
+
+#: common/static/common/templates/discussion/nav-load-more-link.underscore
+#: test_root/staticfiles/common/templates/discussion/nav-load-more-link.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/nav-load-more-link.underscore
+msgid "Load more"
+msgstr "더보기"
+
+#: common/static/common/templates/discussion/new-post-alert.underscore
+#: test_root/staticfiles/common/templates/discussion/new-post-alert.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post-alert.underscore
+msgid "Error posting your message."
+msgstr "메시지를 게시하는 중에 오류가 발생했습니다."
+
+#: common/static/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
+msgid "Add a Post"
+msgstr "게시글 추가"
+
+#: common/static/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
+msgid "Visible to"
+msgstr "공개 대상"
+
+#: common/static/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
+msgid ""
+"Discussion admins, moderators, and TAs can make their posts visible to all "
+"students or specify a single group."
+msgstr "토론 관리자, 진행자 및 조교는 자신의 게시글을 모든 수강자에게 공개하거나 단일 그룹을 공개 대상으로 지정할 수 있습니다."
+
+#: common/static/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
+msgid "All Groups"
+msgstr "모든 그룹"
+
+#: common/static/common/templates/discussion/new-post.underscore
+#: common/static/common/templates/discussion/thread-edit.underscore
+#: test_root/staticfiles/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-edit.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-edit.underscore
+msgid ""
+"Add a clear and descriptive title to encourage participation. (Required)"
+msgstr "참여를 독려하는 분명하고 구체적인 제목을 추가하십시오(필수)."
+
+#: common/static/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
+msgid "Your question or idea (required)"
+msgstr "내 질문 또는 의견(필수)"
+
+#: common/static/common/templates/discussion/thread-type.underscore
+msgid "Questions raise issues that need answers. Discussions share ideas and start conversations."
+msgstr "질문을 통해 답변을 필요로 하는 문제를 제기할 수 있으며, 토론을 통해 의견을 공유하고 대화를 시작할 수 있습니다."
+
+#: common/static/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
+msgid "follow this post"
+msgstr "이 게시글 팔로우"
+
+#: common/static/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
+msgid "post anonymously"
+msgstr "익명으로 게시"
+
+#: common/static/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
+msgid "post anonymously to classmates"
+msgstr "같은 수강자에게 익명으로 게시"
+
+#: common/static/common/templates/discussion/new-post.underscore
+#: common/static/common/templates/discussion/thread-response.underscore
+#: common/static/common/templates/discussion/thread.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+#: test_root/staticfiles/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-response.underscore
+#: test_root/staticfiles/common/templates/discussion/thread.underscore
+#: test_root/staticfiles/templates/verify_student/incourse_reverify.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread.underscore
+msgid "Submit"
+msgstr "제출"
+
+#: common/static/common/templates/discussion/post-user-display.underscore
+#: test_root/staticfiles/common/templates/discussion/post-user-display.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/post-user-display.underscore
+msgid "(Community TA)"
+msgstr "(커뮤니티 조교)"
+
+#: common/static/common/templates/discussion/post-user-display.underscore
+#: test_root/staticfiles/common/templates/discussion/post-user-display.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/post-user-display.underscore
+msgid "(Staff)"
+msgstr "(직원)"
+
+#: common/static/common/templates/discussion/profile-thread.underscore
+#: common/static/common/templates/discussion/thread.underscore
+#: test_root/staticfiles/common/templates/discussion/profile-thread.underscore
+#: test_root/staticfiles/common/templates/discussion/thread.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/profile-thread.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread.underscore
+msgid "This thread is closed."
+msgstr "이 스레드는 마감되었습니다."
+
+#: common/static/common/templates/discussion/profile-thread.underscore
+#: test_root/staticfiles/common/templates/discussion/profile-thread.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/profile-thread.underscore
+msgid "View discussion"
+msgstr "토론 보기"
+
+#: common/static/common/templates/discussion/response-comment-edit.underscore
+#: test_root/staticfiles/common/templates/discussion/response-comment-edit.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/response-comment-edit.underscore
+msgid "Editing comment"
+msgstr "댓글 수정"
+
+#: common/static/common/templates/discussion/response-comment-edit.underscore
+#: test_root/staticfiles/common/templates/discussion/response-comment-edit.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/response-comment-edit.underscore
+msgid "Update comment"
+msgstr "댓글 업데이트"
+
+#: common/static/common/templates/discussion/response-comment-show.underscore
+#: test_root/staticfiles/common/templates/discussion/response-comment-show.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/response-comment-show.underscore
+#, python-format
+msgid "posted %(time_ago)s by %(author)s"
+msgstr "%(time_ago)s에 %(author)s이(가) 게시함"
+
+#: common/static/common/templates/discussion/response-comment-show.underscore
+#: common/static/common/templates/discussion/thread-response-show.underscore
+#: common/static/common/templates/discussion/thread-show.underscore
+#: common/templates/js/discussion/thread-show.underscore
+#: test_root/staticfiles/common/templates/discussion/response-comment-show.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-response-show.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-show.underscore
+#: test_root/staticfiles/templates/discussion/thread-show.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/response-comment-show.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response-show.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-show.underscore
+#: test_root/staticfiles/xmodule_js/common_static/templates/discussion/thread-show.underscore
+msgid "Reported"
+msgstr "신고됨"
+
+#: common/static/common/templates/discussion/thread-edit.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-edit.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-edit.underscore
+msgid "Editing post"
+msgstr "게시글 수정"
+
+#: common/static/common/templates/discussion/thread-edit.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-edit.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-edit.underscore
+msgid "Edit your post below."
+msgstr "아래에서 게시글을 수정하십시오."
+
+#: common/static/common/templates/discussion/thread-edit.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-edit.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-edit.underscore
+msgid "Update post"
+msgstr "게시글 업데이트"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
+msgid "discussion"
+msgstr "토론"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
+msgid "answered question"
+msgstr "답변이 있는 질문"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
+msgid "unanswered question"
+msgstr "답변이 없는 질문"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
+msgid "discussion posted"
+msgstr "토론이 게시됨"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+#: common/static/common/templates/discussion/thread-show.underscore
+#: common/templates/js/discussion/thread-show.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-show.underscore
+#: test_root/staticfiles/templates/discussion/thread-show.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-show.underscore
+#: test_root/staticfiles/xmodule_js/common_static/templates/discussion/thread-show.underscore
+msgid "Pinned"
+msgstr "고정됨"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
+msgid "Following"
+msgstr "팔로잉"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
+msgid "Community TA"
+msgstr "커뮤니티 조교"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+#: common/static/common/templates/discussion/thread-show.underscore
+#: common/templates/js/discussion/thread-show.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-show.underscore
+#: test_root/staticfiles/templates/discussion/thread-show.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-show.underscore
+#: test_root/staticfiles/xmodule_js/common_static/templates/discussion/thread-show.underscore
+#, python-format
+msgid "This post is visible only to %(group_name)s."
+msgstr "%(group_name)s에게만 공개된 게시글입니다."
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+#: common/static/common/templates/discussion/thread-show.underscore
+#: common/templates/js/discussion/thread-show.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-show.underscore
+#: test_root/staticfiles/templates/discussion/thread-show.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-show.underscore
+#: test_root/staticfiles/xmodule_js/common_static/templates/discussion/thread-show.underscore
+msgid "This post is visible to everyone."
+msgstr "모든 사용자에게 공개된 게시글입니다."
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
+msgid "{unread_comments_count} new"
+msgstr "신규 {unread_comments_count}개"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
+#, python-format
+msgid ""
+"%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s "
+"unread comments)%(span_close)s"
+msgstr "%(comments_count)s개 %(span_sr_open)s댓글(%(unread_comments_count)s개 읽지 않은 댓글)%(span_close)s"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
+#, python-format
+msgid "%(comments_count)s %(span_sr_open)scomments %(span_close)s"
+msgstr "%(comments_count)s개 %(span_sr_open)s댓글 %(span_close)s"
+
+#: common/static/common/templates/discussion/thread-response-edit.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-response-edit.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response-edit.underscore
+msgid "Editing response"
+msgstr "응답 수정"
+
+#: common/static/common/templates/discussion/thread-response-edit.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-response-edit.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response-edit.underscore
+msgid "Update response"
+msgstr "응답 업데이트"
+
+#: common/static/common/templates/discussion/thread-response-show.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-response-show.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response-show.underscore
+#, python-format
+msgid "marked as answer %(time_ago)s by %(user)s"
+msgstr "%(time_ago)s에 %(user)s이(가) 답변으로 표시함"
+
+#: common/static/common/templates/discussion/thread-response-show.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-response-show.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response-show.underscore
+#, python-format
+msgid "marked as answer %(time_ago)s"
+msgstr "%(time_ago)s에 답변으로 표시됨"
+#: common/static/common/templates/discussion/thread-response-show.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-response-show.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response-show.underscore
+#, python-format
+msgid "endorsed %(time_ago)s by %(user)s"
+msgstr "%(time_ago)s에 %(user)s이(가) 인증함"
+
+#: common/static/common/templates/discussion/thread-response-show.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-response-show.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response-show.underscore
+#, python-format
+msgid "endorsed %(time_ago)s"
+msgstr "%(time_ago)s에 인증됨"
+
+#: common/static/common/templates/discussion/thread-response.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-response.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response.underscore
+#, python-format
+msgid "Show Comment (%(num_comments)s)"
+msgid_plural "Show Comments (%(num_comments)s)"
+msgstr[0] "댓글 표시(%(num_comments)s개)"
+msgstr[1] "댓글 표시(%(num_comments)s개)"
+
+#: common/static/common/templates/discussion/thread-response.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-response.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response.underscore
+msgid "Add a comment"
+msgstr "댓글 추가"
+
+#: common/static/common/templates/discussion/thread-show.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-show.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-show.underscore
+#, python-format
+msgid "discussion posted %(time_ago)s by %(author)s"
+msgstr "%(time_ago)s에 %(author)s이(가) 게시한 토론"
+
+#: common/static/common/templates/discussion/thread-show.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-show.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-show.underscore
+#, python-format
+msgid "question posted %(time_ago)s by %(author)s"
+msgstr "%(time_ago)s에 %(author)s이(가) 게시한 질문"
+
+#: common/static/common/templates/discussion/thread-show.underscore
+#: common/templates/js/discussion/thread-show.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-show.underscore
+#: test_root/staticfiles/templates/discussion/thread-show.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-show.underscore
+#: test_root/staticfiles/xmodule_js/common_static/templates/discussion/thread-show.underscore
+msgid "Closed"
+msgstr "마감됨"
+
+#: common/static/common/templates/discussion/thread-show.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-show.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-show.underscore
+#, python-format
+msgid "Related to: %(courseware_title_linked)s"
+msgstr "관련 강의 자료: %(courseware_title_linked)s"
+
+#: common/static/common/templates/discussion/thread-type.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-type.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-type.underscore
+msgid "Post type"
+msgstr "게시글 유형"
+
+#: common/static/common/templates/discussion/thread-type.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-type.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-type.underscore
+msgid ""
+"Questions raise issues that need answers. Discussions share ideas and start "
+"conversations. (Required)"
+msgstr "질문을 통해 답변을 필요로 하는 문제를 제기할 수 있으며, 토론을 통해 의견을 공유하고 대화를 시작할 수 있습니다(필수)."
+
+#: common/static/common/templates/discussion/thread-type.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-type.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-type.underscore
+msgid "Question"
+msgstr "질문"
+
+#: common/static/common/templates/discussion/thread-type.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-type.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-type.underscore
+msgid "Discussion"
+msgstr "토론"
+
+#: common/static/common/templates/discussion/thread.underscore
+#: test_root/staticfiles/common/templates/discussion/thread.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread.underscore
+msgid "Add a Response"
+msgstr "응답 추가"
+
+#: common/static/common/templates/discussion/thread.underscore
+#: test_root/staticfiles/common/templates/discussion/thread.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread.underscore
+msgid "Add a response:"
+msgstr "응답 추가:"
+
+#: common/static/common/templates/discussion/topic.underscore
+#: test_root/staticfiles/common/templates/discussion/topic.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/topic.underscore
+msgid "Topic area"
+msgstr "주제 영역"
+
+#: common/static/common/templates/discussion/topic.underscore
+#: test_root/staticfiles/common/templates/discussion/topic.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/topic.underscore
+msgid "Add your post to a relevant topic to help others find it. (Required)"
+msgstr "다른 수강자가 찾을 수 있도록 관련 주제에 게시글을 추가하십시오(필수)."
+
+#: common/templates/js/discussion/thread-show.underscore
+#: test_root/staticfiles/templates/discussion/thread-show.underscore
+#: test_root/staticfiles/xmodule_js/common_static/templates/discussion/thread-show.underscore
+#, python-format
+msgid "%(post_type)s posted %(time_ago)s by %(author)s"
+msgstr "%(time_ago)s에 %(author)s이(가) 게시한 %(post_type)s"
+
+#: common/templates/js/discussion/thread-show.underscore
+#: test_root/staticfiles/templates/discussion/thread-show.underscore
+#: test_root/staticfiles/xmodule_js/common_static/templates/discussion/thread-show.underscore
+#, python-format
+msgid "(this post is about %(courseware_title_linked)s)"
+msgstr "(%(courseware_title_linked)s에 대한 게시글)"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+#: test_root/staticfiles/discussion/templates/discussion-home.underscore
+msgid "Discussion Home"
+msgstr "토론 홈"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Find discussions"
+msgstr "토론 찾기"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+#: test_root/staticfiles/discussion/templates/discussion-home.underscore
+msgid "Use the All Topics menu to find specific topics."
+msgstr "‘모든 주제’ 메뉴를 사용하여 특정 주제를 찾으십시오."
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+#: lms/djangoapps/discussion/static/discussion/templates/search.underscore
+#: test_root/staticfiles/discussion/templates/discussion-home.underscore
+#: test_root/staticfiles/discussion/templates/search.underscore
+msgid "Search all posts"
+msgstr "모든 게시글 검색"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+#: test_root/staticfiles/discussion/templates/discussion-home.underscore
+msgid "Filter and sort topics"
+msgstr "주제 필터링 및 분류"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+#: test_root/staticfiles/discussion/templates/discussion-home.underscore
+msgid "Engage with posts"
+msgstr "게시글에 참여"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+#: test_root/staticfiles/discussion/templates/discussion-home.underscore
+msgid "Vote for good posts and responses"
+msgstr "좋은 게시글 및 응답에 투표"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+#: test_root/staticfiles/discussion/templates/discussion-home.underscore
+msgid "Report abuse, topics, and responses"
+msgstr "남용, 주제 및 응답 신고"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+#: test_root/staticfiles/discussion/templates/discussion-home.underscore
+msgid "Follow or unfollow posts"
+msgstr "게시글 팔로우 또는 팔로우 취소"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+#: test_root/staticfiles/discussion/templates/discussion-home.underscore
+msgid "Receive updates"
+msgstr "업데이트 받기"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+#: test_root/staticfiles/discussion/templates/discussion-home.underscore
+msgid "Toggle Notifications Setting"
+msgstr "알림 설정 전환"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+#: test_root/staticfiles/discussion/templates/discussion-home.underscore
+msgid ""
+"Check this box to receive an email digest once a day notifying you about "
+"new, unread activity from posts you are following."
+msgstr "이 확인란을 선택하면 팔로우 중인 게시글에서 읽지 않은 새 활동에 대해 알려주는 이메일 요약을 하루에 한 번씩 받을 수 있습니다."
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Discussions"
+msgstr "토론"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "How to use discussions"
+msgstr "토론 사용 방법"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "find discussions"
+msgstr "토론 찾기"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Use the"
+msgstr "다음"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid " menu to see a list of all topics."
+msgstr " 메뉴를 사용하여 모든 주제의 목록을 볼 수 있습니다."
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Search and filter all posts to find specific topics or posts."
+msgstr "모든 게시글을 검색 및 필터링하여 특정 주제 또는 게시글을 찾을 수 있습니다."
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "engage with posts"
+msgstr "게시글에 참여"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Vote for goods post and responses"
+msgstr "좋은 게시글 및 응답에 투표"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid ""
+"Earn points for your engagement by adding a new post or responding to an "
+"existing post."
+msgstr "새로운 게시글을 추가하거나 기존 게시글에 응답하여 참여 점수를 취득할 수 있습니다."
+
+#: lms/djangoapps/discussion/static/discussion/templates/user-profile.underscore
+#: test_root/staticfiles/discussion/templates/user-profile.underscore
+msgid "All Posts"
+msgstr "모든 게시글"
+
+#: common/static/common/js/discussion/utils.js
+msgid "Your request could not be processed. Refresh the page and try again."
+msgstr "요청을 처리할 수 없습니다. 페이지를 새로고침한 다음 다시 시도해 보십시오."
+
+#: common/static/common/js/discussion/utils.js
+msgid "Some images in this post have been omitted"
+msgstr "이 게시글의 일부 이미지가 생략됨"
+
+#: common/static/common/js/discussion/utils.js
+msgid "image omitted"
+msgstr "이미지 생략됨"
+
+#: common/static/common/js/discussion/views/discussion_content_view.js
+msgid "there is currently {numVotes} vote"
+msgid_plural "there are currently {numVotes} votes"
+msgstr[0] "현재 {numVotes}표를 받음"
+msgstr[1] "현재 {numVotes}표를 받음"
+
+#: common/static/common/js/discussion/views/discussion_content_view.js
+msgid "{numVotes} Vote"
+msgid_plural "{numVotes} Votes"
+msgstr[0] "{numVotes}표"
+msgstr[1] "{numVotes}표"
+
+#: common/static/common/js/discussion/views/discussion_content_view.js
+msgid ""
+"You could not be subscribed to this post. Refresh the page and try again."
+msgstr "이 게시글을 구독할 수 없습니다. 페이지를 새로고침한 다음 다시 시도해 보십시오."
+
+#: common/static/common/js/discussion/views/discussion_content_view.js
+msgid ""
+"You could not be unsubscribed from this post. Refresh the page and try "
+"again."
+msgstr "이 게시글을 구독 취소할 수 없습니다. 페이지를 새로고침한 다음 다시 시도해 보십시오."
+
+#: common/static/common/js/discussion/views/discussion_content_view.js
+msgid ""
+"This response could not be marked as an answer. Refresh the page and try "
+"again."
+msgstr "이 응답을 답변으로 표시할 수 없습니다. 페이지를 새로고침한 다음 다시 시도해 보십시오."
+
+#: common/static/common/js/discussion/views/discussion_content_view.js
+msgid ""
+"This response could not be unmarked as an answer. Refresh the page and try "
+"again."
+msgstr "이 응답을 답변 표시 해제할 수 없습니다. 페이지를 새로고침한 다음 다시 시도해 보십시오."
+
+#: common/static/common/js/discussion/views/discussion_content_view.js
+msgid ""
+"This response could not be marked as endorsed. Refresh the page and try "
+"again."
+msgstr "이 응답을 인증 표시할 수 없습니다. 페이지를 새로고침한 다음 다시 시도해 보십시오."
+
+#: common/static/common/js/discussion/views/discussion_content_view.js
+msgid "This response could not be unendorsed. Refresh the page and try again."
+msgstr "이 응답을 인증 취소할 수 없습니다. 페이지를 새로고침한 다음 다시 시도해 보십시오."
+
+#: common/static/common/js/discussion/views/discussion_content_view.js
+msgid "This vote could not be processed. Refresh the page and try again."
+msgstr "이 투표를 처리할 수 없습니다. 페이지를 새로고침한 다음 다시 시도해 보십시오."
+
+#: common/static/common/js/discussion/views/discussion_content_view.js
+msgid "This post could not be pinned. Refresh the page and try again."
+msgstr "이 게시글을 고정할 수 없습니다. 페이지를 새로고침한 다음 다시 시도해 보십시오."
+
+#: common/static/common/js/discussion/views/discussion_content_view.js
+msgid "This post could not be unpinned. Refresh the page and try again."
+msgstr "이 게시글을 고정 취소할 수 없습니다. 페이지를 새로고침한 다음 다시 시도해 보십시오."
+
+#: common/static/common/js/discussion/views/discussion_content_view.js
+msgid ""
+"This post could not be flagged for abuse. Refresh the page and try again."
+msgstr "이 게시글을 남용으로 신고할 수 없습니다. 페이지를 새로고침한 다음 다시 시도해 보십시오."
+
+#: common/static/common/js/discussion/views/discussion_content_view.js
+msgid ""
+"This post could not be unflagged for abuse. Refresh the page and try again."
+msgstr "이 게시글에 대한 남용 신고를 취소할 수 없습니다. 페이지를 새로고침한 다음 다시 시도해 보십시오."
+
+#: common/static/common/js/discussion/views/discussion_content_view.js
+msgid "This post could not be closed. Refresh the page and try again."
+msgstr "이 게시글을 닫을 수 없습니다. 페이지를 새로고침한 다음 다시 시도해 보십시오."
+
+#: common/static/common/js/discussion/views/discussion_content_view.js
+msgid "This post could not be reopened. Refresh the page and try again."
+msgstr "이 게시글을 다시 열 수 없습니다. 페이지를 새로고침한 다음 다시 시도해 보십시오."
+
+#: common/static/common/js/discussion/views/discussion_inline_view.js
+msgid "This discussion could not be loaded. Refresh the page and try again."
+msgstr "이 토론을 로드할 수 없습니다. 페이지를 새로고침한 다음 다시 시도해 보십시오."
+
+#: common/static/common/js/discussion/views/discussion_thread_list_view.js
+msgid "Additional posts could not be loaded. Refresh the page and try again."
+msgstr "추가 게시글을 로드할 수 없습니다. 페이지를 새로고침한 다음 다시 시도해 보십시오."
+
+#: common/static/common/js/discussion/views/discussion_thread_list_view.js
+msgid "Loading posts list"
+msgstr "게시글 목록 로드 중"
+
+#: common/static/common/js/discussion/views/discussion_thread_list_view.js
+msgid ""
+"No results found for {original_query}. Showing results for "
+"{suggested_query}."
+msgstr "{original_query}에 대한 결과가 없습니다. {suggested_query}에 대한 결과를 표시합니다."
+
+#: common/static/common/js/discussion/views/discussion_thread_list_view.js
+msgid "No posts matched your query."
+msgstr "질의와 일치하는 게시글이 없습니다."
+
+#: common/static/common/js/discussion/views/discussion_thread_list_view.js
+msgid "Show posts by {username}."
+msgstr "{username}님이 작성한 게시글을 표시합니다."
+
+#: common/static/common/js/discussion/views/discussion_thread_view.js
+msgid "The post you selected has been deleted."
+msgstr "선택하신 게시글은 삭제되었습니다."
+
+#: common/static/common/js/discussion/views/discussion_thread_view.js
+msgid "Responses could not be loaded. Refresh the page and try again."
+msgstr "응답을 로드할 수 없습니다. 페이지를 새로고침한 다음 다시 시도해 보십시오."
+
+#: common/static/common/js/discussion/views/discussion_thread_view.js
+msgid ""
+"Additional responses could not be loaded. Refresh the page and try again."
+msgstr "추가 응답을 로드할 수 없습니다. 페이지를 새로고침한 다음 다시 시도해 보십시오."
+
+#: common/static/common/js/discussion/views/discussion_thread_view.js
+msgid "{numResponses} other response"
+msgid_plural "{numResponses} other responses"
+msgstr[0] "기타 응답 {numResponses}개"
+msgstr[1] "기타 응답 {numResponses}개"
+
+#: common/static/common/js/discussion/views/discussion_thread_view.js
+msgid "{numResponses} response"
+msgid_plural "{numResponses} responses"
+msgstr[0] "응답 {numResponses}개"
+msgstr[1] "응답 {numResponses}개"
+
+#: common/static/common/js/discussion/views/discussion_thread_view.js
+msgid "Showing first response"
+msgid_plural "Showing first {numResponses} responses"
+msgstr[0] "첫 번째 응답 표시 중"
+msgstr[1] "처음 {numResponses}개 응답 표시 중"
+
+#: common/static/common/js/discussion/views/discussion_thread_view.js
+msgid "Load next {numResponses} responses"
+msgstr "다음 {numResponses}개 응답 로드"
+
+#: common/static/common/js/discussion/views/response_comment_view.js
+msgid "This comment could not be deleted. Refresh the page and try again."
+msgstr "이 댓글을 삭제할 수 없습니다. 페이지를 새로고침한 다음 다시 시도해 보십시오."
+
+#: lms/djangoapps/discussion/static/discussion/js/discussion_router.js
+msgid "You are not permitted to view this discussion."
+msgstr "이 토론을 볼 권한이 없습니다."
+
+#: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
+msgid ""
+"Deleting a team is permanent and cannot be undone. All members are removed "
+"from the team, and team discussions can no longer be accessed."
+msgstr "팀을 삭제하면 영구적으로 삭제되며 실행 취소할 수 없습니다. 모든 구성원이 팀에서 제거되며 더 이상 팀 토론에 액세스할 수 없습니다."
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-subcategory.underscore
+#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-subcategory.underscore
+msgid "Divided"
+msgstr "구분"
+
+#: lms/djangoapps/teams/static/teams/js/views/team_profile.js
+msgid ""
+"If you leave, you can no longer post in this team's discussions. Your place "
+"will be available to another learner."
+msgstr "탈퇴하면 더 이상 이 팀의 토론에 게시글을 작성할 수 없으며 내 지위는 다른 수강자에게 제공됩니다."
+
+#: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
+msgid "Delete this team?"
+msgstr "이 팀을 삭제하시겠습니까?"
+
+#: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
+msgid "Team \"{team}\" successfully deleted."
+msgstr "팀 \"{team}\"이(가) 성공적으로 삭제되었습니다."

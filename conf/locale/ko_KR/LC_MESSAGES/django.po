@@ -117,7 +117,7 @@ msgstr ""
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 #: lms/templates/ux/reference/bootstrap/course-skeleton.html
 msgid "Discussion"
-msgstr ""
+msgstr "토론"
 
 #: cms/djangoapps/contentstore/views/component.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
@@ -288,7 +288,7 @@ msgstr ""
 
 #: cms/templates/container.html cms/templates/library.html
 msgid "Display Name"
-msgstr "표시될 이름"
+msgstr "표시 이름"
 
 #: lms/templates/courseware/course_about.html
 msgid "Price"
@@ -393,19 +393,6 @@ msgstr ""
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 msgid "Student"
 msgstr ""
-
-#: common/djangoapps/student/admin.py
-msgid "User profile"
-msgstr ""
-
-#: cms/templates/login.html cms/templates/register.html
-#: lms/templates/login.html lms/templates/provider_login.html
-#: lms/templates/register-form.html lms/templates/signup_modal.html
-#: lms/templates/sysadmin_dashboard.html
-#: themes/red-theme/cms/templates/login.html
-#: themes/stanford-style/lms/templates/register-form.html
-msgid "Password"
-msgstr "비밀번호"
 
 #: common/djangoapps/student/admin.py
 msgid ""
@@ -1996,7 +1983,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/x_module.py
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid "The display name for this component."
-msgstr ""
+msgstr "이 구성 요소의 표시 이름입니다."
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
 msgid "Annotation"
@@ -2117,7 +2104,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "XML data for the problem"
-msgstr ""
+msgstr "문제의 XML 데이터"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Dictionary with the correctness of current student answers"
@@ -2561,7 +2548,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Discussion Blackout Dates"
-msgstr ""
+msgstr "토론 중지 날짜"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
@@ -2574,11 +2561,10 @@ msgid ""
 " two blackout periods looks like this, including the outer pair of square "
 "brackets: [[\"2015-09-15\", \"2015-09-21\"], [\"2015-10-01\", "
 "\"2015-10-08\"]] "
-msgstr ""
-
+msgstr "수강자가 토론 포럼에 게시글을 작성할 수 없는 기간에 해당하는 날짜 쌍을 입력합니다. 제공된 꺾쇠괄호 안에, 입력한 각 날짜 쌍을 둘러싸는 꺾쇠괄호 세트를 추가로 입력합니다. 각 날짜 쌍의 형식이 [\"YYYY-MM-DD\", \"YYYY-MM-DD\"]와 같이 되도록 합니다. 날짜와 함께 시간을 지정하려면 각 쌍의 형식이 [\"YYYY-MM-DDTHH:MM\", \"YYYY-MM-DDTHH:MM\"]와 같이 되도록 합니다. 날짜와 시간 사이에 \"T\"가 들어가야 합니다. 예를 들어 두 개의 중지 기간을 정의하는 항목은 바깥쪽 꺾쇠괄호를 포함하여 다음과 같습니다. [[\"2015-09-15\", \"2015-09-21\"], [\"2015-10-01\", \"2015-10-08\"]] "
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Discussion Topic Mapping"
-msgstr ""
+msgstr "토론 주제 매핑"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
@@ -2587,23 +2573,19 @@ msgid ""
 "example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
 "UniversityX-MUS101-course-2015_T1\"}. The \"id\" value for each category "
 "must be unique. In \"id\" values, the only special characters that are "
-"supported are underscore, hyphen, and period. You can also specify a "
-"category as the default for new posts in the Discussion page by setting its "
-"\"default\" attribute to true. For example, \"Lydian Mode\": {\"id\": \"i4x-"
-"UniversityX-MUS101-course-2015_T1\", \"default\": true}."
-msgstr ""
+"supported are underscore, hyphen, and period."
+msgstr "다음 형식으로 토론 카테고리를 입력합니다. \"카테고리 이름\": {\"id\": \"i4x-기관 이름-강의 번호-강의-강의 회차\"}. 예를 들어, 하나의 토론 카테고리는 다음과 같은 형식일 수 있습니다. \"리디아선법\": {\"id\": \"i4x-X대학교-MUS101-강의-2015_T1\"}. 각 카테고리의 \"id\" 값은 고유의 값이어야 합니다. \"id\" 값에서 유일하게 지원되는 특수 문자는 밑줄, 하이픈 및 마침표입니다."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Discussion Sorting Alphabetical"
-msgstr ""
+msgstr "알파벳순 토론 정렬"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Enter true or false. If true, discussion categories and subcategories are "
 "sorted alphabetically. If false, they are sorted chronologically by creation"
 " date and time."
-msgstr ""
-
+msgstr "true 또는 false를 입력합니다. true인 경우 토론 카테고리 및 하위 카테고리가 알파벳 순서로 정렬됩니다. false인 경우 생성 날짜 및 시간을 기준으로 시간 순서로 정렬됩니다."
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Announcement Date"
 msgstr ""
@@ -2621,8 +2603,7 @@ msgid ""
 "Enter policy keys and values to enable the cohort feature, define automated "
 "student assignment to groups, or identify any course-wide discussion topics "
 "as private to cohort members."
-msgstr ""
-
+msgstr "집단 기능을 사용하고, 수강자 그룹 자동 할당을 정의하거나, 집단 구성원에게 공개되지 않는 강의 토론을 확인하려면 정책 키 및 값을 입력합니다."
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Is New"
 msgstr ""
@@ -2732,24 +2713,24 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Allow Anonymous Discussion Posts"
-msgstr ""
+msgstr "토론 익명 게시글 허용"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Enter true or false. If true, students can create discussion posts that are "
 "anonymous to all users."
-msgstr ""
+msgstr "true 또는 false를 입력합니다. true인 경우 수강자는 모든 사용자에게 익명으로 표시되는 토론 게시글을 작성할 수 있습니다."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Allow Anonymous Discussion Posts to Peers"
-msgstr ""
+msgstr "다른 수강자에게 익명으로 표시되는 토론 게시글 허용"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Enter true or false. If true, students can create discussion posts that are "
 "anonymous to other students. This setting does not make posts anonymous to "
 "course staff."
-msgstr ""
+msgstr "true 또는 false를 입력합니다. true인 경우 수강자는 다른 수강자에게 익명으로 표시되는 토론 게시글을 작성할 수 있습니다. 이렇게 설정해도 강의 담당 직원에게는 익명으로 표시되지 않습니다."
 
 #: common/lib/xmodule/xmodule/course_module.py
 #: common/lib/xmodule/xmodule/library_root_xblock.py
@@ -2936,11 +2917,11 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Discussion Forum External Link"
-msgstr ""
+msgstr "토론 포럼 외부 링크"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Allows specification of an external link to replace discussion forums."
-msgstr ""
+msgstr "토론 포럼을 대체하는 외부 링크를 지정할 수 있습니다."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Hide Progress Tab"
@@ -6706,11 +6687,6 @@ msgstr ""
 msgid "Cohorts"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/instructor_dashboard.py
-#: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
-msgid "Discussions"
-msgstr ""
-
 #: lms/templates/ccx/coach_dashboard.html
 msgid "Student Admin"
 msgstr "학습자 관리"
@@ -10059,13 +10035,6 @@ msgid ""
 " Make sure that you are providing a valid username or a URL that contains \""
 msgstr ""
 
-#: openedx/core/djangoapps/user_api/accounts/views.py
-#: openedx/core/djangoapps/user_authn/views/login.py
-msgid ""
-"This account has been temporarily locked due to excessive login failures. "
-"Try again later."
-msgstr ""
-
 #: lms/templates/provider_login.html
 msgid "Email or password is incorrect."
 msgstr "이메일 또는 비밀번호가 일치하지 않습니다. 다시 한번 확인하시고 로그인해 주세요. "
@@ -10450,27 +10419,17 @@ msgstr ""
 
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid "Category"
-msgstr ""
-
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
-msgid "Week 1"
-msgstr ""
+msgstr "카테고리"
 
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid ""
 "A category name for the discussion. This name appears in the left pane of "
 "the discussion forum for the course."
-msgstr ""
+msgstr "토론의 카테고리 이름이며 강의에 대한 토론 포럼의 왼쪽 창에 표시됩니다."
 
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid "Subcategory"
-msgstr ""
-
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
-msgid ""
-"A subcategory name for the discussion. This name appears in the left pane of"
-" the discussion forum for the course."
-msgstr ""
+msgstr "하위 카테고리"
 
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 #, python-brace-format
@@ -11625,40 +11584,32 @@ msgid "Your {platform_name} account email has been updated"
 msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
-msgid "Add a Post"
-msgstr ""
+msgid "Discussion thread list"
+msgstr "토론 스레드 목록"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
 msgid "New topic form"
-msgstr "신규 주제 형식"
+msgstr "새로운 주제 형식"
 
-#: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
-msgid "Discussion thread list"
-msgstr "게시물 목록"
+#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
+msgid "Discussion - {course_number}"
+msgstr "토론 - {course_number}"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 #: lms/templates/discussion/_user_profile.html
 #, python-format
 msgid "%s discussion started"
 msgid_plural "%s discussions started"
-msgstr[0] "%s 토의 시작됨"
+msgstr[0] "%s개 토론이 시작됨"
+msgstr[1] "%s개 토론이 시작됨"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 #: lms/templates/discussion/_user_profile.html
 #, python-format
 msgid "%s comment"
 msgid_plural "%s comments"
-msgstr[0] "%s 코멘트"
-
-#: lms/djangoapps/discussion/templates/discussion/maintenance_fragment.html
-msgid "Discussion unavailable"
-msgstr ""
-
-#: lms/djangoapps/discussion/templates/discussion/maintenance_fragment.html
-msgid ""
-"The discussions are currently undergoing maintenance. We'll have them back "
-"up shortly!"
-msgstr ""
+msgstr[0] "%s개 댓글"
+msgstr[1] "%s개 댓글"
 
 #: lms/templates/_gated_content.html lms/templates/seq_module.html
 msgid "Content Locked"
@@ -11680,7 +11631,7 @@ msgstr "지시사항 접기"
 
 #: lms/templates/annotatable.html
 msgid "Guided Discussion"
-msgstr "가이드 토론"
+msgstr "안내식 토론"
 
 #: lms/templates/annotatable.html
 msgid "Hide Annotations"
@@ -11892,13 +11843,6 @@ msgstr "이메일이 틀립니다"
 
 #: lms/templates/help_modal.html
 msgid "Support"
-msgstr ""
-
-#: lms/templates/help_modal.html
-msgid ""
-"For {strong_start}questions on course lectures, homework, tools, or "
-"materials for this course{strong_end}, post in the {link_start}course "
-"discussion forum{link_end}."
 msgstr ""
 
 #: lms/templates/help_modal.html
@@ -15473,28 +15417,16 @@ msgid "Results:"
 msgstr "결과"
 
 #: lms/templates/discussion/_discussion_inline.html
-msgid "Topic:"
-msgstr ""
-
-#: lms/templates/discussion/_discussion_inline.html
 msgid "Show Discussion"
-msgstr "게시물 보기"
+msgstr "토론 표시"
 
 #: lms/templates/discussion/_discussion_inline_studio.html
 msgid "To view live discussions, click Preview or View Live in Unit Settings."
-msgstr "게시판을 보려면, 학습활동 설정에서 미리 보기나 적용 결과 보기를 클릭하세요."
+msgstr "라이브 토론을 보려면 유닛 설정에서 미리보기 또는 라이브 보기를 클릭합니다."
 
 #: lms/templates/discussion/_discussion_inline_studio.html
 msgid "Discussion ID: {discussion_id}"
-msgstr "토의 ID: {discussion_id}"
-
-#: lms/templates/discussion/_filter_dropdown.html
-msgid "Discussion topics list"
-msgstr ""
-
-#: lms/templates/discussion/_filter_dropdown.html
-msgid "Filter Topics"
-msgstr "제목 검색"
+msgstr "토론 ID: {discussion_id}"
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "filter topics"
@@ -15502,47 +15434,22 @@ msgstr "제목 검색"
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "All Discussions"
-msgstr "모든 게시물"
+msgstr "모든 토론"
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Posts I'm Following"
-msgstr "구독하는 게시글"
+msgstr "내가 팔로잉하는 게시글"
 
 #. Translators: This labels a filter menu in forum navigation
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Filter:"
 msgstr "필터:"
 
-#. Translators: This is a menu option for showing all forum threads unfiltered
-#: lms/templates/discussion/_thread_list_template.html
-msgid "Show all posts"
-msgstr ""
-
-#. Translators: This is a menu option for showing only unread forum threads
-#: lms/templates/discussion/_thread_list_template.html
-msgid "Unread posts"
-msgstr ""
-
-#. Translators: This is a menu option for showing only unanswered forum
-#. question threads
-#: lms/templates/discussion/_thread_list_template.html
-msgid "Unanswered posts"
-msgstr ""
-
 #. Translators: This is a menu option for showing only forum threads flagged
 #. for abuse
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Flagged"
-msgstr "플래그됨"
-
-#. Translators: This labels a group menu in forum navigation
-#: lms/templates/discussion/_thread_list_template.html
-msgid "Group:"
-msgstr ""
-
-#: lms/templates/discussion/_thread_list_template.html
-msgid "in all groups"
-msgstr ""
+msgstr "신고됨"
 
 #. Translators: This labels a sort menu in forum navigation
 #: lms/templates/discussion/_thread_list_template.html
@@ -15552,17 +15459,17 @@ msgstr "정렬:"
 #. Translators: This is a menu option for sorting forum threads
 #: lms/templates/discussion/_thread_list_template.html
 msgid "by recent activity"
-msgstr "등록 순"
+msgstr "최근 활동 기준"
 
 #. Translators: This is a menu option for sorting forum threads
 #: lms/templates/discussion/_thread_list_template.html
 msgid "by most activity"
-msgstr "댓글 순"
+msgstr "가장 많은 활동 기준"
 
 #. Translators: This is a menu option for sorting forum threads
 #: lms/templates/discussion/_thread_list_template.html
 msgid "by most votes"
-msgstr "추천 순"
+msgstr "최다 투표수 기준"
 
 #: lms/templates/edxnotes/edxnotes.html
 msgid "Student Notes"
@@ -23733,3 +23640,324 @@ msgid ""
 "A new revision was created: Merge between Revision #%(r1)d and Revision "
 "#%(r2)d"
 msgstr "새로운 수정본 생성: 수정본 #%(r1)d 과 수정본 #%(r2)d 의 병합"
+
+#: common/lib/xmodule/xmodule/discussion_module.py
+msgid "Discussion Id"
+msgstr "토론 id"
+
+#: common/lib/xmodule/xmodule/discussion_module.py
+msgid "The id is a unique identifier for the discussion. It is non editable."
+msgstr "id는 토론의 고유한 식별자이며 수정할 수 없습니다."
+
+#: common/lib/xmodule/xmodule/discussion_module.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion_course/xblock_discussion_course.py
+msgid "Display name for this module"
+msgstr "이 모듈의 표시 이름"
+
+#: common/lib/xmodule/xmodule/discussion_module.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+msgid ""
+"A subcategory name for the discussion. This name appears in the left pane of"
+" the discussion forum for the course."
+msgstr "토론의 하위 카테고리 이름이며 강의에 대한 토론 포럼의 왼쪽 창에 표시됩니다."
+
+#: lms/djangoapps/instructor/views/instructor_dashboard.py
+#: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
+msgid "Discussions"
+msgstr "토론"
+
+#: openedx/core/lib/xblock_builtin/xblock_discussion_course/xblock_discussion_course.py
+msgid "Discussion Course"
+msgstr "토론 강의"
+
+#: common/templates/discussion/_discussion_course_studio.html
+msgid ""
+"To view live course discussions, click Preview or View Live in Unit "
+"Settings."
+msgstr "라이브 강의 토론을 보려면 유닛 설정에서 미리보기 또는 라이브 보기를 클릭합니다."
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
+#: lms/templates/discussion/_discussion_course_navigation.html
+msgid "Add a Post"
+msgstr "게시글 추가"
+
+#: lms/djangoapps/discussion/templates/discussion/maintenance_fragment.html
+msgid "Discussion unavailable"
+msgstr "토론을 볼 수 없습니다."
+
+#: lms/djangoapps/discussion/templates/discussion/maintenance_fragment.html
+msgid ""
+"The discussions are currently undergoing maintenance. We'll have them back "
+"up shortly!"
+msgstr "현재 토론에 대한 유지 보수 작업이 진행 중입니다. 빠른 시일 내에 복구하겠습니다."
+
+#: lms/templates/help_modal.html
+msgid ""
+"For {strong_start}questions on course lectures, homework, tools, or "
+"materials for this course{strong_end}, post in the {link_start}course "
+"discussion forum{link_end}."
+msgstr "{strong_start}이 강의의 수업 내용, 과제, 도구 또는 교재에 대한 질문{strong_end}이 있는 경우 {link_start}강의 토론 포럼{link_end}에 올려 주십시오."
+
+#: lms/templates/discussion/_discussion_inline.html
+msgid "Topic:"
+msgstr "주제:"
+
+#: lms/templates/discussion/_filter_dropdown.html
+msgid "Discussion topics list"
+msgstr "토론 주제 목록"
+
+#: lms/templates/discussion/_filter_dropdown.html
+msgid "Filter Topics"
+msgstr "주제 필터링"
+
+#. Translators: This is a menu option for showing all forum threads unfiltered
+#: lms/templates/discussion/_thread_list_template.html
+msgid "Show all posts"
+msgstr "모든 게시글 표시"
+
+#. Translators: This is a menu option for showing only unread forum threads
+#: lms/templates/discussion/_thread_list_template.html
+msgid "Unread posts"
+msgstr "읽지 않은 게시글"
+
+#. Translators: This is a menu option for showing only unanswered forum
+#. question threads
+#: lms/templates/discussion/_thread_list_template.html
+msgid "Unanswered posts"
+msgstr "답변을 받지 못한 게시글"
+
+#. Translators: This labels a group menu in forum navigation
+#: lms/templates/discussion/_thread_list_template.html
+msgid "Group:"
+msgstr "그룹:"
+
+#: lms/templates/discussion/_thread_list_template.html
+msgid "in all groups"
+msgstr "모든 그룹"
+
+#: lms/templates/discussion/maintenance.html
+msgid "We're sorry"
+msgstr "죄송합니다."
+
+#: lms/templates/discussion/maintenance.html
+msgid ""
+"The forums are currently undergoing maintenance. We'll have them back up "
+"shortly!"
+msgstr "현재 포럼에 대한 유지 보수 작업이 진행 중입니다. 빠른 시일 내에 복구하겠습니다."
+
+#: lms/templates/discussion/user_profile.html
+msgid "User Profile"
+msgstr "사용자 프로필"
+
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+msgid "Week 1"
+msgstr "1주차"
+
+#: courses/views.py:871 groups/views.py:378 users/views.py:948
+msgid "group_id is missing"
+msgstr "group_id 누락"
+
+#: courses/views.py:2179
+msgid "Both start_date and end_date parameters are required"
+msgstr "start_date 및 end_date 매개변수가 모두 필요"
+
+#: courses/views.py:2182
+msgid ""
+"Interval parameter is not valid. It should be one of these 'days', 'weeks', "
+"'months'"
+msgstr "간격 매개변수가 유효하지 않습니다. 간격 매개변수는 'days', 'weeks', 'months' 중 하나여야 합니다"
+
+#: courses/views.py:2188
+msgid "date format is invalid"
+msgstr "날짜 형식이 유효하지 않음"
+
+#: courses/views.py:2421
+msgid "content_id is missing"
+msgstr "content_id 누락"
+
+#: courses/views.py:2423 groups/views.py:255
+msgid "user_id is missing"
+msgstr "user_id 누락"
+
+#: courses/views.py:2429
+msgid "content_id is invalid"
+msgstr "content_id가 유효하지 않음"
+
+#: courses/views.py:2434
+msgid "user_id is invalid"
+msgstr "user_id가 유효하지 않음"
+
+#: groups/views.py:382
+msgid "relationship_type is missing"
+msgstr "relationship_type 누락"
+
+#: groups/views.py:548 users/views.py:1065
+msgid "course_id is missing"
+msgstr "course_id 누락"
+
+#: imports/views.py:78
+msgid "Empty field: {}"
+msgstr "비어 있는 필드: {}"
+
+#: imports/views.py:78
+msgid "Processing Participant"
+msgstr "참여자 처리 중"
+
+#: imports/views.py:84
+msgid "Status '{}' doesn't exist"
+msgstr "상태 '{}'이(가) 없음"
+
+#: imports/views.py:85 imports/views.py:127 imports/views.py:137
+#: imports/views.py:149
+msgid "Enrolling Participant in Course"
+msgstr "참여자를 강의에 등록하는 중"
+
+#: imports/views.py:94
+msgid "Email \"{}\" or username \"{}\" already exists"
+msgstr "이메일 \"{}\" 또는 사용자 이름\"{}\"이(가) 이미 있음"
+
+#: imports/views.py:95 imports/views.py:177
+msgid "Registering Participant"
+msgstr "참여자를 등록하는 중"
+
+#: imports/views.py:105
+msgid "Company {} doesn't exist"
+msgstr "회사 {}이(가) 없음"
+
+#: imports/views.py:106 imports/views.py:186
+msgid "Enrolling Participant in Company"
+msgstr "참여자를 회사에 등록하는 중"
+
+#: imports/views.py:116
+msgid "User with email \"{}\" does not exist"
+msgstr "이메일이 \"{}\"인 사용자가 없음"
+
+#: imports/views.py:117
+msgid "Retrieving existing Participant"
+msgstr "기존 참여자를 가져오는 중"
+
+#: imports/views.py:126
+msgid "User with email \"{}\" is already enrolled"
+msgstr "이메일이 \"{}\"인 사용자가 이미 등록됨"
+
+#: imports/views.py:136
+msgid "Course {} doesn't exist"
+msgstr "강의 {}이(가) 없음"
+
+#: imports/views.py:148
+msgid "Course {} is not Internal"
+msgstr "강의 {}은(는) 내부 강의가 아님"
+
+#: imports/views.py:229
+msgid "Setting Participant's Status"
+msgstr "참여자의 상태를 설정하는 중"
+
+#: imports/views.py:234
+msgid "Reason: {}, Activity: {}, Participant: {}"
+msgstr "이유: {}, 활동: {}, 참여자: {}"
+
+#: imports/views.py:234
+msgid "No email"
+msgstr "이메일이 없음"
+
+#: sessions/views.py:74
+msgid "Rate limit exceeded in api login."
+msgstr "api 로그인의 속도 제한을 초과했습니다."
+
+#: sessions/views.py:81 users/views.py:465
+msgid "username is missing"
+msgstr "사용자 이름 누락"
+
+#: sessions/views.py:85 users/views.py:469
+msgid "password is missing"
+msgstr "암호 누락"
+
+#: sessions/views.py:96
+msgid ""
+"This account has been temporarily locked due to excessive login failures. "
+"Try again later."
+msgstr "이 계정은 과도한 로그인 실패로 인해 일시적으로 잠겼습니다. 나중에 다시 시도해 보십시오."
+
+#: sessions/views.py:104
+msgid ""
+"Your password has expired due to password policy on this account. You must "
+"reset your password before you can log in again."
+msgstr "이 계정에 대한 암호 정책으로 인해 귀하의 암호가 만료되었습니다. 다시 로그인하려면 암호를 재설정해야 합니다."
+
+#: users/views.py:453
+msgid "username or ids are missing"
+msgstr "사용자 이름 또는 id 누락"
+
+#: users/views.py:493 users/views.py:813
+msgid "Password: "
+msgstr "암호: "
+
+#: users/views.py:498
+msgid "Valid e-mail is required."
+msgstr "유효한 이메일이 필요합니다."
+
+#: users/views.py:504 users/views.py:771
+msgid "Username should only consist of A-Z and 0-9, with no spaces."
+msgstr "사용자 이름은 공백 없이 A에서 Z까지의 알파벳 및 0에서 9까지의 숫자로만 구성되어야 합니다."
+
+#: users/views.py:778
+#, python-brace-format
+msgid "User '{username}' already exists"
+msgstr "사용자 '{username}'이(가) 이미 있습니다"
+
+#: users/views.py:511
+#, python-brace-format
+msgid "Username '{username}' or email '{email}' already exists"
+msgstr "사용자 이름 '{username}' 또는 이메일 '{email}'이(가) 이미 있음"
+
+#: users/views.py:722
+msgid "Rate limit exceeded in password_reset."
+msgstr "password_reset에서 속도 제한을 초과했습니다."
+
+#: users/views.py:752
+msgid "Invalid email address {}."
+msgstr "{}은(는) 유효하지 않은 이메일 주소입니다."
+
+#: users/views.py:758
+msgid "A user with that email address already exists."
+msgstr "이 이메일을 가진 사용자가 이미 있습니다."
+
+#: users/views.py:772
+msgid "invalid_username"
+msgstr "invalid_username"
+
+#: users/views.py:796
+msgid "Could not update profile image"
+msgstr "프로필 이미지를 업데이트할 수 없음"
+
+#: users/views.py:814
+msgid "invalid_password"
+msgstr "invalid_password"
+
+#: users/views.py:824
+#, python-brace-format
+msgid ""
+"You are re-using a password that you have used recently. You must have {0} "
+"distinct password(s) before reusing a previous password."
+msgstr "최근에 사용한 암호를 다시 사용하고 계십니다. 이전 암호를 다시 사용하기 전에 {0}개의 다른 암호를 설정해야 합니다."
+
+#: users/views.py:831
+#, python-brace-format
+msgid ""
+"You are resetting passwords too frequently. Due to security policies, {0} "
+"day(s) must elapse between password resets"
+msgstr "암호를 너무 자주 재설정하고 계십니다. 보안 정책으로 인해 {0}일의 간격을 두고 암호를 재설정해야 합니다."
+
+#: users/views.py:1084
+#, python-brace-format
+msgid ""
+"Student {student} already added to cohort {cohort_name} for course {course}"
+msgstr "수강자 {student}님이 이미 강의 {course}의 집단 {cohort_name}에 추가됨"
+
+#: users/views.py:1347
+msgid "Student not enrolled in given course"
+msgstr "해당 강의에 등록되지 않은 수강자"
+
+#: users/views.py:1762
+msgid "read field is missing"
+msgstr "읽기 필드 누락"
