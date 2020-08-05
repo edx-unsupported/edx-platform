@@ -133,7 +133,9 @@
 
       // green button
       .add-xblock-component-button {
-        @extend %t-action3;
+          @extend %t-action3;
+          min-height:($baseline*6);
+          vertical-align: top;
 
         @include margin-right($baseline*0.75);
 

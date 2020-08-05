@@ -238,7 +238,7 @@ def get_component_templates(courselike, library=False):
         }
 
     component_display_names = {
-        'discussion': _("Discussion"),
+        'discussion': _("Discussion - Do not use"),
         'html': _("HTML"),
         'problem': _("Problem"),
         'video': _("Video")
