@@ -290,7 +290,7 @@ def _sort_alphanumeric_list(l):
     convert = lambda text: int(text) if text.isdigit() else text
     alphanum_key = lambda key: [convert(c) for c in re.split('([0-9]+)', key[1]["sort_key"])] \
         if key[1]["sort_key"] is not None else key[1]["sort_key"]
-    return sorted(l, key = alphanum_key)
+    return sorted(l, key=alphanum_key)
 
 
 def _sort_map_entries(category_map, sort_alpha):
