@@ -7211,12 +7211,24 @@ msgid "Discussion Home"
 msgstr "صفحة المناقشة الرئيسية"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Discussions"
+msgstr "نقاشات"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 #, python-format
 msgid "How to use %(platform_name)s discussions"
 msgstr "كيفية استخدام نقاشات %(platform_name)s"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "How to use discussions"
+msgstr "كيفية استخدام نقاشات"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Find discussions"
+msgstr "إيجاد النقاشات"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "find discussions"
 msgstr "إيجاد النقاشات"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
@@ -7235,6 +7247,18 @@ msgstr "تصفية وتصنيف المواضيع"
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Engage with posts"
 msgstr "شارك في المنشورات"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "engage with posts"
+msgstr "شارك في المنشورات"
+
+#: lms/djangoapps/django_comment_client/base/views.py
+msgid "Title can't be empty"
+msgstr "لا يمكن ترك العنوان فارغًا "
+
+#: lms/djangoapps/django_comment_client/base/views.py
+msgid "Body can't be empty"
+msgstr "لا يمكن ترك المحتوى فارغًا"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Vote for good posts and responses"
