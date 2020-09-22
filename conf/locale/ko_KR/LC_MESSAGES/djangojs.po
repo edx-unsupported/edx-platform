@@ -10625,6 +10625,10 @@ msgstr "%(comments_count)s개 %(span_sr_open)s댓글(%(unread_comments_count)s�
 msgid "%(comments_count)s %(span_sr_open)scomments %(span_close)s"
 msgstr "%(comments_count)s개 %(span_sr_open)s댓글 %(span_close)s"
 
+#: common/static/common/templates/discussion/thread-list-item.underscore:30
+msgid "by"
+msgstr "작성자"
+
 #: common/static/common/templates/discussion/thread-response-edit.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-response-edit.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response-edit.underscore

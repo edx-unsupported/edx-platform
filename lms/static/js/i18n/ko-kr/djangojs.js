@@ -511,6 +511,7 @@
     "about an hour": "\uc57d \ud55c \uc2dc\uac04 \uc815\ub3c4", 
     "anonymous": "\uc775\uba85", 
     "answered question": "\ub2f5\ubcc0\uc774 \uc788\ub294 \uc9c8\ubb38", 
+    "by": "\uc791\uc131\uc790", 
     "bytes": "bytes", 
     "discussion": "\ud1a0\ub860", 
     "discussion posted": "\ud1a0\ub860\uc774 \uac8c\uc2dc\ub428", 

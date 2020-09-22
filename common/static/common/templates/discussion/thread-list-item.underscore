@@ -26,8 +26,8 @@
       <span class="forum-nav-thread-title"><%- title %></span>
       <% if(typeof(username) !== "undefined" && typeof(created_at) !== "undefined") { %>
         <div class="posted-details">
-          <%- gettext("discussion posted") %> <span class="timeago" title="<%- created_at %>"><%- created_at %></span> by
-          <span class="username"><%- username %></span>
+          <%- gettext("discussion posted") %> <span class="timeago" title="<%- created_at %>"><%- created_at %></span>
+           <%- gettext("by") %> <span class="username"><%- username %></span>
         </div>
       <% } %>
       <% if (showThreadPreview){ %>

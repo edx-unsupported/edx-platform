@@ -7096,6 +7096,10 @@ msgid "Discussion Home"
 msgstr "Página inicial de discussão"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Discussions"
+msgstr "Discussões"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 #, python-format
 msgid "How to use %(platform_name)s discussions"
 msgstr "Como usar  as discussões de %(platform_name)s"
@@ -7119,6 +7123,10 @@ msgstr "Filtrar e classificar tópicos"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Engage with posts"
+msgstr "Participar das publicações"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "engage with posts"
 msgstr "Participar das publicações"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore

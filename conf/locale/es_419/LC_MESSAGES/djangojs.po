@@ -5792,6 +5792,10 @@ msgstr ""
 msgid "Staff"
 msgstr "Equipo del curso"
 
+#: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "by"
+msgstr "por"
+
 #: cms/static/js/factories/manage_users.js
 #: cms/static/js/factories/manage_users_lib.js
 msgid "Admin"
@@ -7517,6 +7521,10 @@ msgid "Discussion Home"
 msgstr "Inicio de la discusión"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Discussions"
+msgstr "Discusiones"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 #, python-format
 msgid "How to use %(platform_name)s discussions"
 msgstr "Cómo usar las discusiones de %(platform_name)s"
@@ -7540,6 +7548,10 @@ msgstr "Filtrar y ordenar los temas"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Engage with posts"
+msgstr "Trabajar con las publicaciones"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "engage with posts"
 msgstr "Trabajar con las publicaciones"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
