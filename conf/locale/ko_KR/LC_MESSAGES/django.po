@@ -5904,11 +5904,11 @@ msgstr ""
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Title can't be empty"
-msgstr ""
+msgstr "제목은 비워둘 수 없습니다."
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Body can't be empty"
-msgstr ""
+msgstr "본문은 비워둘 수 없습니다."
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Topic doesn't exist"

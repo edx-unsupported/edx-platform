@@ -7152,7 +7152,7 @@ msgstr "مناقشة نشرت %(time_ago)s by %(author)s"
 #: common/static/common/templates/discussion/thread-show.underscore
 #, python-format
 msgid "question posted %(time_ago)s by %(author)s"
-msgstr ""
+msgstr "نُشر السؤال قبل %(time_ago)s بواسطة %(author)s"
 
 #: common/static/common/templates/discussion/thread-show.underscore
 msgid "Closed"
@@ -7218,10 +7218,6 @@ msgstr "نقاشات"
 #, python-format
 msgid "How to use %(platform_name)s discussions"
 msgstr "كيفية استخدام نقاشات %(platform_name)s"
-
-#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
-msgid "How to use discussions"
-msgstr "كيفية استخدام نقاشات"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Find discussions"
@@ -10924,3 +10920,23 @@ msgstr ""
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 msgid "Use Current Transcript"
 msgstr "استخدم النص الحالي"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "How to use discussions"
+msgstr "كيفية استخدام قائمة"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "menu to see a list of all topics."
+msgstr "المناقشات لرؤية قائمة بجميع المواضيع."
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Use the"
+msgstr "استخدم"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Search and filter all posts to find specific topics or posts."
+msgstr "البحث وصفِّ جميع المنشورات للعثور على المواضيع أو المنشورات المحددة."
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Questions raise issues that need answers. Discussions share ideas and start conversations"
+msgstr "تثير الأسئلة مشكلات تحتاج إلى إجابات. وتشارك المناقشات أفكارًا وتفتتح المحادثات"

@@ -2,7 +2,7 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-# 
+#
 #, fuzzy
 msgid ""
 msgstr ""
@@ -656,3 +656,11 @@ msgstr "Tydzień 1"
 #: openedx/core/lib/xblock_builtin/xblock_discussion_course/xblock_discussion_course.py
 msgid "Discussion Course"
 msgstr "Kurs, do którego przynależy dyskusja"
+
+#: lms/djangoapps/django_comment_client/base/views.py
+msgid "Title can't be empty"
+msgstr "tytuł nie może być pusty"
+
+#: lms/djangoapps/django_comment_client/base/views.py
+msgid "Body can't be empty"
+msgstr "treść nie może być pusta"

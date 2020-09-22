@@ -6794,11 +6794,11 @@ msgstr ""
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Title can't be empty"
-msgstr "O título não pode ficar vazio"
+msgstr "o título não pode ficar vazio"
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Body can't be empty"
-msgstr "O corpo não pode ficar vazio"
+msgstr "o corpo não pode ficar vazio"
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Topic doesn't exist"

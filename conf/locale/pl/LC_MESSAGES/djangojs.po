@@ -2,7 +2,7 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-# 
+#
 #, fuzzy
 msgid ""
 msgstr ""
@@ -744,8 +744,8 @@ msgid "Use the"
 msgstr "Użyj menu"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
-msgid " menu to see a list of all topics."
-msgstr " aby zobaczyć listę wszystkich tematów."
+msgid "menu to see a list of all topics."
+msgstr "aby zobaczyć listę wszystkich tematów."
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Search and filter all posts to find specific topics or posts."
@@ -1252,3 +1252,89 @@ msgstr "Pomyślnie usunięto zespół „{team}”"
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-delete.underscore
 msgid "Delete"
 msgstr "Usuń"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Questions raise issues that need answers. Discussions share ideas and start conversations"
+msgstr "Za pomocą Pytania możesz podnieść kwestie wymagające odpowiedzi. Za pomocą Dyskusji możesz podzielić się spostrzeżeniami i rozpocząć rozmowę."
+
+#: common/static/js/src/jquery.timeago.locale.js
+#, javascript-format
+msgid "%s ago"
+msgstr "%s temu"
+
+#: common/static/js/src/jquery.timeago.locale.js
+msgid "less than a minute"
+msgstr "mniej niż minutę"
+
+#: common/static/js/src/jquery.timeago.locale.js
+msgid "about a minute"
+msgstr "około minuty"
+
+#: common/static/js/src/jquery.timeago.locale.js
+#, javascript-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d minute"
+
+
+#: common/static/js/src/jquery.timeago.locale.js
+msgid "about an hour"
+msgstr "około godziny"
+
+#: common/static/js/src/jquery.timeago.locale.js
+#, javascript-format
+msgid "about %d hour"
+msgid_plural "about %d hours"
+msgstr[0] "około %d godzin(-y)"
+
+#: common/static/js/src/jquery.timeago.locale.js
+msgid "about a month"
+msgstr "około miesiąca"
+
+#: common/static/js/src/jquery.timeago.locale.js
+msgid "about a year"
+msgstr "około roku"
+
+#: cms/templates/js/asset-library.underscore
+msgid "Preview"
+msgstr "PODGLĄD"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Bold (Ctrl+B)"
+msgstr "Pogrubienie (Ctrl+B)"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Italic (Ctrl+I)"
+msgstr "Kursywa (Ctrl+I)"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Hyperlink (Ctrl+L)"
+msgstr "Hiperłącze (Ctrl+L)"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Blockquote (Ctrl+Q)"
+msgstr "Blockquote (Ctrl+Q)"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Numbered List (Ctrl+O)"
+msgstr "Lista numerowana (Ctrl+O)"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Bulleted List (Ctrl+U)"
+msgstr "Lista punktowana (Ctrl+O)"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Heading (Ctrl+H)"
+msgstr "Nagłówek (Ctrl+H)"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Horizontal Rule (Ctrl+R)"
+msgstr "Linijka pozioma (Ctrl+R)"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Undo (Ctrl+Z)"
+msgstr "Cofnij (Ctrl+Z)"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Redo (Ctrl+Y)"
+msgstr "Powtórz (Ctrl+Y)"

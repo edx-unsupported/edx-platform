@@ -10920,3 +10920,23 @@ msgstr ""
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 msgid "Use Current Transcript"
 msgstr "Nutze aktuelles Transkript"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "How to use discussions"
+msgstr "Wie man Diskussionen verwendet"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "menu to see a list of all topics."
+msgstr "Menü, um eine Liste aller Themen anzusehen."
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Use the"
+msgstr "Verwenden Sie das"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Search and filter all posts to find specific topics or posts."
+msgstr "Alle Beiträge durchsuchen und filtern, um bestimmte Themen oder Beiträge zu finden."
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Questions raise issues that need answers. Discussions share ideas and start conversations"
+msgstr "Fragen werfen Probleme auf, die gelöst werden müssen. Diskussionen dienen dem Ideenaustausch und regen Gespräche an"

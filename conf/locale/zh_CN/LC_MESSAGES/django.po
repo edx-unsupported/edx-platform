@@ -6448,7 +6448,7 @@ msgstr "标题不能为空"
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Body can't be empty"
-msgstr "内容不能为空"
+msgstr "正文不能为空"
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Topic doesn't exist"

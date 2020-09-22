@@ -2,7 +2,7 @@
 # edX community translations have been downloaded from Japanese (Japan) (http://www.transifex.com/open-edx/edx-platform/language/ja_JP/).
 # Copyright (C) 2018 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # わたカフェの店長, 2013-2015
 # ayokose <ayokose.gacco@gmail.com>, 2014-2015,2017
@@ -25,7 +25,7 @@
 # edX translation file.
 # Copyright (C) 2018 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # わたカフェの店長, 2014,2017
 # kawa <h.kawasaki@nttks.co.jp>, 2014
@@ -41,7 +41,7 @@
 # edX community translations have been downloaded from Japanese (Japan) (http://www.transifex.com/open-edx/edx-platform/language/ja_JP/)
 # Copyright (C) 2018 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # わたカフェの店長, 2013-2015
 # ayokose <ayokose.gacco@gmail.com>, 2014-2016
@@ -70,7 +70,7 @@
 # edX translation file
 # Copyright (C) 2018 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # わたカフェの店長, 2014-2015
 # ayokose <ayokose.gacco@gmail.com>, 2015-2016
@@ -91,7 +91,7 @@
 # edX translation file
 # Copyright (C) 2018 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # わたカフェの店長, 2014
 # h_yoshida <h_yoshida@matsumo-sys.com>, 2014
@@ -6186,11 +6186,11 @@ msgstr ""
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Title can't be empty"
-msgstr "件名は空白ではいけません。"
+msgstr "件名は空欄にできません。"
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Body can't be empty"
-msgstr "本文は空白ではいけません。"
+msgstr "本文は空欄にできません。"
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Topic doesn't exist"

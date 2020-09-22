@@ -2330,7 +2330,7 @@ msgstr "ターゲットにドロップ"
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "%s ago"
-msgstr ""
+msgstr "%s 前"
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
@@ -2339,27 +2339,27 @@ msgstr ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "less than a minute"
-msgstr ""
+msgstr "1 分未満"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a minute"
-msgstr ""
+msgstr "約 1分"
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] ""
+msgstr[0] "%d 分"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about an hour"
-msgstr ""
+msgstr "約 1 時間"
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "about %d hour"
 msgid_plural "about %d hours"
-msgstr[0] ""
+msgstr[0] "約 %d 時間"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "a day"
@@ -2373,7 +2373,7 @@ msgstr[0] ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a month"
-msgstr ""
+msgstr "約 1 ヶ月"
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
@@ -2383,7 +2383,7 @@ msgstr[0] ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a year"
-msgstr ""
+msgstr "約 1 年"
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
@@ -10369,3 +10369,23 @@ msgstr "あなたは動画URLを変更しましたが、字幕ファイルは変
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 msgid "Use Current Transcript"
 msgstr "現在の字幕を使用する"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "How to use discussions"
+msgstr "ディスカッション"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "menu to see a list of all topics."
+msgstr "メニューを使ってすべてのトピックを列挙する方法"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Use the"
+msgstr "特定のトピックまたは投稿を"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Search and filter all posts to find specific topics or posts."
+msgstr "検索するには、全統校の検索およびフィルタリング機能を使用します。"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Questions raise issues that need answers. Discussions share ideas and start conversations"
+msgstr "質問: 回答が必要な問題を提起します。ディスカッション: 対話を開始し、アイデアを共有します。"

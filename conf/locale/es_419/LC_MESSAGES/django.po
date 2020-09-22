@@ -7032,11 +7032,11 @@ msgstr "Respuesta a %(thread_title)s"
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Title can't be empty"
-msgstr "El título no puede estar vacío"
+msgstr "el título no puede estar vacío"
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Body can't be empty"
-msgstr "El cuerpo no puede estar vacío"
+msgstr "el cuerpo no puede estar vacío"
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Topic doesn't exist"

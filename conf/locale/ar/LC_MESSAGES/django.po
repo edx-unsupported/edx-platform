@@ -6830,11 +6830,11 @@ msgstr ""
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Title can't be empty"
-msgstr "لا يمكن ترك العنوان فارغًا "
+msgstr "لا يمكن أن يكون العنوان فارغًا"
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Body can't be empty"
-msgstr "لا يمكن ترك المحتوى فارغًا"
+msgstr "لا يمكن أن يكون النص فارغًا"
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Topic doesn't exist"
@@ -17152,13 +17152,13 @@ msgstr "عرض كل المشاركات"
 #. Translators: This is a menu option for showing only unread forum threads
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Unread posts"
-msgstr ""
+msgstr "المنشورات غير المقروءة"
 
 #. Translators: This is a menu option for showing only unanswered forum
 #. question threads
 #: lms/templates/discussion/_thread_list_template.html
 msgid "Unanswered posts"
-msgstr ""
+msgstr "المنشورات غير المُجاب عنها"
 
 #. Translators: This is a menu option for showing only forum threads flagged
 #. for abuse
