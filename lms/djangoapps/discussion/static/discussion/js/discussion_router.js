@@ -140,6 +140,7 @@
                         complete: function() {
                             var attr = self.newPostView.$el.fadeIn(200).focus();
                             $('.thread-title').focus();
+                            $('label[for=anonymous]').removeClass('selected');
                             return attr;
                         }
                     });
