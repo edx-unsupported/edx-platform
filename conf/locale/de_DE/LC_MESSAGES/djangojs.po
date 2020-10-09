@@ -7107,6 +7107,14 @@ msgid "unanswered question"
 msgstr "unbeantwortete Frage"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "discussion posted"
+msgstr "Diskussion wurde vor"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "question posted"
+msgstr "Frage wurde vor"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
 #: common/static/common/templates/discussion/thread-show.underscore
 msgid "Pinned"
 msgstr "Festgeheftet"

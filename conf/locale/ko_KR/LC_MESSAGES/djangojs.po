@@ -10555,6 +10555,10 @@ msgid "discussion posted"
 msgstr "토론이 게시됨"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "question posted"
+msgstr "이(가) 게시한 질문"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
 #: common/static/common/templates/discussion/thread-show.underscore
 #: common/templates/js/discussion/thread-show.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore

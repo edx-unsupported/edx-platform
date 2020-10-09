@@ -438,6 +438,10 @@ msgid "discussion posted"
 msgstr "opublikowana dyskusja"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "question posted"
+msgstr "opublikowane pytanie"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
 #: common/static/common/templates/discussion/thread-show.underscore
 #: common/templates/js/discussion/thread-show.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore

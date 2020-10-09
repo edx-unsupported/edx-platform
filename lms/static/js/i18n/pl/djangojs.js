@@ -348,6 +348,7 @@
     "post anonymously": "opublikuj anonimowo", 
     "post anonymously to classmates": "opublikuj anonimowo dla koleg\u00f3w z kursu", 
     "posted %(time_ago)s by %(author)s": "opublikowano %(time_ago)s przez %(author)s", 
+    "question posted": "opublikowane pytanie", 
     "question posted %(time_ago)s by %(author)s": "opublikowane pytanie %(time_ago)s przez %(author)s", 
     "there is currently {numVotes} vote": [
       "aktualna liczba punkt\u00f3w to: {numVotes}", 

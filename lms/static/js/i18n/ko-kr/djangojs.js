@@ -547,6 +547,7 @@
     "post anonymously": "\uc775\uba85\uc73c\ub85c \uac8c\uc2dc", 
     "post anonymously to classmates": "\uac19\uc740 \uc218\uac15\uc790\uc5d0\uac8c \uc775\uba85\uc73c\ub85c \uac8c\uc2dc", 
     "posted %(time_ago)s by %(author)s": "%(time_ago)s\uc5d0 %(author)s\uc774(\uac00) \uac8c\uc2dc\ud568", 
+    "question posted": "\uc774(\uac00) \uac8c\uc2dc\ud55c \uc9c8\ubb38", 
     "question posted %(time_ago)s by %(author)s": "%(time_ago)s\uc5d0 %(author)s\uc774(\uac00) \uac8c\uc2dc\ud55c \uc9c8\ubb38", 
     "strong text": "\uac15\ud558\uac8c", 
     "team count": "\ud300 \uc778\uc6d0 \uc218", 
