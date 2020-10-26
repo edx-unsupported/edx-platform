@@ -943,8 +943,10 @@ def delete_users(users):
     # Finally delete user and related models
     for user in users.exclude(email__in=failed):
         try:
-            if user.coursecreator:
-                user.coursecreator.delete()
+            user.coursecreator.delete()
+        except Exception:
+            pass
+        try:
             user.delete()
         except Exception as e:
             failed[user.email] = str(e)
