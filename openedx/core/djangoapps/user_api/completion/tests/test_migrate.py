@@ -11,7 +11,7 @@ from openedx.core.djangoapps.user_api.completion.tasks import (
     OUTCOME_SOURCE_NOT_FOUND,
     OUTCOME_TARGET_ALREADY_ENROLLED,
     OUTCOME_TARGET_NOT_FOUND,
-    _migrate_completions,
+    _migrate_progress,
 )
 from student.models import CourseEnrollment
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -25,7 +25,7 @@ class ProgressMigrationTestCase(ModuleStoreTestCase):
     """
     Parent test case for progress migration tests
     """
-    # TODO Test 'merge_completions'
+    # TODO Test 'migrate_progress'
 
     def setUp(self):
         super(ProgressMigrationTestCase, self).setUp()
@@ -50,7 +50,7 @@ class ProgressMigrationTestCase(ModuleStoreTestCase):
         source = self._create_user(enrolled=self.course)
         target = self._create_user()
         self.assertEqual(
-            _migrate_completions('a+b+c', source.email, target.email),
+            _migrate_progress('a+b+c', source.email, target.email),
             OUTCOME_COURSE_KEY_INVALID
         )
 
@@ -58,14 +58,14 @@ class ProgressMigrationTestCase(ModuleStoreTestCase):
         source = self._create_user(enrolled=self.course)
         target = self._create_user()
         self.assertEqual(
-            _migrate_completions(self.course_id + 'abc', source.email, target.email),
+            _migrate_progress(self.course_id + 'abc', source.email, target.email),
             OUTCOME_COURSE_NOT_FOUND
         )
 
     def test_source_not_found(self):
         target = self._create_user()
         self.assertEqual(
-            _migrate_completions(self.course_id, 'dummy@example.com', target.email),
+            _migrate_progress(self.course_id, 'dummy@example.com', target.email),
             OUTCOME_SOURCE_NOT_FOUND
         )
 
@@ -73,14 +73,14 @@ class ProgressMigrationTestCase(ModuleStoreTestCase):
         source = self._create_user()
         target = self._create_user()
         self.assertEqual(
-            _migrate_completions(self.course_id, source.email, target.email),
+            _migrate_progress(self.course_id, source.email, target.email),
             OUTCOME_SOURCE_NOT_ENROLLED
         )
 
     def test_target_not_found(self):
         source = self._create_user(enrolled=self.course)
         self.assertEqual(
-            _migrate_completions(self.course_id, source.email, 'dummy@example.com'),
+            _migrate_progress(self.course_id, source.email, 'dummy@example.com'),
             OUTCOME_TARGET_NOT_FOUND
         )
 
@@ -88,7 +88,7 @@ class ProgressMigrationTestCase(ModuleStoreTestCase):
         source = self._create_user(enrolled=self.course)
         target = self._create_user(enrolled=self.course)
         self.assertEqual(
-            _migrate_completions(self.course_id, source.email, target.email),
+            _migrate_progress(self.course_id, source.email, target.email),
             OUTCOME_TARGET_ALREADY_ENROLLED
         )
 
@@ -96,7 +96,7 @@ class ProgressMigrationTestCase(ModuleStoreTestCase):
         source = self._create_user(enrolled=self.course)
         target = self._create_user()
         self.assertEqual(
-            _migrate_completions(self.course_id, source.email, target.email),
+            _migrate_progress(self.course_id, source.email, target.email),
             OUTCOME_MIGRATED
         )
 
@@ -106,6 +106,6 @@ class ProgressMigrationTestCase(ModuleStoreTestCase):
         with patch.object(CourseEnrollment, 'save') as mock:
             mock.side_effect = Exception('Failed to save')
             self.assertEqual(
-                _migrate_completions(self.course_id, source.email, target.email),
+                _migrate_progress(self.course_id, source.email, target.email),
                 OUTCOME_FAILED_MIGRATION
             )

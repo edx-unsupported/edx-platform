@@ -31,7 +31,7 @@ OUTCOME_MIGRATED = 'migrated'
 
 
 @task(bind=True)
-def merge_completions(self, merge_list, result_recipients=None):
+def migrate_progress(self, merge_list, result_recipients=None):
     """
     Task that migrates progress from one user to another
     """
@@ -45,7 +45,7 @@ def merge_completions(self, merge_list, result_recipients=None):
         'course': course,
         'source_email': source,
         'dest_email': target,
-        'outcome': _migrate_completions(course, source, target)
+        'outcome': _migrate_progress(course, source, target)
     } for (course, source, target) in merge_list]
 
     # TODO Generate output csv
@@ -63,7 +63,7 @@ def _create_results_csv(self, results):
 
     return csv_file
 
-def _migrate_completions(course, source, target):
+def _migrate_progress(course, source, target):
     """
     Task that migrates progress from one user to another
     """

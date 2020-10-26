@@ -6,7 +6,7 @@ from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .tasks import merge_completions
+from .tasks import migrate_progress
 
 
 class MergeCompletion(APIView):
@@ -37,5 +37,5 @@ class MergeCompletion(APIView):
             if row.get('outcome') != 'migrated'  # Ignore lines marked as migrated
         ]
         # Start background task to merge progress for given users
-        merge_completions.delay(merge_list)
+        migrate_progress.delay(merge_list)
         return Response(status=200)
