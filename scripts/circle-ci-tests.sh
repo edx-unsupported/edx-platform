@@ -80,23 +80,23 @@ else
             ;;
 
         1)  # run all of the lms unit tests
-            paver test_system -s lms --cov-args="-p" --disable-migrations
+            paver test_system -s lms/djangoapps/grades/tests/test_tasks.py --cov-args="-p" --disable-migrations
             ;;
 
         2)  # run all of the cms unit tests
-            paver test_system -s cms --cov-args="-p" --disable-migrations
-            ;;
+#            paver test_system -s cms --cov-args="-p" --disable-migrations
+#            ;;
 
         3)  # run the commonlib and solutions apps unit tests
-            paver test_lib
-            paver test_system -s lms --pyargs -t edx_solutions_api_integration --disable-migrations
-            paver test_system -s lms --pyargs -t edx_solutions_organizations --disable-migrations
-            paver test_system -s lms --pyargs -t edx_solutions_projects --disable-migrations
-            paver test_system -s lms --pyargs -t gradebook --disable-migrations
-            paver test_system -s lms --pyargs -t social_engagement --disable-migrations
-            paver test_system -s lms --pyargs -t course_metadata --disable-migrations
-            paver test_system -s lms --pyargs -t mobileapps --disable-migrations
-            ;;
+#            paver test_lib
+#            paver test_system -s lms --pyargs -t edx_solutions_api_integration --disable-migrations
+#            paver test_system -s lms --pyargs -t edx_solutions_organizations --disable-migrations
+#            paver test_system -s lms --pyargs -t edx_solutions_projects --disable-migrations
+#            paver test_system -s lms --pyargs -t gradebook --disable-migrations
+#            paver test_system -s lms --pyargs -t social_engagement --disable-migrations
+#            paver test_system -s lms --pyargs -t course_metadata --disable-migrations
+#            paver test_system -s lms --pyargs -t mobileapps --disable-migrations
+#            ;;
 
         *)
             echo "No tests were executed in this container."
