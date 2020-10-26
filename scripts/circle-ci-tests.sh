@@ -96,7 +96,7 @@ else
 #            paver test_system -s lms --pyargs -t social_engagement --disable-migrations
 #            paver test_system -s lms --pyargs -t course_metadata --disable-migrations
 #            paver test_system -s lms --pyargs -t mobileapps --disable-migrations
-#            ;;
+            ;;
 
         *)
             echo "No tests were executed in this container."
