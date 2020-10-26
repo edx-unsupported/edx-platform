@@ -152,9 +152,9 @@ urlpatterns = [
         name='accounts_retirement_update'
     ),
     url(
-        r'^v1/completion/migrate/$',
+        r'^v1/progress/migrate/$',
         MigrateProgressView.as_view(),
-        name='accounts_retirement_update'
+        name='progress_migrate'
     ),
     url(
         r'^v1/validation/registration$',

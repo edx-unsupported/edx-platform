@@ -1,7 +1,7 @@
 import csv
 
+from rest_framework.authentication import SessionAuthentication
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
-from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -15,20 +15,20 @@ class MigrateProgressView(APIView):
     Only admins can use this.
     """
 
-    authentication_classes = (JwtAuthentication, )
+    authentication_classes = (JwtAuthentication, SessionAuthentication,)
     permission_classes = (
         permissions.IsAuthenticated,
         permissions.IsAdminUser,
-        SessionAuthenticationAllowInactiveUser,
     )
 
     def post(self, request):
         """
         POST /api/user/v1/completion/migrate/
 
-        Migrate progress.
+        Migrate user progress.
         """
         csv_file = request.FILES['file']
+        recepient_address = request.POST.get('recepient_address')
 
         reader = csv.DictReader(csv_file)
 
@@ -43,5 +43,8 @@ class MigrateProgressView(APIView):
         ]
 
         # Start background task to migrate progress for given users
-        migrate_progress.delay(migrate_list)
+        migrate_progress.delay(
+            migrate_list,
+            [recepient_address] if recepient_address else None
+        )
         return Response(status=200)
