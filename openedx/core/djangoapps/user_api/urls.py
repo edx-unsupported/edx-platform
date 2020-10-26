@@ -15,6 +15,7 @@ from .accounts.views import (
     DeactivateLogoutView,
     LMSAccountRetirementView
 )
+from .completion.views import MigrateProgressView
 from .preferences.views import PreferencesDetailView, PreferencesView
 from .verification_api.views import IDVerificationStatusView
 from .validation.views import RegistrationValidationView
@@ -148,6 +149,11 @@ urlpatterns = [
     url(
         r'^v1/accounts/update_retirement_status/$',
         RETIREMENT_UPDATE,
+        name='accounts_retirement_update'
+    ),
+    url(
+        r'^v1/completion/migrate/$',
+        MigrateProgressView.as_view(),
         name='accounts_retirement_update'
     ),
     url(

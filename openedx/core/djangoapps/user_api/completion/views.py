@@ -9,20 +9,24 @@ from rest_framework.views import APIView
 from .tasks import migrate_progress, OUTCOME_MIGRATED
 
 
-class MergeCompletion(APIView):
+class MigrateProgressView(APIView):
     """
-    Merges completions for a set of user pairs.
+    Migrates user progress for a set of user pairs.
     Only admins can use this.
     """
 
     authentication_classes = (JwtAuthentication, )
-    permission_classes = (permissions.IsAuthenticated, SessionAuthenticationAllowInactiveUser)
+    permission_classes = (
+        permissions.IsAuthenticated,
+        permissions.IsAdminUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
 
     def post(self, request):
         """
-        POST /api/user/v1/completion/merge/
+        POST /api/user/v1/completion/migrate/
 
-        Merge completions.
+        Migrate progress.
         """
         csv_file = request.FILES['file']
 
@@ -38,6 +42,6 @@ class MergeCompletion(APIView):
             if row.get('outcome') != OUTCOME_MIGRATED  # Ignore lines marked as migrated
         ]
 
-        # Start background task to merge progress for given users
+        # Start background task to migrate progress for given users
         migrate_progress.delay(migrate_list)
         return Response(status=200)

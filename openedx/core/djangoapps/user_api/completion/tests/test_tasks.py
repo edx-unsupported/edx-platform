@@ -1,5 +1,12 @@
 """Unit tests for merging user progress module"""
 
+import json
+
+from completion import waffle as completion_waffle
+from completion.models import BlockCompletion
+from courseware.models import StudentModule
+from courseware.tests.factories import StudentModuleFactory
+
 from django.contrib.auth.models import User
 from django.core import mail
 
@@ -17,9 +24,11 @@ from openedx.core.djangoapps.user_api.completion.tasks import (
     _create_results_csv,
     _migrate_progress,
 )
-from student.models import CourseEnrollment
+from student.models import CourseEnrollment, anonymous_id_for_user
+from submissions import api as sub_api
+from submissions.models import StudentItem
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from mock import patch
 import uuid
@@ -51,6 +60,41 @@ class ProgressMigrationTestCase(ModuleStoreTestCase):
         if enrolled:
             CourseEnrollment.enroll(user, self.course.id, mode='audit')
         return user
+
+    def _create_user_progress(self, user):
+        """
+        Creates block completion, student module and submission for a given
+        user.
+        """
+
+        block = ItemFactory.create(parent=self.course)
+
+        completion_test_value = 0.4
+
+        with completion_waffle.waffle().override(completion_waffle.ENABLE_COMPLETION_TRACKING, True):
+            BlockCompletion.objects.submit_completion(
+                user=user,
+                course_key=block.location.course_key,
+                block_key=block.location,
+                completion=completion_test_value,
+            )
+
+        StudentModuleFactory.create(
+            student=user,
+            course_id=self.course.id,
+            module_state_key=block.location,
+            state=json.dumps({})
+        )
+
+        sub_api.create_submission(
+            {
+                'student_id': anonymous_id_for_user(user, self.course.id),
+                'course_id': str(self.course.id),
+                'item_id': str(block.location),
+                'item_type': 'problem',
+            },
+            'test answer'
+        )
 
     def test_course_invalid_key(self):
         source = self._create_user(enrolled=self.course)
@@ -101,10 +145,21 @@ class ProgressMigrationTestCase(ModuleStoreTestCase):
     def test_migrated(self):
         source = self._create_user(enrolled=self.course)
         target = self._create_user()
+
+        self._create_user_progress(source)
+
         self.assertEqual(
             _migrate_progress(self.course_id, source.email, target.email),
             OUTCOME_MIGRATED
         )
+
+        # Check that all user's progress transferred to another user
+        assert CourseEnrollment.objects.filter(user=target, course=self.course.id).exists()
+        assert BlockCompletion.user_course_completion_queryset(user=target, course_key=self.course.id).exists()
+        assert StudentItem.objects.filter(
+            course_id=self.course.id, student_id=anonymous_id_for_user(target, self.course.id)
+        ).exists()
+        assert StudentModule.objects.filter(student=target, course_id=self.course.id).exists()
 
     def test_failed_migration(self):
         source = self._create_user(enrolled=self.course)
@@ -117,6 +172,12 @@ class ProgressMigrationTestCase(ModuleStoreTestCase):
             )
 
     def test_migrate_progress(self):
+        """
+        Integration test, that checks that:
+            1. We send email with correct subject, text and attachment.
+            2. Attachment contain correct results set.
+        """
+
         result_csv_rows = [
             {
                 'course': self.course_id + 'abc',
