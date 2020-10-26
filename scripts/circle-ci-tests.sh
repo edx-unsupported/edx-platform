@@ -39,27 +39,27 @@ if [ "$CIRCLE_NODE_TOTAL" == "1" ] ; then
     echo "via the CircleCI UI and adjust scripts/circle-ci-tests.sh to match."
 
     echo "Running tests for common/lib/ and pavelib/"
-    paver test_lib --cov-args="-p" || EXIT=1
+#    paver test_lib --cov-args="-p" || EXIT=1
     echo "Running python tests for Studio"
-    paver test_system -s cms --cov-args="-p" || EXIT=1
+#    paver test_system -s cms --cov-args="-p" || EXIT=1
     echo "Running python tests for lms"
-    paver test_system -s lms --cov-args="-p" || EXIT=1
+#    paver test_system -s lms --cov-args="-p" || EXIT=1
 
     exit $EXIT
 else
     # Split up the tests to run in parallel on 4 containers
     case $CIRCLE_NODE_INDEX in
         0)  # run the quality metrics
-            echo "Finding fixme's and storing report..."
-            paver find_fixme > fixme.log || { cat fixme.log; EXIT=1; }
-
-            echo "Finding PEP 8 violations and storing report..."
-            paver run_pep8 > pep8.log || { cat pep8.log; EXIT=1; }
-
-            echo "Finding pylint violations and storing in report..."
-            # HACK: we need to print something to the console, otherwise circleci
-            # fails and aborts the job because nothing is displayed for > 10 minutes.
-            paver run_pylint -l $LOWER_PYLINT_THRESHOLD:$UPPER_PYLINT_THRESHOLD | tee pylint.log || EXIT=1
+#            echo "Finding fixme's and storing report..."
+#            paver find_fixme > fixme.log || { cat fixme.log; EXIT=1; }
+#
+#            echo "Finding PEP 8 violations and storing report..."
+#            paver run_pep8 > pep8.log || { cat pep8.log; EXIT=1; }
+#
+#            echo "Finding pylint violations and storing in report..."
+#            # HACK: we need to print something to the console, otherwise circleci
+#            # fails and aborts the job because nothing is displayed for > 10 minutes.
+#            paver run_pylint -l $LOWER_PYLINT_THRESHOLD:$UPPER_PYLINT_THRESHOLD | tee pylint.log || EXIT=1
 
             #mkdir -p reports
             #PATH=$PATH:node_modules/.bin
