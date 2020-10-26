@@ -6,7 +6,7 @@ from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .tasks import migrate_progress
+from .tasks import migrate_progress, OUTCOME_MIGRATED
 
 
 class MergeCompletion(APIView):
@@ -14,6 +14,7 @@ class MergeCompletion(APIView):
     Merges completions for a set of user pairs.
     Only admins can use this.
     """
+
     authentication_classes = (JwtAuthentication, )
     permission_classes = (permissions.IsAuthenticated, SessionAuthenticationAllowInactiveUser)
 
@@ -23,19 +24,20 @@ class MergeCompletion(APIView):
 
         Merge completions.
         """
-        # Get file from request
-        f = request.FILES['file']
+        csv_file = request.FILES['file']
 
-        # Parse CSV content to create a list
-        reader = csv.DictReader(f)
-        if not set(['course', 'source_email', 'dest_email']) < set(reader.fieldnames):
+        reader = csv.DictReader(csv_file)
+
+        if not {'course', 'source_email', 'dest_email'}.issubset(set(reader.fieldnames)):
             # Assert correct csv is uploaded
             return Response(status=400)
+
         # Extract list to be used in migration task
-        merge_list = [
+        migrate_list = [
             (row['course'], row['source_email'], row['dest_email']) for row in reader
-            if row.get('outcome') != 'migrated'  # Ignore lines marked as migrated
+            if row.get('outcome') != OUTCOME_MIGRATED  # Ignore lines marked as migrated
         ]
+
         # Start background task to merge progress for given users
-        migrate_progress.delay(merge_list)
+        migrate_progress.delay(migrate_list)
         return Response(status=200)

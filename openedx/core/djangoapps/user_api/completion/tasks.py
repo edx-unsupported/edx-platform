@@ -3,23 +3,26 @@
 import csv
 import logging
 
-from io import StringIO
+from io import BytesIO
 
 from celery.task import task
 from completion.models import BlockCompletion
-from django.contrib.auth import get_user_model
-from django.core.exceptions import ObjectDoesNotExist
-from django.db import transaction
 from courseware.courses import get_course
 from courseware.models import StudentModule
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.mail.message import EmailMessage
+from django.db import transaction
+from django.utils.translation import ugettext as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from student.models import AnonymousUserId, anonymous_id_for_user, CourseEnrollment
 from submissions.models import StudentItem
 
 log = logging.getLogger(__name__)
 
-# TODO: Add i18n
 OUTCOME_SOURCE_NOT_FOUND = 'source email not found'
 OUTCOME_SOURCE_NOT_ENROLLED = 'source email not enrolled in given course'
 OUTCOME_TARGET_NOT_FOUND = 'target email not found'
@@ -31,14 +34,10 @@ OUTCOME_MIGRATED = 'migrated'
 
 
 @task(bind=True)
-def migrate_progress(self, merge_list, result_recipients=None):
+def migrate_progress(self, migrate_list, result_recipients=None):
     """
     Task that migrates progress from one user to another
     """
-
-    if not result_recipients:
-        # TODO Get from settings
-        pass
 
     # Starting migrating completions for each entry
     results = [{
@@ -46,22 +45,48 @@ def migrate_progress(self, merge_list, result_recipients=None):
         'source_email': source,
         'dest_email': target,
         'outcome': _migrate_progress(course, source, target)
-    } for (course, source, target) in merge_list]
+    } for (course, source, target) in migrate_list]
 
-    # TODO Generate output csv
-    # TODO Save CSV and send email notifying recipients
+    results_csv = _create_results_csv(results)
+    _send_email_with_results(result_recipients, results_csv)
 
 
-def _create_results_csv(self, results):
+def _create_results_csv(results):
+    """
+    Turns results of migration into csv bytestring.
+    """
+
     fieldnames = ['course', 'source_email', 'dest_email', 'outcome']
 
-    csv_file = StringIO()
+    csv_file = BytesIO()
 
     writer = csv.DictWriter(csv_file, fieldnames)
     writer.writeheader()
     writer.writerows(results)
 
-    return csv_file
+    return csv_file.getvalue()
+
+
+def _send_email_with_results(recepients, results_csv):
+    """
+    Triggers email with csv attachment.
+    """
+
+    email_subject = _('Progress migration result')
+    email_text = _('Migration is finished. Please review this email attachment.')
+
+    from_address = configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
+    recepients = recepients or [settings.SERVER_EMAIL]
+    attachment_name = 'MigrationResults.csv'
+
+    email = EmailMessage()
+    email.subject = email_subject
+    email.body = email_text
+    email.from_email = from_address
+    email.to = recepients
+    email.attach(attachment_name, results_csv, 'text/csv')
+
+    email.send()
 
 def _migrate_progress(course, source, target):
     """
