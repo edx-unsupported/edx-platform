@@ -3,6 +3,7 @@
 from django.contrib.auth.models import User
 
 from openedx.core.djangoapps.user_api.completion.tasks import (
+    OUTCOME_COURSE_KEY_INVALID,
     OUTCOME_COURSE_NOT_FOUND,
     OUTCOME_FAILED_MIGRATION,
     OUTCOME_MIGRATED,
@@ -45,11 +46,19 @@ class ProgressMigrationTestCase(ModuleStoreTestCase):
             CourseEnrollment.enroll(user, self.course.id, mode='audit')
         return user
 
-    def test_course_not_found(self):
+    def test_course_invalid_key(self):
         source = self._create_user(enrolled=self.course)
         target = self._create_user()
         self.assertEqual(
             _migrate_completions('a+b+c', source.email, target.email),
+            OUTCOME_COURSE_KEY_INVALID
+        )
+
+    def test_course_not_found(self):
+        source = self._create_user(enrolled=self.course)
+        target = self._create_user()
+        self.assertEqual(
+            _migrate_completions(self.course_id + 'abc', source.email, target.email),
             OUTCOME_COURSE_NOT_FOUND
         )
 
