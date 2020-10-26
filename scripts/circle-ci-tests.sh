@@ -85,7 +85,7 @@ else
 
         2)  # run all of the cms unit tests
 #            paver test_system -s cms --cov-args="-p" --disable-migrations
-#            ;;
+            ;;
 
         3)  # run the commonlib and solutions apps unit tests
 #            paver test_lib
