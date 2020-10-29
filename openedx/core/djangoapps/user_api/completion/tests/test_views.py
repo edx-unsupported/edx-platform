@@ -22,7 +22,7 @@ class ProgressMigrateAPITestCase(APITestCase):
     def test_invalid_csv(self):
         invalid_csv = b'course,source_email,wrong_column,outcome\r\n' \
             'course-v1:a+b+c,source@example.com,target@example.com,\r\n'
-    
+
         csv_file = SimpleUploadedFile("migrate.csv", invalid_csv, content_type="text/csv")
 
         response = self.api_client.post(
@@ -33,7 +33,7 @@ class ProgressMigrateAPITestCase(APITestCase):
     def test_migrate_scheduling(self, migrate_progress):
         csv = b'course,source_email,dest_email,outcome\r\n' \
             'course-v1:a+b+c,source@example.com,target@example.com,\r\n'
-    
+
         csv_file = SimpleUploadedFile("migrate.csv", csv, content_type="text/csv")
 
         response = self.api_client.post(

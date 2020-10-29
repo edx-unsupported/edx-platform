@@ -92,6 +92,7 @@ def _send_email_with_results(recepients, results_csv):
 
     log.info('Email with users progress migration results sent to %s', recepients)
 
+
 def _migrate_progress(course, source, target):
     """
     Task that migrates progress from one user to another
