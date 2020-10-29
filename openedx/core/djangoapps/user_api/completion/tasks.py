@@ -39,6 +39,8 @@ def migrate_progress(self, migrate_list, result_recipients=None):
     Task that migrates progress from one user to another
     """
 
+    log.info('Started progress migration. Items to process: %s', len(migrate_list))
+
     # Starting migrating completions for each entry
     results = [{
         'course': course,
@@ -88,37 +90,50 @@ def _send_email_with_results(recepients, results_csv):
 
     email.send()
 
+    log.info('Email with users progress migration results sent to %s', recepients)
+
 def _migrate_progress(course, source, target):
     """
     Task that migrates progress from one user to another
     """
+    log.info('Started progress migration from "%s" to "%s" for "%s" course', source, target, course)
 
     try:
         course_key = CourseKey.from_string(course)
     except InvalidKeyError:
+        log.warning('Migration failed. Invalid course key: %s', course)
         return OUTCOME_COURSE_KEY_INVALID
 
     try:
         get_course(course_key)
     except ValueError:
+        log.warning('Migration failed. Course not found:: %s', course_key)
         return OUTCOME_COURSE_NOT_FOUND
 
     try:
         source = get_user_model().objects.get(email=source)
     except ObjectDoesNotExist:
+        log.warning('Migration failed. Source user with such email not found: %s', source)
         return OUTCOME_SOURCE_NOT_FOUND
 
     try:
         enrollment = CourseEnrollment.objects.select_for_update().get(user=source, course=course_key)
     except ObjectDoesNotExist:
+        log.warning(
+            'Migration failed. Source user with email "%s" not enrolled in "%s" course', source.email, course_key
+        )
         return OUTCOME_SOURCE_NOT_ENROLLED
 
     try:
         target = get_user_model().objects.get(email=target)
     except ObjectDoesNotExist:
+        log.warning('Migration failed. Target user with such email not found: %s', target)
         return OUTCOME_TARGET_NOT_FOUND
 
     if CourseEnrollment.objects.filter(user=target, course=course_key).exists():
+        log.warning(
+            'Migration failed. Target user with email "%s" already enrolled in "%s" course', target.email, course_key
+        )
         return OUTCOME_TARGET_ALREADY_ENROLLED
 
     # Fetch completions for source user
@@ -159,4 +174,7 @@ def _migrate_progress(course, source, target):
         log.exception("Unexpected error while migrating user progress.")
         return OUTCOME_FAILED_MIGRATION
 
+    log.info(
+        'User progress in "%s" course successfully migrated from "%s" to "%s"', course_key, source.email, target.email
+    )
     return OUTCOME_MIGRATED

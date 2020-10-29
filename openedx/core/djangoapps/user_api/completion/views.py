@@ -1,12 +1,16 @@
 import csv
+import logging
 
 from rest_framework.authentication import SessionAuthentication
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
 from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .tasks import migrate_progress, OUTCOME_MIGRATED
+
+log = logging.getLogger(__name__)
 
 
 class MigrateProgressView(APIView):
@@ -15,7 +19,12 @@ class MigrateProgressView(APIView):
     Only admins can use this.
     """
 
-    authentication_classes = (JwtAuthentication, SessionAuthentication,)
+    authentication_classes = (
+        JwtAuthentication,
+        SessionAuthentication,
+        SessionAuthenticationAllowInactiveUser,
+    )
+
     permission_classes = (
         permissions.IsAuthenticated,
         permissions.IsAdminUser,
@@ -33,8 +42,8 @@ class MigrateProgressView(APIView):
         reader = csv.DictReader(csv_file)
 
         if not {'course', 'source_email', 'dest_email'}.issubset(set(reader.fieldnames)):
-            # Assert correct csv is uploaded
-            return Response(status=400)
+            log.warning('Received invalid csv.')
+            return Response(status=411)
 
         # Extract list to be used in migration task
         migrate_list = [
@@ -47,4 +56,7 @@ class MigrateProgressView(APIView):
             migrate_list,
             [recepient_address] if recepient_address else None
         )
+
+        log.info('Scheduled user progress migration. Items to process: %s', len(migrate_list))
+
         return Response(status=200)
