@@ -18,7 +18,7 @@ from datetime import datetime
 # pylint: disable=invalid-name
 from openedx.core.djangoapps.course_groups.models import CourseCohortsSettings
 
-_target_module = "django_comment_client.management.commands.export_discussion_participation"
+_target_module = "lms.djangoapps.discussion.management.commands.export_discussion_participation"
 
 _std_parameters_list = (
     (CourseLocator(org="edX", course="demoX", run="now"), None, None, None),

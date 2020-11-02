@@ -159,7 +159,7 @@ class Command(BaseCommand):
             try:
                 self.dump_one(*args, **options)
             except MissingCohortedConfigCommandError as e:
-                print('Error generating CSV for course {}: {}'.format(raw_course_key, e.message))
+                print('Error generating CSV for course {}: {}'.format(raw_course_key, str(e)))
 
     def dump_one(self, *args, **options):
         if not args:
