@@ -17,7 +17,7 @@
 #-e git+https://github.com/OfficeDev/xblock-officemix.git@86238f5968a08db005717dbddc1.9.6346808f1ed3716#egg=xblock-officemix
 -e git+https://github.com/open-craft/xblock-chat.git@v0.3.0#egg=chat-xblock==0.3.0
 -e git+https://github.com/open-craft/xblock-eoc-journal.git@v0.9.1#egg=xblock-eoc-journal==0.9.1
-    -e git+https://github.com/mckinseyacademy/xblock-scorm.git@v3.0#egg=xblock-scorm==3.0
+-e git+https://github.com/mckinseyacademy/xblock-scorm.git@v3.0#egg=xblock-scorm==3.0
 -e git+https://github.com/mckinseyacademy/xblock-diagnosticfeedback.git@v0.3.0#egg=xblock-diagnostic-feedback==0.3.0
 
 #-e git+https://github.com/open-craft/xblock-group-project-v2.git@0.7.2#egg=xblock-group-project-v2==0.7.2
@@ -27,10 +27,10 @@
 git+https://github.com/edx-solutions/gradebook-edx-platform-extensions.git@rebase-juniper#egg=gradebook-edx-platform-extensions==3.0.0
 git+https://github.com/edx-solutions/mobileapps-edx-platform-extensions.git@rebase-juniper#egg=mobileapps-edx-platform-extensions==3.0.0
 git+https://github.com/edx-solutions/discussion-edx-platform-extensions.git@rebase-juniper#egg=discussion-edx-platform-extensions==3.0.1
-git+https://github.com/edx-solutions/organizations-edx-platform-extensions.git@rebase-juniper#egg=organizations-edx-platform-extensions==3.0.0
+git+https://github.com/edx-solutions/organizations-edx-platform-extensions.git@rebase-juniper#egg=organizations-edx-platform-extensions==3.0.1
 git+https://github.com/edx-solutions/course-edx-platform-extensions.git@rebase-juniper#egg=course-edx-platform-extensions==4.0.0
 git+https://github.com/edx-solutions/projects-edx-platform-extensions.git@rebase-juniper#egg=projects-edx-platform-extensions==4.0.0
-git+https://github.com/edx-solutions/api-integration.git@rebase-juniper#egg=api-integration==5.0.0
+git+https://github.com/edx-solutions/api-integration.git@rebase-juniper#egg=api-integration==5.0.1
 
 git+https://github.com/mckinseyacademy/openedx-user-manager-api@v2.0.0#egg=openedx-user-manager-api==2.0.0
 openedx-completion-aggregator==3.0.0
