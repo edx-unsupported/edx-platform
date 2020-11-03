@@ -32,9 +32,36 @@ class MigrateProgressView(APIView):
 
     def post(self, request):
         """
-        POST /api/user/v1/completion/migrate/
+        **Use Cases**
 
-        Migrate user progress.
+            Migrate progress (enrollment, block completions, submissions,
+            student module) from one user to another.
+
+        **Example Requests**:
+
+            POST /api/user/v1/completion/migrate/
+            {
+                "recepient_address": "devops@example.com",
+            }
+
+            ``Content-type`` header of request should be ``multipart/form-data``.
+            Also note, that "recepient_address" field is not required,
+            but multipart-encoded csv file is required.
+
+            Example structure of required csv file:
+            ```
+            course,source_email,dest_email,outcome
+            course-v1:a+b+c,a@example.com,b@example.com,course key invalid
+            ```
+
+        **Example POST Responses**
+
+            * If attached csv file doesn't contain any of the required fields
+            (``course``, ``source_email``, ``dest_email``), status code of the
+            response will be 400.
+
+            * If migration task successfully scheduled, status code will be 204.
+
         """
         csv_file = request.FILES['file']
         recepient_address = request.POST.get('recepient_address')
@@ -43,7 +70,7 @@ class MigrateProgressView(APIView):
 
         if not {'course', 'source_email', 'dest_email'}.issubset(set(reader.fieldnames)):
             log.warning('Received invalid csv.')
-            return Response(status=411)
+            return Response(status=400)
 
         # Extract list to be used in migration task
         migrate_list = [
@@ -59,4 +86,4 @@ class MigrateProgressView(APIView):
 
         log.info('Scheduled user progress migration. Items to process: %s', len(migrate_list))
 
-        return Response(status=200)
+        return Response(status=204)

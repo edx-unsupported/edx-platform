@@ -29,6 +29,8 @@ class ProgressMigrateAPITestCase(APITestCase):
             self.url, {"file": csv_file}, content_type="application/json"
         )
 
+        self.assertEqual(response.status_code, 400)
+
     @mock.patch('openedx.core.djangoapps.user_api.completion.views.migrate_progress.delay')
     def test_migrate_scheduling(self, migrate_progress):
         csv = b'course,source_email,dest_email,outcome\r\n' \
@@ -40,7 +42,7 @@ class ProgressMigrateAPITestCase(APITestCase):
             self.url, {"recepient_address": self.user.email, "file": csv_file}, format="multipart"
         )
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 204)
 
         migrate_progress.assert_called_with(
             [('course-v1:a+b+c', 'source@example.com', 'target@example.com')],
