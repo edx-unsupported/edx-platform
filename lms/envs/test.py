@@ -503,7 +503,7 @@ PROFILE_IMAGE_MIN_BYTES = 100
 
 # Set dummy values for organization logo image settings.
 ORGANIZATION_LOGO_IMAGE_BACKEND = {
-    'class': 'storages.backends.overwrite.OverwriteStorage',
+    'class': 'openedx.core.storage.OverwriteStorage',
     'options': {
         'location': os.path.join(MEDIA_ROOT, 'organization-logo-images/'),
         'base_url': os.path.join(MEDIA_URL, 'organization-logo-images/'),
