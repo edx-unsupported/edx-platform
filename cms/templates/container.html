@@ -64,7 +64,7 @@ from openedx.core.djangolib.markup import HTML, Text
                 $('.seq_new_button').click(function(evt) {
                     evt.preventDefault();
                     XBlockUtils.addXBlock($(evt.target)).done(function(locator) {
-                        ViewUtils.redirect('/container/' + locator + '?action=new');      
+                        ViewUtils.redirect('/container/' + locator + '?action=new');
                         return false;
                     });
                     return false;
