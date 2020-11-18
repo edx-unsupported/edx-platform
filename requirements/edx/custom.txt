@@ -20,7 +20,7 @@ git+https://github.com/edx-solutions/xblock-group-project.git@saqib/MCKIN-26250#
 -e git+https://github.com/mckinseyacademy/xblock-scorm.git@v3.0#egg=xblock-scorm==3.0
 -e git+https://github.com/mckinseyacademy/xblock-diagnosticfeedback.git@v0.3.0#egg=xblock-diagnostic-feedback==0.3.0
 
--e git+https://github.com/open-craft/xblock-group-project-v2.git@farhaan/bb-2952-update-python-version-support-py3#egg=xblock-group-project-v2==0.7.3
+-e git+https://github.com/open-craft/xblock-group-project-v2.git@0.11.0#egg=xblock-group-project-v2==0.11.0
 -e git+https://github.com/open-craft/xblock-virtualreality.git@v0.1.5#egg=xblock-virtualreality==0.1.5
 
 -e git+https://github.com/edx/edx-notifications.git@rebase-juniper#egg=edx-notifications==3.0.0
