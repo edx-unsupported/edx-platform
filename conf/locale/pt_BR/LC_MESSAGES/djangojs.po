@@ -2269,7 +2269,7 @@ msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "No posts matched your query."
-msgstr ""
+msgstr "Nenhuma publicação corresponde à sua consulta."
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "Show posts by {username}."
@@ -6945,7 +6945,7 @@ msgstr "discussão postada %(time_ago)s by %(author)s"
 #: common/static/common/templates/discussion/templates.underscore
 #, python-format
 msgid "question posted %(time_ago)s by %(author)s"
-msgstr ""
+msgstr "pergunta postada %(time_ago)s por %(author)s"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Pinned"
@@ -6988,7 +6988,15 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Update post"
-msgstr ""
+msgstr "Atualizar publicação"
+
+#: common/static/common/templates/discussion/templates.underscore
+msgid "discussion posted"
+msgstr "discussão postada"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "question posted"
+msgstr "pergunta postada"
 
 #: common/static/common/templates/discussion/templates.underscore
 #, python-format
@@ -7044,23 +7052,23 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "discussion"
-msgstr ""
+msgstr "discussão"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "answered question"
-msgstr ""
+msgstr "questão respondida"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "unanswered question"
-msgstr ""
+msgstr "questão não respondida"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Following"
-msgstr ""
+msgstr "Seguindo"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Community TA"
-msgstr ""
+msgstr "Assistente de ensino da comunidade"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "{unread_comments_count} new"
@@ -7072,6 +7080,10 @@ msgid ""
 "%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s "
 "unread comments)%(span_close)s"
 msgstr ""
+
+#: wiki/templates/wiki/includes/revision_info.html
+msgid "by"
+msgstr "por"
 
 #: common/static/common/templates/discussion/templates.underscore
 #, python-format
@@ -7119,7 +7131,7 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "This post will be visible to everyone."
-msgstr ""
+msgstr "Esta publicação estará visível para todos."
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Topic area"
@@ -7140,7 +7152,7 @@ msgstr ""
 #: common/static/common/templates/discussion/templates.underscore
 #: lms/djangoapps/discussion/static/discussion/templates/user-profile.underscore
 msgid "All Posts"
-msgstr ""
+msgstr "Todas as Publicações"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Return to all posts"
@@ -7229,6 +7241,10 @@ msgid "Discussion Home"
 msgstr "Página inicial de discussão"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Discussions"
+msgstr "Discussões"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 #, python-format
 msgid "How to use %(platform_name)s discussions"
 msgstr "Como usar  as discussões de %(platform_name)s"
@@ -7252,6 +7268,10 @@ msgstr "Filtrar e classificar tópicos"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Engage with posts"
+msgstr "Participar das publicações"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "engage with posts"
 msgstr "Participar das publicações"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
@@ -10976,3 +10996,32 @@ msgstr ""
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 msgid "Use Current Transcript"
 msgstr "Usar a Transcrição Atual"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "How to use discussions"
+msgstr "Como usar as discussões"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "menu to see a list of all topics."
+msgstr "menu para ver uma lista de todos os tópicos."
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Use the"
+msgstr "Use o"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Search and filter all posts to find specific topics or posts."
+msgstr ""
+"Pesquise e filtre todas as publicações para encontrar publicações ou tópicos específicos."
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Questions raise issues that need answers. Discussions share ideas and start conversations."
+msgstr "As perguntas levantam questões que precisam de respostas. As discussões compartilham ideias e iniciam conversas"
+
+#: discussions/views/new_post_view_spec.js
+msgid "Title can't be empty"
+msgstr "o título não pode ficar vazio"
+
+#: discussions/views/new_post_view_spec.js
+msgid "Body can't be empty"
+msgstr "o corpo não pode ficar vazio"

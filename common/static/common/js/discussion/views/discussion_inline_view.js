@@ -230,6 +230,7 @@
             this.toggleDiscussionBtn.addClass('shown');
             this.toggleDiscussionBtn.find('.button-text').text(gettext('Hide Discussion'));
             this.showed = true;
+            this.$('label[for=anonymous]').removeClass('selected');
             $('.new-post-btn').focusout();
             $('.thread-title').focus();
         },

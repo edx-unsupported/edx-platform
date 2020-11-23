@@ -27283,3 +27283,16 @@ msgstr ""
 #: edx_proctoring_proctortrack/backends/proctortrack_rest.py
 msgid "Click on the \"Start Proctored Exam\" button below to continue."
 msgstr "Seleccione la opción \"Empezar examen supervisado\" abajo para continuar."
+
+#: users/views.py:778
+#, python-brace-format
+msgid "User '{username}' already exists"
+msgstr "El usuario '{username}' ya existe."
+
+#: users/views.py:824
+#, python-brace-format
+msgid ""
+"You are re-using a password that you have used recently. You must have {0} "
+"distinct password(s) before reusing a previous password."
+msgstr "Elija una contraseña que no haya usado recientemente. Para volver a usar "
+"una contraseña anterior, debe haber cambiado de contraseña al menos {0} veces."

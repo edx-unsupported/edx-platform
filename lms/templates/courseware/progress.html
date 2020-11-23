@@ -169,10 +169,9 @@ username = get_enterprise_learner_generic_name(request) or student.username
                                 %for section in chapter['sections']:
                                     <div>
                                         <%
-                                        earned = section.graded_total.earned
-                                        total = section.graded_total.possible
-
-                                        percentageString = "{0:.0%}".format(section.percent_graded) if total > 0 or earned > 0 else ""
+                                        earned = section.all_total.earned
+                                        total = section.all_total.possible
+                                        percentageString = "{0:.0%}".format( float(earned)/total) if earned > 0 and total > 0 else ""
                                         %>
                                         <h4 class="hd hd-4">
                                             <a href="${reverse('courseware_section', kwargs=dict(course_id=text_type(course.id), chapter=chapter['url_name'], section=section.url_name))}">

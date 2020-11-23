@@ -392,7 +392,7 @@ class AssignmentFormatGrader(CourseGrader):
                     possible = scores[i].graded_total.possible
                     section_name = scores[i].display_name
 
-                percentage = scores[i].percent_graded
+                percentage = earned / possible
                 summary_format = u"{section_type} {index} - {name} - {percent:.0%} ({earned:.3n}/{possible:.3n})"
                 summary = summary_format.format(
                     index=i + self.starting_index,

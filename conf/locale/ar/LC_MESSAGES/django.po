@@ -25937,3 +25937,16 @@ msgid ""
 "A new revision was created: Merge between Revision #%(r1)d and Revision "
 "#%(r2)d"
 msgstr "أُنشأت مراجعة جديدة: الدمج بين المراجعة #%(r1)d والمراجعة #%(r2)d "
+
+#: users/views.py:778
+#, python-brace-format
+msgid "User '{username}' already exists"
+msgstr "المستخدم '{username}' موجود بالفعل"
+
+#: users/views.py:824
+#, python-brace-format
+msgid ""
+"You are re-using a password that you have used recently. You must have {0} "
+"distinct password(s) before reusing a previous password."
+msgstr "إنك تعيد استخدام كلمة مرور استخدمتها مؤخرًا. يجب"
+" أن يكون لديك {0} كلمة (كلمات) مرور مختلفة قبل إعادة استخدام كلمة مرور سابقة"

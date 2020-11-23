@@ -7215,7 +7215,7 @@ msgstr "question publiée %(time_ago)s par %(author)s"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Pinned"
-msgstr ""
+msgstr "Épinglé"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Reported"
@@ -7256,6 +7256,19 @@ msgstr ""
 msgid "Update post"
 msgstr ""
 
+
+
+#: wiki/templates/wiki/includes/revision_info.html
+msgid "by"
+msgstr "par"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "discussion posted"
+msgstr "discussion publiée"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "question posted"
+msgstr "question publiée"
 #: common/static/common/templates/discussion/templates.underscore
 #, python-format
 msgid "Show Comment (%(num_comments)s)"
@@ -7310,27 +7323,27 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "discussion"
-msgstr ""
+msgstr "Discussion"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "answered question"
-msgstr ""
+msgstr "Question répondue"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "unanswered question"
-msgstr ""
+msgstr "Question non répondue"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Following"
-msgstr ""
+msgstr "Suivi"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Community TA"
-msgstr ""
+msgstr "Assistant communauté d'apprentissage"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "{unread_comments_count} new"
-msgstr ""
+msgstr "{unread_comments_count} nouveaux"
 
 #: common/static/common/templates/discussion/templates.underscore
 #, python-format
@@ -7436,7 +7449,7 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Discussion"
-msgstr ""
+msgstr "Discussion"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Endorse"
@@ -7495,6 +7508,10 @@ msgid "Discussion Home"
 msgstr "Page d'accueil de Discussion"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Discussions"
+msgstr "Discussions"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 #, python-format
 msgid "How to use %(platform_name)s discussions"
 msgstr "Comment utiliser les discussions %(platform_name)s"
@@ -7518,6 +7535,10 @@ msgstr "Filtrer et trier les sujets"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Engage with posts"
+msgstr "Participez à la conversation"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "engage with posts"
 msgstr "Participez à la conversation"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
@@ -11361,3 +11382,31 @@ msgstr ""
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 msgid "Use Current Transcript"
 msgstr "Utiliser la transcription courante"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "How to use discussions"
+msgstr "Comment utiliser le menu des discussions"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "menu to see a list of all topics."
+msgstr "pour visualiser une liste de tous les sujets."
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Use the"
+msgstr "Utiliser la"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Search and filter all posts to find specific topics or posts."
+msgstr "fonction de recherche pour filtrer tous les messages afin de trouver des sujets ou des messages spécifiques."
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Questions raise issues that need answers. Discussions share ideas and start conversations."
+msgstr "Les questions portent sur des problèmes qui nécessitent des réponses. Les discussions permettent de partager des idées et de démarrer des conversations"
+
+#: discussions/views/new_post_view_spec.js
+msgid "Title can't be empty"
+msgstr "le titre ne peut être vide"
+
+#: discussions/views/new_post_view_spec.js
+msgid "Body can't be empty"
+msgstr "le corps ne peut être vide"

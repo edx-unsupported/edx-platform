@@ -2188,7 +2188,7 @@ msgstr "ターゲットにドロップ"
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "%s ago"
-msgstr ""
+msgstr "%s 前"
 
 #. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
@@ -2198,27 +2198,27 @@ msgstr ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "less than a minute"
-msgstr ""
+msgstr "1 分未満"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a minute"
-msgstr ""
+msgstr "約 1分"
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] ""
+msgstr[0] "%d 分"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about an hour"
-msgstr ""
+msgstr "約 1 時間"
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "about %d hour"
 msgid_plural "about %d hours"
-msgstr[0] ""
+msgstr[0] "約 %d 時間"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "a day"
@@ -2228,11 +2228,11 @@ msgstr ""
 #, javascript-format
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] ""
+msgstr[0] "%d日"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a month"
-msgstr ""
+msgstr "約 1 ヶ月"
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
@@ -2242,7 +2242,7 @@ msgstr[0] ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a year"
-msgstr ""
+msgstr "約 1 年"
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
@@ -6649,7 +6649,7 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Pinned"
-msgstr ""
+msgstr "ピン留め"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Reported"
@@ -6752,6 +6752,14 @@ msgstr ""
 #: common/static/common/templates/discussion/templates.underscore
 msgid "unanswered question"
 msgstr ""
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "discussion posted"
+msgstr "前に投稿したディスカッション"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "question posted"
+msgstr "前に投稿した質問"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Following"
@@ -6928,6 +6936,10 @@ msgid "Discussion Home"
 msgstr "ディスカッション・ホーム"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Discussions"
+msgstr "ディスカッション"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 #, python-format
 msgid "How to use %(platform_name)s discussions"
 msgstr "%(platform_name)s のディスカッションの使い方"
@@ -6951,6 +6963,10 @@ msgstr "トピックをフィルタリングおよびソートする"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Engage with posts"
+msgstr "投稿での参加"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "engage with posts"
 msgstr "投稿での参加"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
@@ -10307,6 +10323,9 @@ msgstr ""
 msgid "API Secret"
 msgstr ""
 
+msgid "by"
+msgstr "により"
+
 #: cms/templates/js/unit-access-editor.underscore
 msgid "Unit Access"
 msgstr "ユニット・アクセス"
@@ -10547,3 +10566,31 @@ msgstr "あなたは動画URLを変更しましたが、字幕ファイルは変
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 msgid "Use Current Transcript"
 msgstr "現在の字幕を使用する"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "How to use discussions"
+msgstr "ディスカッション"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "menu to see a list of all topics."
+msgstr "メニューを使ってすべてのトピックを列挙する方法"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Use the"
+msgstr "特定のトピックまたは投稿を"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Search and filter all posts to find specific topics or posts."
+msgstr "検索するには、全統校の検索およびフィルタリング機能を使用します。"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Questions raise issues that need answers. Discussions share ideas and start conversations."
+msgstr "質問: 回答が必要な問題を提起します。ディスカッション: 対話を開始し、アイデアを共有します。"
+
+#: discussions/views/new_post_view_spec.js
+msgid "Title can't be empty"
+msgstr "件名は空欄にできません。"
+
+#: discussions/views/new_post_view_spec.js
+msgid "Body can't be empty"
+msgstr "本文は空欄にできません。"

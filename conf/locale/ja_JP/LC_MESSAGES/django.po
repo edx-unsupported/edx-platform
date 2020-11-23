@@ -24299,3 +24299,16 @@ msgstr ""
 #: edx_proctoring_proctortrack/backends/proctortrack_rest.py
 msgid "Click on the \"Start Proctored Exam\" button below to continue."
 msgstr ""
+
+#: users/views.py:778
+#, python-brace-format
+msgid "User '{username}' already exists"
+msgstr "'{username}' というユーザーは既に存在します"
+
+#: users/views.py:824
+#, python-brace-format
+msgid ""
+"You are re-using a password that you have used recently. You must have {0} "
+"distinct password(s) before reusing a previous password."
+msgstr "最近まで使用していたパスワードを再使用しようとしています。過去に使用したことのあるパスワードは、"
+"異なるパスワードを {0} 回使用した後でないと再使用できません"

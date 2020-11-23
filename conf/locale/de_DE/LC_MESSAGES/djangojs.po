@@ -7366,7 +7366,7 @@ msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Pinned"
-msgstr ""
+msgstr "Festgeheftet"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Reported"
@@ -7471,6 +7471,14 @@ msgstr ""
 msgid "unanswered question"
 msgstr ""
 
+#: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "discussion posted"
+msgstr "Diskussion wurde vor"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "question posted"
+msgstr "Frage wurde vor"
+
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Following"
 msgstr ""
@@ -7558,6 +7566,10 @@ msgstr ""
 #: lms/djangoapps/discussion/static/discussion/templates/user-profile.underscore
 msgid "All Posts"
 msgstr "Alle Beiträge"
+
+#: wiki/templates/wiki/includes/revision_info.html
+msgid "by"
+msgstr "durch"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Return to all posts"
@@ -7652,6 +7664,10 @@ msgid "Discussion Home"
 msgstr "Forum Home"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Discussions"
+msgstr "Diskussionen"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 #, python-format
 msgid "How to use %(platform_name)s discussions"
 msgstr "So nutzen Sie das %(platform_name)s Diskussionsforum"
@@ -7676,7 +7692,11 @@ msgstr "Filter und sortiere Themen"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Engage with posts"
-msgstr "Forumsfunktionen"
+msgstr "Engagieren Sie sich mit Beiträgen"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "engage with posts"
+msgstr "Engagieren Sie sich mit Beiträgen"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Vote for good posts and responses"
@@ -11633,3 +11653,31 @@ msgstr ""
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 msgid "Use Current Transcript"
 msgstr "Nutze aktuelles Transkript"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "How to use discussions"
+msgstr "Wie man Diskussionen verwendet"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "menu to see a list of all topics."
+msgstr "Menü, um eine Liste aller Themen anzusehen."
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Use the"
+msgstr "Verwenden Sie das"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Search and filter all posts to find specific topics or posts."
+msgstr "Alle Beiträge durchsuchen und filtern, um bestimmte Themen oder Beiträge zu finden."
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Questions raise issues that need answers. Discussions share ideas and start conversations."
+msgstr "Fragen werfen Probleme auf, die gelöst werden müssen. Diskussionen dienen dem Ideenaustausch und regen Gespräche an"
+
+#: discussions/views/new_post_view_spec.js
+msgid "Title can't be empty"
+msgstr "Titel darf nicht leer sein"
+
+#: discussions/views/new_post_view_spec.js
+msgid "Body can't be empty"
+msgstr "Text darf nicht leer sein"

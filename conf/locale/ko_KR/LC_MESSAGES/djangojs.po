@@ -2417,7 +2417,7 @@ msgstr ""
 #: common/static/common/templates/discussion/new-post.underscore
 #: common/static/common/templates/discussion/thread-edit.underscore
 msgid "Title"
-msgstr ""
+msgstr "제목"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -10555,6 +10555,10 @@ msgid "discussion posted"
 msgstr "토론이 게시됨"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "question posted"
+msgstr "이(가) 게시한 질문"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
 #: common/static/common/templates/discussion/thread-show.underscore
 #: common/templates/js/discussion/thread-show.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
@@ -10624,6 +10628,10 @@ msgstr "%(comments_count)s개 %(span_sr_open)s댓글(%(unread_comments_count)s�
 #, python-format
 msgid "%(comments_count)s %(span_sr_open)scomments %(span_close)s"
 msgstr "%(comments_count)s개 %(span_sr_open)s댓글 %(span_close)s"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore:30
+msgid "by"
+msgstr "작성자"
 
 #: common/static/common/templates/discussion/thread-response-edit.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-response-edit.underscore
@@ -10853,7 +10861,7 @@ msgid "Use the"
 msgstr "다음"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
-msgid " menu to see a list of all topics."
+msgid "menu to see a list of all topics."
 msgstr " 메뉴를 사용하여 모든 주제의 목록을 볼 수 있습니다."
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
@@ -11059,3 +11067,15 @@ msgstr "이 팀을 삭제하시겠습니까?"
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid "Team \"{team}\" successfully deleted."
 msgstr "팀 \"{team}\"이(가) 성공적으로 삭제되었습니다."
+
+#: discussions/views/new_post_view_spec.js
+msgid "Title can't be empty"
+msgstr "제목은 비워둘 수 없습니다."
+
+#: discussions/views/new_post_view_spec.js
+msgid "Body can't be empty"
+msgstr "본문은 비워둘 수 없습니다."
+
+#: common/static/common/templates/discussion/new-post-visibility.underscore
+msgid "This post will be visible to everyone."
+msgstr "이 게시물은 모든 사용자에게 표시됩니다."

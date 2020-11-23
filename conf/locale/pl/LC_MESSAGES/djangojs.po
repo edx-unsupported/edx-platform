@@ -161,6 +161,20 @@ msgstr "Zapisywanie"
 msgid "Delete"
 msgstr "Usuń"
 
+#: common/static/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
+msgid "discussion posted"
+msgstr "opublikowana dyskusja"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "question posted"
+msgstr "opublikowane pytanie"
+
+#: wiki/templates/wiki/includes/revision_info.html
+msgid "by"
+msgstr "przez"
+
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -2287,7 +2301,7 @@ msgstr "upuszczenie na cel"
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
 msgid "%s ago"
-msgstr ""
+msgstr "%s temu"
 
 #. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
@@ -2297,11 +2311,11 @@ msgstr ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "less than a minute"
-msgstr ""
+msgstr "mniej niż minutę"
 
 #: common/static/js/src/jquery.timeago.locale.js
 msgid "about a minute"
-msgstr ""
+msgstr "około minuty"
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
@@ -11345,3 +11359,109 @@ msgstr ""
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 msgid "Use Current Transcript"
 msgstr "Użyj istniejącej transkrypcji"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Questions raise issues that need answers. Discussions share ideas and start conversations."
+msgstr "Za pomocą Pytania możesz podnieść kwestie wymagające odpowiedzi. Za pomocą Dyskusji możesz podzielić się spostrzeżeniami i rozpocząć rozmowę."
+
+#: common/static/js/src/jquery.timeago.locale.js
+#, javascript-format
+msgid "%s ago"
+msgstr "%s temu"
+
+#: common/static/js/src/jquery.timeago.locale.js
+msgid "less than a minute"
+msgstr "mniej niż minutę"
+
+#: common/static/js/src/jquery.timeago.locale.js
+msgid "about a minute"
+msgstr "około minuty"
+
+#: common/static/js/src/jquery.timeago.locale.js
+#, javascript-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d minute"
+
+
+#: common/static/js/src/jquery.timeago.locale.js
+msgid "about an hour"
+msgstr "około godziny"
+
+#: common/static/js/src/jquery.timeago.locale.js
+#, javascript-format
+msgid "about %d hour"
+msgid_plural "about %d hours"
+msgstr[0] "około %d godzin(-y)"
+
+#: common/static/js/src/jquery.timeago.locale.js
+msgid "about a month"
+msgstr "około miesiąca"
+
+#: common/static/js/src/jquery.timeago.locale.js
+msgid "about a year"
+msgstr "około roku"
+
+#: cms/templates/js/asset-library.underscore
+msgid "Preview"
+msgstr "PODGLĄD"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Bold (Ctrl+B)"
+msgstr "Pogrubienie (Ctrl+B)"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Italic (Ctrl+I)"
+msgstr "Kursywa (Ctrl+I)"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Hyperlink (Ctrl+L)"
+msgstr "Hiperłącze (Ctrl+L)"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Blockquote (Ctrl+Q)"
+msgstr "Blockquote (Ctrl+Q)"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Numbered List (Ctrl+O)"
+msgstr "Lista numerowana (Ctrl+O)"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Bulleted List (Ctrl+U)"
+msgstr "Lista punktowana (Ctrl+O)"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Heading (Ctrl+H)"
+msgstr "Nagłówek (Ctrl+H)"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Horizontal Rule (Ctrl+R)"
+msgstr "Linijka pozioma (Ctrl+R)"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Undo (Ctrl+Z)"
+msgstr "Cofnij (Ctrl+Z)"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Redo (Ctrl+Y)"
+msgstr "Powtórz (Ctrl+Y)"
+
+#: discussions/views/new_post_view_spec.js
+msgid "Title can't be empty"
+msgstr "tytuł nie może być pusty"
+
+#: discussions/views/new_post_view_spec.js
+msgid "Body can't be empty"
+msgstr "treść nie może być pusta"
+
+#: common/static/common/templates/discussion/new-post-visibility.underscore
+msgid "This post will be visible to everyone."
+msgstr "Ten post będzie widoczny dla wszystkich"
+
+
+#: common/static/js/src/jquery.timeago.locale.js
+#, javascript-format
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] "%d dzień"
+msgstr[1] "%d dni"

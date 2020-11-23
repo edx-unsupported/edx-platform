@@ -26379,7 +26379,7 @@ msgstr ""
 
 #: wiki/templates/wiki/includes/revision_info.html
 msgid "by"
-msgstr ""
+msgstr "par"
 
 #: wiki/templates/wiki/includes/revision_info.html
 msgid "restored"
@@ -26481,3 +26481,16 @@ msgid ""
 msgstr ""
 "Une nouvelle révision a été créée : Fusion entre la révision #%(r1)d et la "
 "révision #%(r2)d"
+
+#: users/views.py:778
+#, python-brace-format
+msgid "User '{username}' already exists"
+msgstr "L'utilisateur '{username}' existe déjà"
+
+#: users/views.py:824
+#, python-brace-format
+msgid ""
+"You are re-using a password that you have used recently. You must have {0} "
+"distinct password(s) before reusing a previous password."
+msgstr "Vous réutilisez un mot de passe que vous avez déjà utilisé par le passé. Vous devez avoir "
+"{0} mots de passe différents avant de réutiliser un mot de passe déjà utilisé par le passé."

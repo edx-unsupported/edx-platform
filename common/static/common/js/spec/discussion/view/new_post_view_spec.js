@@ -228,7 +228,7 @@
                 view.render();
                 eventSpy = jasmine.createSpy('eventSpy');
                 view.listenTo(view, 'newPost:cancel', eventSpy);
-                view.$('.post-errors').html("<li class='post-error'>Title can't be empty</li>");
+                view.$('.post-errors').html("<li class='post-error'>gettext(\"Title can't be empty\");</li>");
                 view.$("label[for$='post-type-question']").click();
                 view.$('.js-post-title').val('Test Title');
                 view.$('.js-post-body textarea').val('Test body');

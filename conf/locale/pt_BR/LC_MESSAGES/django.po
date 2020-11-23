@@ -17009,7 +17009,7 @@ msgstr "Resultados:"
 
 #: lms/templates/discussion/_discussion_inline.html
 msgid "Topic:"
-msgstr ""
+msgstr "Tópico:"
 
 #: lms/templates/discussion/_discussion_inline.html
 msgid "Show Discussion"
@@ -25867,3 +25867,16 @@ msgid ""
 msgstr ""
 "Uma nova revisão foi criada: combinar entre Revisão #%(r1)d e Revisão "
 "#%(r2)d"
+
+#: users/views.py:778
+#, python-brace-format
+msgid "User '{username}' already exists"
+msgstr "O usuário '{username}' já existe"
+
+#: users/views.py:824
+#, python-brace-format
+msgid ""
+"You are re-using a password that you have used recently. You must have {0} "
+"distinct password(s) before reusing a previous password."
+msgstr "Você está reutilizando uma senha que usou recentemente. Você deve ter {0} "
+"senha(s) distinta(s) antes de reutilizar uma senha anterior"

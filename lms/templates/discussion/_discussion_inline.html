@@ -24,17 +24,21 @@ from openedx.core.djangolib.js_utils import js_escaped_string
     % endif
     <div class="discussion-module-header">
         <h3 class="hd hd-3 discussion-module-title">${_(display_name)}</h3>
+        <button class="discussion-show btn"
+        data-discussion-id="${discussion_id}"
+        ${"disabled=disabled" if not user.is_authenticated else ""}>
+        <span class="button-text">${_("Show Discussion")}</span>
+        </button>
+        
+        <div class="add_post_btn_container">
+            <button class="btn-link new-post-btn">${_("Add a Post")}</button>
+    </div>
         <div class="inline-discussion-topic"><span class="inline-discussion-topic-title">${_("Topic:")}</span> ${discussion_category}
               % if discussion_target:
                     / ${discussion_target}
               %endif
            </div>
     </div>
-    <button class="discussion-show btn"
-        data-discussion-id="${discussion_id}"
-        ${"disabled=disabled" if not user.is_authenticated else ""}>
-        <span class="button-text">${_("Show Discussion")}</span>
-    </button>
 
 </div>
 <script type="text/javascript">

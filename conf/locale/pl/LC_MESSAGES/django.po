@@ -305,8 +305,8 @@ msgid ""
 "You are re-using a password that you have used recently. You must have {0} "
 "distinct password(s) before reusing a previous password."
 msgstr ""
-"Używasz ponownie hasła, którego używałeś niedawno. Musisz ustawić {0} rożne "
-"hasło(-a), zanim powrócisz do poprzedniego."
+"Niedawno używałeś już tego hasła. Zanim będziesz mógł ponownie użyć tego samego hasła,"
+ " musisz użyć {0} innych haseł różnych od niego"
 
 #: edx_solutions_api_integration/users/views.py:803
 #, python-brace-format
@@ -26309,7 +26309,7 @@ msgstr ""
 
 #: wiki/templates/wiki/includes/revision_info.html
 msgid "by"
-msgstr ""
+msgstr "przez"
 
 #: wiki/templates/wiki/includes/revision_info.html
 msgid "restored"
@@ -26432,3 +26432,8 @@ msgstr ""
 #: edx_proctoring_proctortrack/backends/proctortrack_rest.py
 msgid "Click on the \"Start Proctored Exam\" button below to continue."
 msgstr ""
+
+#: users/views.py:778
+#, python-brace-format
+msgid "User '{username}' already exists"
+msgstr "Użytkownik o nazwie '{username}' już istnieje"

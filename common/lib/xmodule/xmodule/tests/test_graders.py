@@ -10,8 +10,6 @@ import ddt
 from pytz import UTC
 import six
 from six import text_type
-
-from lms.djangoapps.grades.scores import compute_percent
 from xmodule import graders
 from xmodule.graders import AggregatedScore, ProblemScore, ShowCorrectness, aggregate_scores
 
@@ -100,10 +98,6 @@ class GraderTest(unittest.TestCase):
             self.graded_total = graded_total
             self.display_name = display_name
 
-        @property
-        def percent_graded(self):
-            return compute_percent(self.graded_total.earned, self.graded_total.possible)
-
     common_fields = dict(graded=True, first_attempted=datetime.now())
     test_gradesheet = {
         'Homework': {
@@ -160,11 +154,11 @@ class GraderTest(unittest.TestCase):
         self.assertEqual(len(graded['section_breakdown']), 12 + 1)
 
         graded = overflow_grader.grade(self.test_gradesheet)
-        self.assertAlmostEqual(graded['percent'], 0.8879999999999999)  # 100% + 10% / 5 assignments
+        self.assertAlmostEqual(graded['percent'], 0.8880952380952382)  # 100% + 10% / 5 assignments
         self.assertEqual(len(graded['section_breakdown']), 7 + 1)
 
         graded = lab_grader.grade(self.test_gradesheet)
-        self.assertAlmostEqual(graded['percent'], 0.92249999999999999)
+        self.assertAlmostEqual(graded['percent'], 0.9226190476190477)
         self.assertEqual(len(graded['section_breakdown']), 7 + 1)
 
     def test_assignment_format_grader_on_single_section_entry(self):
@@ -180,7 +174,7 @@ class GraderTest(unittest.TestCase):
             self.assertEqual(graded['section_breakdown'][0]['label'], 'Midterm')
 
         graded = midterm_grader.grade(self.test_gradesheet)
-        self.assertAlmostEqual(graded['percent'], 0.50)
+        self.assertAlmostEqual(graded['percent'], 0.505)
         self.assertEqual(len(graded['section_breakdown']), 0 + 1)
 
     def test_weighted_subsections_grader(self):
@@ -218,17 +212,17 @@ class GraderTest(unittest.TestCase):
         empty_grader = graders.WeightedSubsectionsGrader([])
 
         graded = weighted_grader.grade(self.test_gradesheet)
-        self.assertAlmostEqual(graded['percent'], 0.50812499999999994)
+        self.assertAlmostEqual(graded['percent'], 0.5106547619047619)
         self.assertEqual(len(graded['section_breakdown']), (12 + 1) + (7 + 1) + 1)
         self.assertEqual(len(graded['grade_breakdown']), 3)
 
         graded = over_one_weights_grader.grade(self.test_gradesheet)
-        self.assertAlmostEqual(graded['percent'], 0.76624999999999999)
+        self.assertAlmostEqual(graded['percent'], 0.7688095238095238)
         self.assertEqual(len(graded['section_breakdown']), (12 + 1) + (7 + 1) + 1)
         self.assertEqual(len(graded['grade_breakdown']), 3)
 
         graded = zero_weights_grader.grade(self.test_gradesheet)
-        self.assertAlmostEqual(graded['percent'], 0.25)
+        self.assertAlmostEqual(graded['percent'], 0.2525)
         self.assertEqual(len(graded['section_breakdown']), (12 + 1) + (7 + 1) + 1)
         self.assertEqual(len(graded['grade_breakdown']), 3)
 
@@ -319,7 +313,7 @@ class GraderTest(unittest.TestCase):
         empty_grader = graders.grader_from_conf([])
 
         graded = weighted_grader.grade(self.test_gradesheet)
-        self.assertAlmostEqual(graded['percent'], 0.50812499999999994)
+        self.assertAlmostEqual(graded['percent'], 0.5106547619047619)
         self.assertEqual(len(graded['section_breakdown']), (12 + 1) + (7 + 1) + 1)
         self.assertEqual(len(graded['grade_breakdown']), 3)
 
