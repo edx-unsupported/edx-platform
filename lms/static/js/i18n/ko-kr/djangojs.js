@@ -4,7 +4,7 @@
 
   var django = globals.django || (globals.django = {});
 
-
+  
   django.pluralidx = function(n) {
     var v=0;
     if (typeof(v) == 'boolean') {
@@ -13,14 +13,13 @@
       return v;
     }
   };
-
+  
 
   /* gettext library */
 
   django.catalog = django.catalog || {};
-
+  
   var newcatalog = {
-    " menu to see a list of all topics.": " \uba54\ub274\ub97c \uc0ac\uc6a9\ud558\uc5ec \ubaa8\ub4e0 \uc8fc\uc81c\uc758 \ubaa9\ub85d\uc744 \ubcfc \uc218 \uc788\uc2b5\ub2c8\ub2e4.",
     "%(comments_count)s %(span_sr_open)scomments %(span_close)s": "%(comments_count)s\uac1c %(span_sr_open)s\ub313\uae00 %(span_close)s",
     "%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s unread comments)%(span_close)s": "%(comments_count)s\uac1c %(span_sr_open)s\ub313\uae00(%(unread_comments_count)s\uac1c \uc77d\uc9c0 \uc54a\uc740 \ub313\uae00)%(span_close)s",
     "%(num_questions)s question": [
@@ -85,6 +84,8 @@
     "An error occurred retrieving your email. Please try again later, and contact technical support if the problem persists.": "\uc774\uba54\uc77c\uc744 \uac80\uc0c9\ud558\ub294 \ub3d9\uc548 \uc624\ub958\uac00 \ubc1c\uc0dd\ud588\uc2b5\ub2c8\ub2e4. \ub098\uc911\uc5d0 \ub2e4\uc2dc \uc2dc\ub3c4\ud55c \ud6c4, \ubb38\uc81c\uac00 \uc9c0\uc18d\ub418\uba74 \uae30\uc220 \uc9c0\uc6d0\ud300\uc5d0 \uc5f0\ub77d\uc8fc\uc138\uc694.",
     "An error occurred. Make sure that the student's username or email address is correct and try again.": "\uc624\ub958\uac00 \ubc1c\uc0dd\ud588\uc2b5\ub2c8\ub2e4. \ud559\uc2b5\uc790\uc758 \uc544\uc774\ub514\uc640 \uc774\uba54\uc77c \uc8fc\uc18c\uac00 \uc62c\ubc14\ub978\uc9c0 \ud655\uc778\ud558\uace0 \ub2e4\uc2dc \uc2dc\ub3c4\ud574 \uc8fc\uc138\uc694.",
     "An error occurred. Please try again.": "\uc624\ub958\uac00 \ubc1c\uc0dd\ud588\uc2b5\ub2c8\ub2e4. \uc7a0\uc2dc \ud6c4\uc5d0 \ub2e4\uc2dc \uc2dc\ub3c4\ud558\uc138\uc694.",
+    "Announcement": "\uacf5\uc9c0\uc0ac\ud56d",
+    "Announcements": "\uacf5\uc9c0\uc0ac\ud56d",
     "Any divided discussion topics are divided based on cohort.": "\uad6c\ubd84\ub41c \ud1a0\ub860 \uc8fc\uc81c\uac00 \ubaa8\ub450 \uc9d1\ub2e8\uc744 \uae30\uc900\uc73c\ub85c \uad6c\ubd84\ub429\ub2c8\ub2e4.",
     "Any divided discussion topics are divided based on enrollment track.": "\uad6c\ubd84\ub41c \ud1a0\ub860 \uc8fc\uc81c\uac00 \ubaa8\ub450 \ub4f1\ub85d \ud2b8\ub799\uc744 \uae30\uc900\uc73c\ub85c \uad6c\ubd84\ub429\ub2c8\ub2e4.",
     "April": "4\uc6d4",
@@ -96,6 +97,7 @@
     "Available %s": "\uc774\uc6a9 \uac00\ub2a5\ud55c %s",
     "Blockquote": "\ube14\ub85d \uc778\uc6a9",
     "Blockquote (Ctrl+Q)": "\ube14\ub85d\uc778\uc6a9 (Ctrl+Q)",
+    "Body can't be empty": "\ubcf8\ubb38\uc740 \ube44\uc6cc\ub458 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4.",
     "Bold (Ctrl+B)": "\uc9c4\ud558\uac8c (Ctrl+B)",
     "Bulleted List (Ctrl+U)": "\uae00\uba38\ub9ac\ud45c (Ctrl+U)",
     "Cancel": "\ucde8\uc18c",
@@ -205,6 +207,7 @@
     "Following": "\ud314\ub85c\uc789",
     "Full Name": "\uc2e4\uba85",
     "Gender": "\uc131 ",
+    "Group Work": "\uadf8\ub8f9 \uacfc\uc81c",
     "Heading": "\uc81c\ubaa9",
     "Heading (Ctrl+H)": "\uc81c\ubaa9 (Ctrl+H)",
     "Hide": "\uac10\ucd94\uae30",
@@ -226,6 +229,7 @@
     "June": "6\uc6d4",
     "KB": "KB",
     "Language": "\uc5b8\uc5b4",
+    "Leaderboards": "\ub9ac\ub354\ubcf4\ub4dc",
     "Less": "\uc801\uac8c",
     "Linking": "\uc5f0\uacb0\ud558\uae30",
     "Links are generated on demand and expire within 5 minutes due to the sensitive nature of student information.": "\uc694\uccad\uc5d0 \uc758\ud574 \uc0dd\uc131\ub41c \ub9c1\ud06c\ub294 \ud559\uc2b5\uc790 \uc815\ubcf4 \ubcf4\ud638\ub97c \uc704\ud574  5\ubd84 \ub0b4\uc5d0 \uc18c\uba78\ub429\ub2c8\ub2e4.",
@@ -277,6 +281,7 @@
     "Only properly formatted .csv files will be accepted.": "\uc801\ud569\ud55c .csv \ud30c\uc77c\ub9cc \uc62c\ub9b4 \uc218 \uc788\uc2b5\ub2c8\ub2e4. ",
     "Open": "\uc5f4\uae30",
     "Order No.": "\uc8fc\ubb38 \ubc88\ud638",
+    "Other": "\uae30\ud0c0",
     "Password": "\ube44\ubc00\ubc88\ud638",
     "Photo Captured successfully.": "\uc0ac\uc9c4\uc774 \uc131\uacf5\uc801\uc73c\ub85c \ucea1\uccd0\ub418\uc5c8\uc2b5\ub2c8\ub2e4.",
     "Pin": "\uace0\uc815",
@@ -295,6 +300,7 @@
     "Previous": "\uc774\uc804",
     "Professional Education": "\uc804\ubb38 \uad50\uc721 \uacfc\uc815",
     "Professional Education Verified Certificate": "\uc804\ubb38 \uacfc\uc815 \uc774\uc218\uc99d",
+    "Progress": "\uc9c4\ub3c4\uc728",
     "Question": "\uc9c8\ubb38",
     "Questions raise issues that need answers. Discussions share ideas and start conversations.": "\uc9c8\ubb38\uc744 \ud1b5\ud574 \ub2f5\ubcc0\uc744 \ud544\uc694\ub85c \ud558\ub294 \ubb38\uc81c\ub97c \uc81c\uae30\ud560 \uc218 \uc788\uc73c\uba70, \ud1a0\ub860\uc744 \ud1b5\ud574 \uc758\uacac\uc744 \uacf5\uc720\ud558\uace0 \ub300\ud654\ub97c \uc2dc\uc791\ud560 \uc218 \uc788\uc2b5\ub2c8\ub2e4.",
     "Questions raise issues that need answers. Discussions share ideas and start conversations. (Required)": "\uc9c8\ubb38\uc744 \ud1b5\ud574 \ub2f5\ubcc0\uc744 \ud544\uc694\ub85c \ud558\ub294 \ubb38\uc81c\ub97c \uc81c\uae30\ud560 \uc218 \uc788\uc73c\uba70, \ud1a0\ub860\uc744 \ud1b5\ud574 \uc758\uacac\uc744 \uacf5\uc720\ud558\uace0 \ub300\ud654\ub97c \uc2dc\uc791\ud560 \uc218 \uc788\uc2b5\ub2c8\ub2e4(\ud544\uc218).",
@@ -337,7 +343,6 @@
     "Settings": "\uc124\uc815",
     "Show": "\ubcf4\uae30",
     "Show Comment (%(num_comments)s)": [
-      "\ub313\uae00 \ud45c\uc2dc(%(num_comments)s\uac1c)",
       "\ub313\uae00 \ud45c\uc2dc(%(num_comments)s\uac1c)"
     ],
     "Show Discussion": "\ud1a0\ub860 \ud45c\uc2dc",
@@ -345,8 +350,7 @@
     "Show posts by {username}.": "{username}\ub2d8\uc774 \uc791\uc131\ud55c \uac8c\uc2dc\uae00\uc744 \ud45c\uc2dc\ud569\ub2c8\ub2e4.",
     "Showing all responses": "\ubaa8\ub4e0 \uc751\ub2f5 \ud45c\uc2dc \uc911",
     "Showing first response": [
-      "\uccab \ubc88\uc9f8 \uc751\ub2f5 \ud45c\uc2dc \uc911",
-      "\ucc98\uc74c {numResponses}\uac1c \uc751\ub2f5 \ud45c\uc2dc \uc911"
+      "\uccab \ubc88\uc9f8 \uc751\ub2f5 \ud45c\uc2dc \uc911"
     ],
     "Sign in": "\ub85c\uadf8\uc778",
     "Some images in this post have been omitted": "\uc774 \uac8c\uc2dc\uae00\uc758 \uc77c\ubd80 \uc774\ubbf8\uc9c0\uac00 \uc0dd\ub7b5\ub428",
@@ -414,6 +418,7 @@
     "This post could not be unpinned. Refresh the page and try again.": "\uc774 \uac8c\uc2dc\uae00\uc744 \uace0\uc815 \ucde8\uc18c\ud560 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4. \ud398\uc774\uc9c0\ub97c \uc0c8\ub85c\uace0\uce68\ud55c \ub2e4\uc74c \ub2e4\uc2dc \uc2dc\ub3c4\ud574 \ubcf4\uc2ed\uc2dc\uc624.",
     "This post is visible only to %(group_name)s.": "%(group_name)s\uc5d0\uac8c\ub9cc \uacf5\uac1c\ub41c \uac8c\uc2dc\uae00\uc785\ub2c8\ub2e4.",
     "This post is visible to everyone.": "\ubaa8\ub4e0 \uc0ac\uc6a9\uc790\uc5d0\uac8c \uacf5\uac1c\ub41c \uac8c\uc2dc\uae00\uc785\ub2c8\ub2e4.",
+    "This post will be visible to everyone.": "\uc774 \uac8c\uc2dc\ubb3c\uc740 \ubaa8\ub4e0 \uc0ac\uc6a9\uc790\uc5d0\uac8c \ud45c\uc2dc\ub429\ub2c8\ub2e4.",
     "This response could not be marked as an answer. Refresh the page and try again.": "\uc774 \uc751\ub2f5\uc744 \ub2f5\ubcc0\uc73c\ub85c \ud45c\uc2dc\ud560 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4. \ud398\uc774\uc9c0\ub97c \uc0c8\ub85c\uace0\uce68\ud55c \ub2e4\uc74c \ub2e4\uc2dc \uc2dc\ub3c4\ud574 \ubcf4\uc2ed\uc2dc\uc624.",
     "This response could not be marked as endorsed. Refresh the page and try again.": "\uc774 \uc751\ub2f5\uc744 \uc778\uc99d \ud45c\uc2dc\ud560 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4. \ud398\uc774\uc9c0\ub97c \uc0c8\ub85c\uace0\uce68\ud55c \ub2e4\uc74c \ub2e4\uc2dc \uc2dc\ub3c4\ud574 \ubcf4\uc2ed\uc2dc\uc624.",
     "This response could not be unendorsed. Refresh the page and try again.": "\uc774 \uc751\ub2f5\uc744 \uc778\uc99d \ucde8\uc18c\ud560 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4. \ud398\uc774\uc9c0\ub97c \uc0c8\ub85c\uace0\uce68\ud55c \ub2e4\uc74c \ub2e4\uc2dc \uc2dc\ub3c4\ud574 \ubcf4\uc2ed\uc2dc\uc624.",
@@ -422,7 +427,10 @@
     "This vote could not be processed. Refresh the page and try again.": "\uc774 \ud22c\ud45c\ub97c \ucc98\ub9ac\ud560 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4. \ud398\uc774\uc9c0\ub97c \uc0c8\ub85c\uace0\uce68\ud55c \ub2e4\uc74c \ub2e4\uc2dc \uc2dc\ub3c4\ud574 \ubcf4\uc2ed\uc2dc\uc624.",
     "Time Sent": "\ubcf4\ub0b8 \uc2dc\uac04",
     "Time Sent:": "\ubcf4\ub0b8 \uc2dc\uac04:",
+    "Title": "\uc81c\ubaa9",
+    "Title can't be empty": "\uc81c\ubaa9\uc740 \ube44\uc6cc\ub458 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4.",
     "Today": "\uc624\ub298",
+    "Today at ": "\uc2dc\uac04(\uc624\ub298):",
     "Toggle Notifications Setting": "\uc54c\ub9bc \uc124\uc815 \uc804\ud658",
     "Tomorrow": "\ub0b4\uc77c",
     "Topic area": "\uc8fc\uc81c \uc601\uc5ed",
@@ -476,6 +484,7 @@
     "Year of Birth": "\ucd9c\uc0dd\uc5f0\ub3c4",
     "Yesterday": "\uc5b4\uc81c",
     "You are not permitted to view this discussion.": "\uc774 \ud1a0\ub860\uc744 \ubcfc \uad8c\ud55c\uc774 \uc5c6\uc2b5\ub2c8\ub2e4.",
+    "You are now": "\ud604\uc7ac:",
     "You could not be subscribed to this post. Refresh the page and try again.": "\uc774 \uac8c\uc2dc\uae00\uc744 \uad6c\ub3c5\ud560 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4. \ud398\uc774\uc9c0\ub97c \uc0c8\ub85c\uace0\uce68\ud55c \ub2e4\uc74c \ub2e4\uc2dc \uc2dc\ub3c4\ud574 \ubcf4\uc2ed\uc2dc\uc624.",
     "You could not be unsubscribed from this post. Refresh the page and try again.": "\uc774 \uac8c\uc2dc\uae00\uc744 \uad6c\ub3c5 \ucde8\uc18c\ud560 \uc218 \uc5c6\uc2b5\ub2c8\ub2e4. \ud398\uc774\uc9c0\ub97c \uc0c8\ub85c\uace0\uce68\ud55c \ub2e4\uc74c \ub2e4\uc2dc \uc2dc\ub3c4\ud574 \ubcf4\uc2ed\uc2dc\uc624.",
     "You currently have no cohorts configured": "\uc124\uc815\ub41c \ud559\uc2b5 \uc9d1\ub2e8\uc774 \ud604\uc7ac \uc5c6\uc2b5\ub2c8\ub2e4.",
@@ -511,6 +520,7 @@
     "about an hour": "\uc57d \ud55c \uc2dc\uac04 \uc815\ub3c4",
     "anonymous": "\uc775\uba85",
     "answered question": "\ub2f5\ubcc0\uc774 \uc788\ub294 \uc9c8\ubb38",
+    "by": "\uc791\uc131\uc790",
     "bytes": "bytes",
     "discussion": "\ud1a0\ub860",
     "discussion posted": "\ud1a0\ub860\uc774 \uac8c\uc2dc\ub428",
@@ -527,10 +537,13 @@
     "enter link description here": "\ub9c1\ud06c \uc124\uba85\uc744 \uc5ec\uae30\uc5d0 \uc785\ub825\ud558\uc138\uc694",
     "find discussions": "\ud1a0\ub860 \ucc3e\uae30",
     "follow this post": "\uc774 \uac8c\uc2dc\uae00 \ud314\ub85c\uc6b0",
+    "for": "\ub300\uc0c1:",
     "image omitted": "\uc774\ubbf8\uc9c0 \uc0dd\ub7b5\ub428",
+    "in the cohort!": "(\uc9d1\ub2e8 \ub0b4)",
     "less than a minute": "\uc77c\ubd84 \uc774\ub0b4",
     "marked as answer %(time_ago)s": "%(time_ago)s\uc5d0 \ub2f5\ubcc0\uc73c\ub85c \ud45c\uc2dc\ub428",
     "marked as answer %(time_ago)s by %(user)s": "%(time_ago)s\uc5d0 %(user)s\uc774(\uac00) \ub2f5\ubcc0\uc73c\ub85c \ud45c\uc2dc\ud568",
+    "menu to see a list of all topics.": " \uba54\ub274\ub97c \uc0ac\uc6a9\ud558\uc5ec \ubaa8\ub4e0 \uc8fc\uc81c\uc758 \ubaa9\ub85d\uc744 \ubcfc \uc218 \uc788\uc2b5\ub2c8\ub2e4.",
     "name": "\uc774\ub984",
     "one letter Friday\u0004F": "\uae08",
     "one letter Monday\u0004M": "\uc6d4",
@@ -542,24 +555,21 @@
     "post anonymously": "\uc775\uba85\uc73c\ub85c \uac8c\uc2dc",
     "post anonymously to classmates": "\uac19\uc740 \uc218\uac15\uc790\uc5d0\uac8c \uc775\uba85\uc73c\ub85c \uac8c\uc2dc",
     "posted %(time_ago)s by %(author)s": "%(time_ago)s\uc5d0 %(author)s\uc774(\uac00) \uac8c\uc2dc\ud568",
+    "question posted": "\uc774(\uac00) \uac8c\uc2dc\ud55c \uc9c8\ubb38",
     "question posted %(time_ago)s by %(author)s": "%(time_ago)s\uc5d0 %(author)s\uc774(\uac00) \uac8c\uc2dc\ud55c \uc9c8\ubb38",
     "strong text": "\uac15\ud558\uac8c",
     "team count": "\ud300 \uc778\uc6d0 \uc218",
     "there is currently {numVotes} vote": [
-      "\ud604\uc7ac {numVotes}\ud45c\ub97c \ubc1b\uc74c",
       "\ud604\uc7ac {numVotes}\ud45c\ub97c \ubc1b\uc74c"
     ],
     "unanswered question": "\ub2f5\ubcc0\uc774 \uc5c6\ub294 \uc9c8\ubb38",
     "{numResponses} other response": [
-      "\uae30\ud0c0 \uc751\ub2f5 {numResponses}\uac1c",
       "\uae30\ud0c0 \uc751\ub2f5 {numResponses}\uac1c"
     ],
     "{numResponses} response": [
-      "\uc751\ub2f5 {numResponses}\uac1c",
       "\uc751\ub2f5 {numResponses}\uac1c"
     ],
     "{numVotes} Vote": [
-      "{numVotes}\ud45c",
       "{numVotes}\ud45c"
     ],
     "{unread_comments_count} new": "\uc2e0\uaddc {unread_comments_count}\uac1c",
@@ -568,7 +578,7 @@
   for (var key in newcatalog) {
     django.catalog[key] = newcatalog[key];
   }
-
+  
 
   if (!django.jsi18n_initialized) {
     django.gettext = function(msgid) {

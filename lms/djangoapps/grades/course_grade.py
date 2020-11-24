@@ -16,7 +16,6 @@ from openedx.core.lib.grade_utils import round_away_from_zero
 from xmodule import block_metadata_utils
 
 from .config import assume_zero_if_absent
-from .scores import compute_percent
 from .subsection_grade import ZeroSubsectionGrade
 from .subsection_grade_factory import SubsectionGradeFactory
 
