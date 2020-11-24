@@ -130,7 +130,7 @@ jobs:
          command: |
            source ~/virtualenvs/venv-3.5.2/bin/activate
            ./scripts/all-tests.sh
-         no_output_timeout: 15m
+         no_output_timeout: 20m
 
      # If you have enabled coveralls for your repo, configure your COVERALLS_REPO_TOKEN
      # as an Environment Variable in the Project Settings on CircleCI, and coverage

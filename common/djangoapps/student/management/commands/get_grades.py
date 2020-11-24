@@ -17,6 +17,9 @@ import csv
 
 
 class Command(BaseCommand):
+    """
+    Management command to generate a list of grades for all students that are enrolled in a course.
+    """
 
     help = """
     Generate a list of grades for all students
@@ -108,7 +111,9 @@ class Command(BaseCommand):
             percents = {section['label']: section['percent'] for section in grade['section_breakdown']}
             row_percents = [percents[label] for label in header]
             if student.username in cert_grades:
-                rows.append([student.email, student.username, cert_grades[student.username], grade['percent']] + row_percents)
+                rows.append(
+                    [student.email, student.username, cert_grades[student.username], grade['percent']] + row_percents
+                )
             else:
                 rows.append([student.email, student.username, "N/A", grade['percent']] + row_percents)
         with open(options['output'], 'wb') as f:
