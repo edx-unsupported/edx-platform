@@ -100,9 +100,14 @@ from openedx.core.djangolib.markup import HTML, Text
                             <div class="nav-sub">
                                 <ul>
                                 % for child in block['children']:
-                                <li class="nav-item">
-                                    <a href="${xblock_studio_url(child)}">${child.display_name_with_default}</a>
-                                </li>
+                                    <%
+                                    url = xblock_studio_url(child)
+                                    %>
+                                    % if url:
+                                        <li class="nav-item">
+                                            <a href="${url}">${child.display_name_with_default}</a>
+                                        </li>
+                                    % endif
                                 % endfor
                                 </ul>
                             </div>
