@@ -1343,10 +1343,6 @@ msgstr ""
 msgid "Prev"
 msgstr ""
 
-#: cms/templates/js/asset-library.underscore
-msgid "Preview"
-msgstr "Podgląd"
-
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
@@ -2300,60 +2296,11 @@ msgstr "upuszczenie na cel"
 #. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
-msgid "%s ago"
-msgstr "%s temu"
-
-#. Translators: %s will be a time quantity, such as "4 minutes" or "1 day"
-#: common/static/js/src/jquery.timeago.locale.js
-#, javascript-format
 msgid "%s from now"
 msgstr ""
 
 #: common/static/js/src/jquery.timeago.locale.js
-msgid "less than a minute"
-msgstr "mniej niż minutę"
-
-#: common/static/js/src/jquery.timeago.locale.js
-msgid "about a minute"
-msgstr "około minuty"
-
-#: common/static/js/src/jquery.timeago.locale.js
-#, javascript-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-
-#: common/static/js/src/jquery.timeago.locale.js
-msgid "about an hour"
-msgstr ""
-
-#: common/static/js/src/jquery.timeago.locale.js
-#, javascript-format
-msgid "about %d hour"
-msgid_plural "about %d hours"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-
-#: common/static/js/src/jquery.timeago.locale.js
 msgid "a day"
-msgstr ""
-
-#: common/static/js/src/jquery.timeago.locale.js
-#, javascript-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-
-#: common/static/js/src/jquery.timeago.locale.js
-msgid "about a month"
 msgstr ""
 
 #: common/static/js/src/jquery.timeago.locale.js
@@ -2364,10 +2311,6 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
-
-#: common/static/js/src/jquery.timeago.locale.js
-msgid "about a year"
-msgstr ""
 
 #: common/static/js/src/jquery.timeago.locale.js
 #, javascript-format
@@ -3039,52 +2982,12 @@ msgstr[2] "Znaleziono %(errorCount)s błędów w formularzu."
 msgstr[3] "Znaleziono %(errorCount)s błędów w formularzu."
 
 #: lms/static/js/Markdown.Editor.js
-msgid "Bold (Ctrl+B)"
-msgstr "Pogrubienie (Ctrl+B)"
-
-#: lms/static/js/Markdown.Editor.js
-msgid "Italic (Ctrl+I)"
-msgstr "Kursywa (Ctrl+I)"
-
-#: lms/static/js/Markdown.Editor.js
-msgid "Hyperlink (Ctrl+L)"
-msgstr "Odnośnik (Ctrl+L)"
-
-#: lms/static/js/Markdown.Editor.js
-msgid "Blockquote (Ctrl+Q)"
-msgstr "Długi cytat (Ctrl+Q)"
-
-#: lms/static/js/Markdown.Editor.js
 msgid "Code Sample (Ctrl+K)"
 msgstr "Przykładowy kod (Ctrl+K)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Image (Ctrl+G)"
 msgstr "Obraz (Ctrl+G)"
-
-#: lms/static/js/Markdown.Editor.js
-msgid "Numbered List (Ctrl+O)"
-msgstr "Lista numerowana (Ctrl+O)"
-
-#: lms/static/js/Markdown.Editor.js
-msgid "Bulleted List (Ctrl+U)"
-msgstr "Lista punktowana (Ctrl+U)"
-
-#: lms/static/js/Markdown.Editor.js
-msgid "Heading (Ctrl+H)"
-msgstr "Nagłówek (Ctrl+H)"
-
-#: lms/static/js/Markdown.Editor.js
-msgid "Horizontal Rule (Ctrl+R)"
-msgstr "Linia pozioma (Ctrl+R)"
-
-#: lms/static/js/Markdown.Editor.js
-msgid "Undo (Ctrl+Z)"
-msgstr "Cofnij (Ctrl+Z)"
-
-#: lms/static/js/Markdown.Editor.js
-msgid "Redo (Ctrl+Y)"
-msgstr "Popraw (Ctrl+Y)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Redo (Ctrl+Shift+Z)"
@@ -7300,10 +7203,6 @@ msgstr "Nie udało się opublikować Twojej wiadomości."
 #: common/static/common/templates/discussion/templates.underscore
 #, python-format
 msgid "This post will be visible only to %(group_name)s."
-msgstr ""
-
-#: common/static/common/templates/discussion/templates.underscore
-msgid "This post will be visible to everyone."
 msgstr ""
 
 #: common/static/common/templates/discussion/templates.underscore

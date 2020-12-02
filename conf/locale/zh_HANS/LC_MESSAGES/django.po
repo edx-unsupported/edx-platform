@@ -24588,3 +24588,15 @@ msgstr "要确认已开始监控，请确保您的网络摄像头源和蓝色的
 #: edx_proctoring_proctortrack/backends/proctortrack_rest.py
 msgid "Click on the \"Start Proctored Exam\" button below to continue."
 msgstr "点击下方的“开始监考考试”按钮继续"
+
+#: users/views.py:778
+#, python-brace-format
+msgid "User '{username}' already exists"
+msgstr "用户“{username}”已存在"
+
+#: users/views.py:824
+#, python-brace-format
+msgid ""
+"You are re-using a password that you have used recently. You must have {0} "
+"distinct password(s) before reusing a previous password."
+msgstr "您正在重复使用最近使用过的密码  在重复使用以前的密码之前，您必须使用过 {0} 个不同的密码"

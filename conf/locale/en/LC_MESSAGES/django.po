@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2020-06-02 20:41+0000\n"
-"PO-Revision-Date: 2020-06-02 20:41:03.431676\n"
+"POT-Creation-Date: 2020-12-02 09:06+0000\n"
+"PO-Revision-Date: 2020-12-02 09:06:51.891599\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "Language: en\n"
@@ -48,17 +48,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.8.0\n"
-
-#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
-#. Translators: 'Discussion' refers to the tab in the courseware that leads to
-#. the discussion forums
-#: cms/djangoapps/contentstore/views/component.py
-#: lms/djangoapps/courseware/tabs.py lms/djangoapps/discussion/plugins.py
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
-#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
-#: lms/templates/ux/reference/bootstrap/course-skeleton.html
-msgid "Discussion"
-msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py
 #: common/lib/xmodule/xmodule/video_module/video_module.py
@@ -224,6 +213,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/annotatable_module.py
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/conditional_module.py
+#: common/lib/xmodule/xmodule/discussion_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/library_content_module.py
 #: common/lib/xmodule/xmodule/lti_module.py
@@ -232,6 +222,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 #: common/lib/xmodule/xmodule/x_module.py
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion_course/xblock_discussion_course.py
 #: cms/templates/container.html cms/templates/library.html
 msgid "Display Name"
 msgstr ""
@@ -906,6 +897,13 @@ msgstr ""
 #: common/djangoapps/third_party_auth/models.py
 #, python-brace-format
 msgid "{platform_name} Support"
+msgstr ""
+
+#: common/djangoapps/third_party_auth/pipeline.py
+#, python-brace-format
+msgid ""
+"This account has not yet been activated. An activation email has been re-"
+"sent to {email_address}."
 msgstr ""
 
 #: common/djangoapps/third_party_auth/templates/third_party_auth/post_custom_auth_entry.html
@@ -2081,6 +2079,7 @@ msgid "Per Student"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/discussion_module.py
 msgid "XML data for the problem"
 msgstr ""
 
@@ -3252,6 +3251,43 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/discussion_module.py
+msgid "Discussion Id"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/discussion_module.py
+msgid "The id is a unique identifier for the discussion. It is non editable."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/discussion_module.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion_course/xblock_discussion_course.py
+msgid "Display name for this module"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/discussion_module.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
+msgid "Category"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/discussion_module.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
+msgid ""
+"A category name for the discussion. This name appears in the left pane of "
+"the discussion forum for the course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/discussion_module.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
+msgid "Subcategory"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/discussion_module.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
+msgid ""
+"A subcategory name for the discussion. This name appears in the left pane of"
+" the discussion forum for the course."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/graders.py
@@ -5640,6 +5676,16 @@ msgstr ""
 msgid "Textbooks"
 msgstr ""
 
+#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
+#. Translators: 'Discussion' refers to the tab in the courseware that leads to
+#. the discussion forums
+#: lms/djangoapps/courseware/tabs.py lms/djangoapps/discussion/plugins.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
+#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
+#: lms/templates/ux/reference/bootstrap/course-skeleton.html
+msgid "Discussion"
+msgstr ""
+
 #: lms/djangoapps/courseware/tabs.py
 msgid "Dates"
 msgstr ""
@@ -5739,6 +5785,7 @@ msgstr ""
 #: lms/djangoapps/courseware/views/views.py
 #: openedx/features/course_experience/views/course_home_messages.py
 #: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/navigation.html
 #: lms/templates/navigation/navbar-not-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
 msgid "Sign in"
@@ -6019,6 +6066,10 @@ msgid "Body can't be empty"
 msgstr ""
 
 #: lms/djangoapps/discussion/django_comment_client/base/views.py
+msgid "An anonymous user"
+msgstr ""
+
+#: lms/djangoapps/discussion/django_comment_client/base/views.py
 msgid "Topic doesn't exist"
 msgstr ""
 
@@ -6292,6 +6343,13 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Could not find problem with this location."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"A problem responses report generation task is already in progress. Check the"
+" 'Pending Tasks' table for the status of the task. When completed, the "
+"report will be available for download in the table below."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -7339,7 +7397,7 @@ msgstr ""
 
 #: lms/djangoapps/learner_dashboard/programs.py
 #: lms/templates/header/navbar-authenticated.html
-#: lms/templates/learner_dashboard/programs.html
+#: lms/templates/learner_dashboard/programs.html lms/templates/navigation.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/navigation/navbar-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-authenticated.html
@@ -10662,6 +10720,7 @@ msgstr ""
 
 #: openedx/core/djangoapps/user_authn/views/login.py
 #: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/navigation.html
 #: lms/templates/navigation/navbar-not-authenticated.html
 #: themes/edx.org/lms/templates/header/navbar-not-authenticated.html
 #: themes/stanford-style/lms/templates/register-form.html
@@ -11022,27 +11081,7 @@ msgid ""
 msgstr ""
 
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
-msgid "Category"
-msgstr ""
-
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
 msgid "Week 1"
-msgstr ""
-
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
-msgid ""
-"A category name for the discussion. This name appears in the left pane of "
-"the discussion forum for the course."
-msgstr ""
-
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
-msgid "Subcategory"
-msgstr ""
-
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
-msgid ""
-"A subcategory name for the discussion. This name appears in the left pane of"
-" the discussion forum for the course."
 msgstr ""
 
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion/__init__.py
@@ -11050,6 +11089,10 @@ msgstr ""
 msgid ""
 "You are not signed in. To view the discussion content, {sign_in_link} or "
 "{register_link}, and enroll in this course."
+msgstr ""
+
+#: openedx/core/lib/xblock_builtin/xblock_discussion_course/xblock_discussion_course.py
+msgid "Discussion Course"
 msgstr ""
 
 #: openedx/features/calendar_sync/ics.py
@@ -11574,6 +11617,10 @@ msgid "{platform_name} Support Levels:"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py
+msgid "Discussion - Do not use"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/component.py
 msgid "HTML"
 msgstr ""
 
@@ -11627,6 +11674,11 @@ msgid ""
 "You must link this course to an organization in order to continue. "
 "Organization you selected does not exist in the system, you will need to add"
 " it to the system"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/course.py
+#, python-brace-format
+msgid "Announcement on {date}"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
@@ -12117,6 +12169,7 @@ msgid "Course Outline"
 msgstr ""
 
 #: cms/templates/course_outline.html
+#: cms/templates/widgets/deprecated-course-key-warning.html
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Warning"
 msgstr ""
@@ -12143,6 +12196,7 @@ msgstr ""
 #: cms/templates/index.html lms/templates/courseware/courses.html
 #: lms/templates/header/navbar-authenticated.html
 #: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/navigation.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/navigation/navbar-authenticated.html
 #: lms/templates/navigation/navbar-not-authenticated.html
@@ -12222,7 +12276,7 @@ msgid ""
 msgstr ""
 
 #: cms/templates/widgets/header.html lms/templates/header/header.html
-#: lms/templates/navigation/navigation.html
+#: lms/templates/navigation.html lms/templates/navigation/navigation.html
 #: lms/templates/widgets/footer-language-selector.html
 msgid "Choose Language"
 msgstr ""
@@ -12316,6 +12370,12 @@ msgstr ""
 msgid "Code Editor"
 msgstr ""
 
+#: common/templates/discussion/_discussion_course_studio.html
+msgid ""
+"To view live course discussions, click Preview or View Live in Unit "
+"Settings."
+msgstr ""
+
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Feedback Form"
 msgstr ""
@@ -12369,14 +12429,18 @@ msgid "Your {platform_name} account email has been updated"
 msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
+#: lms/templates/discussion/_discussion_course_navigation.html
+#: lms/templates/discussion/_discussion_inline.html
 msgid "Add a Post"
 msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
+#: lms/templates/discussion/index.html
 msgid "New topic form"
 msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_board_fragment.html
+#: lms/templates/discussion/index.html
 msgid "Discussion thread list"
 msgstr ""
 
@@ -12391,7 +12455,7 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
-#: lms/templates/discussion/_user_profile.html
+#: lms/templates/discussion/__user_profile.html
 #, python-format
 msgid "%s discussion started"
 msgid_plural "%s discussions started"
@@ -12399,7 +12463,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
-#: lms/templates/discussion/_user_profile.html
+#: lms/templates/discussion/__user_profile.html
 #, python-format
 msgid "%s comment"
 msgid_plural "%s comments"
@@ -12490,6 +12554,7 @@ msgstr ""
 
 #: lms/templates/dashboard.html
 #: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/navigation.html
 #: lms/templates/navigation/bootstrap/navbar-authenticated.html
 #: lms/templates/navigation/navbar-authenticated.html
 #: themes/edx.org/lms/templates/dashboard.html
@@ -12907,6 +12972,59 @@ msgstr ""
 
 #: lms/templates/module-error.html
 msgid "Raw data:"
+msgstr ""
+
+#: lms/templates/navigation.html lms/templates/navigation/navigation.html
+msgid "Global"
+msgstr ""
+
+#: lms/templates/header/brand.html
+#: lms/templates/header/navbar-logo-header.html lms/templates/navigation.html
+#: lms/templates/navigation/bootstrap/navbar-logo-header.html
+#: lms/templates/navigation/navbar-logo-header.html
+msgid "{platform_name} Home Page"
+msgstr ""
+
+#. Translators: This is short for "System administration".
+#: lms/templates/header/navbar-authenticated.html
+#: lms/templates/navigation.html
+#: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: lms/templates/navigation/navbar-authenticated.html
+msgid "Sysadmin"
+msgstr ""
+
+#: lms/templates/header/navbar-authenticated.html
+#: lms/templates/navigation.html
+#: lms/templates/navigation/bootstrap/navbar-authenticated.html
+#: lms/templates/navigation/navbar-authenticated.html
+#: lms/templates/shoppingcart/shopping_cart.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+msgid "Shopping Cart"
+msgstr ""
+
+#: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/navigation.html
+#: lms/templates/navigation/navbar-not-authenticated.html
+#: themes/edx.org/lms/templates/header/navbar-authenticated.html
+msgid "How it Works"
+msgstr ""
+
+#: lms/templates/header/navbar-not-authenticated.html
+#: lms/templates/navigation.html
+#: lms/templates/navigation/navbar-not-authenticated.html
+msgid "Schools"
+msgstr ""
+
+#: lms/templates/navigation.html
+#: lms/templates/navigation/navbar-not-authenticated.html
+msgid "Explore Courses"
+msgstr ""
+
+#: lms/templates/header/header.html lms/templates/navigation.html
+#: lms/templates/navigation/navigation.html
+msgid ""
+"{begin_strong}Warning:{end_strong} Your browser is not fully supported. We "
+"strongly recommend using {chrome_link} or {ff_link}."
 msgstr ""
 
 #: lms/templates/preview_menu.html
@@ -15957,11 +16075,11 @@ msgid "Results:"
 msgstr ""
 
 #: lms/templates/discussion/_discussion_inline.html
-msgid "Topic:"
+msgid "Show Discussion"
 msgstr ""
 
 #: lms/templates/discussion/_discussion_inline.html
-msgid "Show Discussion"
+msgid "Topic:"
 msgstr ""
 
 #: lms/templates/discussion/_discussion_inline_studio.html
@@ -16046,6 +16164,25 @@ msgstr ""
 #. Translators: This is a menu option for sorting forum threads
 #: lms/templates/discussion/_thread_list_template.html
 msgid "by most votes"
+msgstr ""
+
+#: lms/templates/discussion/index.html
+#: lms/templates/discussion/user_profile.html
+msgid "Discussion - {course_number}"
+msgstr ""
+
+#: lms/templates/discussion/maintenance.html
+msgid "We're sorry"
+msgstr ""
+
+#: lms/templates/discussion/maintenance.html
+msgid ""
+"The forums are currently undergoing maintenance. We'll have them back up "
+"shortly!"
+msgstr ""
+
+#: lms/templates/discussion/user_profile.html
+msgid "User Profile"
 msgstr ""
 
 #: lms/templates/edxnotes/edxnotes.html
@@ -16614,21 +16751,8 @@ msgstr ""
 msgid "Apply for Financial Assistance"
 msgstr ""
 
-#: lms/templates/header/brand.html
-#: lms/templates/header/navbar-logo-header.html
-#: lms/templates/navigation/bootstrap/navbar-logo-header.html
-#: lms/templates/navigation/navbar-logo-header.html
-msgid "{platform_name} Home Page"
-msgstr ""
-
 #: lms/templates/header/header.html lms/templates/header/user_dropdown.html
 msgid "Options Menu"
-msgstr ""
-
-#: lms/templates/header/header.html lms/templates/navigation/navigation.html
-msgid ""
-"{begin_strong}Warning:{end_strong} Your browser is not fully supported. We "
-"strongly recommend using {chrome_link} or {ff_link}."
 msgstr ""
 
 #: lms/templates/header/navbar-authenticated.html
@@ -16636,34 +16760,8 @@ msgstr ""
 msgid "Discover New"
 msgstr ""
 
-#. Translators: This is short for "System administration".
-#: lms/templates/header/navbar-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: lms/templates/navigation/navbar-authenticated.html
-msgid "Sysadmin"
-msgstr ""
-
-#: lms/templates/header/navbar-authenticated.html
-#: lms/templates/navigation/bootstrap/navbar-authenticated.html
-#: lms/templates/navigation/navbar-authenticated.html
-#: lms/templates/shoppingcart/shopping_cart.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "Shopping Cart"
-msgstr ""
-
 #: lms/templates/header/navbar-not-authenticated.html
 msgid "Supplemental Links"
-msgstr ""
-
-#: lms/templates/header/navbar-not-authenticated.html
-#: lms/templates/navigation/navbar-not-authenticated.html
-#: themes/edx.org/lms/templates/header/navbar-authenticated.html
-msgid "How it Works"
-msgstr ""
-
-#: lms/templates/header/navbar-not-authenticated.html
-#: lms/templates/navigation/navbar-not-authenticated.html
-msgid "Schools"
 msgstr ""
 
 #: lms/templates/header/user_dropdown.html
@@ -18260,14 +18358,6 @@ msgstr ""
 msgid ""
 "Don't see your preferred language? {link_start}Volunteer to become a "
 "translator!{link_end}"
-msgstr ""
-
-#: lms/templates/navigation/navbar-not-authenticated.html
-msgid "Explore Courses"
-msgstr ""
-
-#: lms/templates/navigation/navigation.html
-msgid "Global"
 msgstr ""
 
 #: lms/templates/peer_grading/peer_grading.html
@@ -19981,7 +20071,7 @@ msgstr ""
 #: cms/templates/edit-tabs.html cms/templates/index.html
 #: cms/templates/library.html cms/templates/manage_users.html
 #: cms/templates/manage_users_lib.html cms/templates/textbooks.html
-#: cms/templates/videos_index.html
+#: cms/templates/ux/reference/container.html cms/templates/videos_index.html
 msgid "Page Actions"
 msgstr ""
 
@@ -22663,6 +22753,24 @@ msgstr ""
 
 #: cms/templates/registration/activation_invalid.html
 msgid "Return to the {link_start}home page{link_end}."
+msgstr ""
+
+#: cms/templates/widgets/deprecated-course-key-warning.html
+msgid "Support will be removed in an upcoming release."
+msgstr ""
+
+#: cms/templates/widgets/deprecated-course-key-warning.html
+msgid "Support will be removed on {expiration_date}."
+msgstr ""
+
+#: cms/templates/widgets/deprecated-course-key-warning.html
+msgid "This course uses a legacy storage format."
+msgstr ""
+
+#: cms/templates/widgets/deprecated-course-key-warning.html
+msgid ""
+"Please reach out to your support team contact, if you have any additional "
+"questions or concerns."
 msgstr ""
 
 #: cms/templates/widgets/footer.html

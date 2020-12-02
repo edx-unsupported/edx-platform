@@ -19,9 +19,6 @@ test_root/staticfiles
 # Gitignored xmodule stuff
 common/static/xmodule
 
-# Generated bundle files
-common/static/bundles
-
 
 # Symlinks into common/lib/xmodule/xmodule/js
 cms/static/xmodule_js

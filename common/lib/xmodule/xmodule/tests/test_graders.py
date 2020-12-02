@@ -276,7 +276,7 @@ class GraderTest(unittest.TestCase):
         ])
 
         graded = weighted_grader.grade(self.test_gradesheet)
-        self.assertAlmostEqual(graded['percent'], 0.50812499999999994)
+        self.assertAlmostEqual(graded['percent'], 0.5106547619047619)
         self.assertEqual(len(graded['section_breakdown']), (12 + 1) + (7 + 1) + 1)
         self.assertEqual(len(graded['grade_breakdown']), 3)
 

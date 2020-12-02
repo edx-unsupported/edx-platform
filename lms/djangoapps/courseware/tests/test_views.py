@@ -1952,7 +1952,7 @@ class ProgressPageShowCorrectnessTests(ProgressPageBaseTests):
 
         # Test overall sequential score
         if graded and max_score > 0:
-            percentageString = "{0:.0%}".format(percent) if max_score > 0 else ""
+            percentageString = "{0:.0%}".format(percent) if score > 0 and max_score > 0 else ""
             template = u'<span> ({0:.3n}/{1:.3n}) {2}</span>'
             expected_grade_summary = template.format(float(score),
                                                      float(max_score),

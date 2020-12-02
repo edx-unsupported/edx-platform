@@ -6842,11 +6842,11 @@ msgstr ""
 #: common/static/common/templates/discussion/templates.underscore
 #, python-format
 msgid "question posted %(time_ago)s by %(author)s"
-msgstr ""
+msgstr "由%(author)s于%(time_ago)s发布此问题"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Pinned"
-msgstr ""
+msgstr "已固定"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Reported"
@@ -6950,6 +6950,14 @@ msgstr ""
 msgid "unanswered question"
 msgstr ""
 
+#: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "discussion posted"
+msgstr "发布此讨论帖"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "question posted"
+msgstr "发布此问题"
+
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Following"
 msgstr ""
@@ -7038,6 +7046,10 @@ msgstr ""
 msgid "All Posts"
 msgstr "所有讨论帖"
 
+#: wiki/templates/wiki/includes/revision_info.html
+msgid "by"
+msgstr "由"
+
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Return to all posts"
 msgstr ""
@@ -7125,6 +7137,10 @@ msgid "Discussion Home"
 msgstr "讨论区"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Discussions"
+msgstr "讨论"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 #, python-format
 msgid "How to use %(platform_name)s discussions"
 msgstr "如何使用 %(platform_name)s 讨论"
@@ -7151,8 +7167,12 @@ msgid "Engage with posts"
 msgstr "参与讨论"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "engage with posts"
+msgstr "参与讨论"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Vote for good posts and responses"
-msgstr "为出色的发帖和回复投票"
+msgstr "为出色的帖子和回复投票"
 
 #: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
 msgid "Report abuse, topics, and responses"
@@ -7175,6 +7195,12 @@ msgid ""
 "Check this box to receive an email digest once a day notifying you about "
 "new, unread activity from posts you are following."
 msgstr "勾选此项，每天接收一封邮件，通知您所关注的讨论帖的最新未读情况。"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid ""
+"Earn points for your engagement by adding a new post or responding to an "
+"existing post."
+msgstr "通过添加新的文章或者回复现有文章，赢得参与积分。"
 
 #: lms/djangoapps/support/static/support/templates/certificates.underscore
 msgid "username or email"
@@ -10723,3 +10749,31 @@ msgstr "您变更了视频的 URL，但没有变更字幕文件。您希望继�
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 msgid "Use Current Transcript"
 msgstr "使用当前字幕"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "How to use discussions"
+msgstr "如何使用“讨论”"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "menu to see a list of all topics."
+msgstr "菜单查看所有主题的列表。"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Use the"
+msgstr "使用"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Search and filter all posts to find specific topics or posts."
+msgstr "“搜索和筛选所有帖子”以查找特定主题或帖子。"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Questions raise issues that need answers. Discussions share ideas and start conversations."
+msgstr "使用“问题”可提出需要解答的问题。使用“讨论”可分享想法并开始对话"
+
+#: discussions/views/new_post_view_spec.js
+msgid "Title can't be empty"
+msgstr "标题不能为空"
+
+#: discussions/views/new_post_view_spec.js
+msgid "Body can't be empty"
+msgstr "正文不能为空"
