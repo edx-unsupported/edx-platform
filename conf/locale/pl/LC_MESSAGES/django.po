@@ -7077,14 +7077,6 @@ msgid "full_name"
 msgstr "full_name"
 
 #: lms/djangoapps/discussion/django_comment_client/base/views.py
-msgid "Title can't be empty"
-msgstr "Tytuł nie może być pusty"
-
-#: lms/djangoapps/discussion/django_comment_client/base/views.py
-msgid "Body can't be empty"
-msgstr "Zawartość nie może być pusta"
-
-#: lms/djangoapps/discussion/django_comment_client/base/views.py
 msgid "Topic doesn't exist"
 msgstr "Temat nie istnieje"
 
@@ -26312,10 +26304,6 @@ msgid "New article below"
 msgstr ""
 
 #: wiki/templates/wiki/includes/revision_info.html
-msgid "by"
-msgstr "przez"
-
-#: wiki/templates/wiki/includes/revision_info.html
 msgid "restored"
 msgstr ""
 
@@ -26436,11 +26424,6 @@ msgstr ""
 #: edx_proctoring_proctortrack/backends/proctortrack_rest.py
 msgid "Click on the \"Start Proctored Exam\" button below to continue."
 msgstr ""
-
-#: users/views.py:778
-#, python-brace-format
-msgid "User '{username}' already exists"
-msgstr "Użytkownik o nazwie '{username}' już istnieje"
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Title can't be empty"

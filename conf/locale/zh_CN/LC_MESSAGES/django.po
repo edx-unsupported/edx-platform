@@ -24600,3 +24600,19 @@ msgid ""
 "You are re-using a password that you have used recently. You must have {0} "
 "distinct password(s) before reusing a previous password."
 msgstr "您正在重复使用最近使用过的密码  在重复使用以前的密码之前，您必须使用过 {0} 个不同的密码"
+
+#: lms/lib/utils.py:8
+#, python-format
+msgid ""
+"File type '%(detected_type)s' is not allowed. Allowed types are: "
+"'%(allowed_types)s'."
+msgstr ""
+"文件类型“%(detected_type)s”不受支持。支持的类型为：“%(allowed_types)s”。"
+
+#: lms/lib/utils.py:13
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+"文件扩展名“%(extension)s”不受支持。支持的扩展名为：“%(allowed_extensions)s”。"

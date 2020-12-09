@@ -4,23 +4,23 @@
 -e git+https://github.com/edx-solutions/xblock-mentoring.git@rebase-juniper#egg=xblock-mentoring==1.0
 -e git+https://github.com/edx-solutions/xblock-image-explorer.git@juniper-rebase#egg=xblock-image-explorer==2.0
 -e git+https://github.com/edx-solutions/xblock-drag-and-drop.git@rebase-juniper#egg=xblock-drag-and-drop==1.0
--e git+https://github.com/edx-solutions/xblock-drag-and-drop-v2.git@apros-master#egg=xblock-drag-and-drop-v2==2.5.2
+-e git+https://github.com/edx-solutions/xblock-drag-and-drop-v2.git@apros-master#egg=xblock-drag-and-drop-v2==2.5.3
 # This is required for A2E courses that were created with the temporary (xblock-drag-and-drop-v2-new) DnDv2 branch to continue to work.
 # FIXME: bump version to 2.1.6 when https://github.com/edx-solutions/xblock-drag-and-drop-v2/pull/154 merged and tagged
 #-e git+https://github.com/open-craft/xblock-drag-and-drop-v2.git@82c9dc5e16d10793e8b79e60661e1a78893fce25#egg=xblock-drag-and-drop-v2-new
 -e git+https://github.com/edx-solutions/xblock-ooyala.git@rebase-juniper#egg=xblock-ooyala==5.0.0
 
-git+https://github.com/edx-solutions/xblock-group-project.git@saqib/MCKIN-26250#egg=xblock-group-project==0.1.4
+git+https://github.com/edx-solutions/xblock-group-project.git@rebase-juniper#egg=xblock-group-project==1.0.0
 -e git+https://github.com/edx-solutions/xblock-adventure.git@rebase-juniper#egg=xblock-adventure==0.3
 -e git+https://github.com/open-craft/xblock-poll.git@v1.10.1#egg=xblock-poll==1.10.1
 -e git+https://github.com/open-craft/problem-builder.git@v4.1.7#egg=xblock-problem-builder==4.1.7
 #-e git+https://github.com/OfficeDev/xblock-officemix.git@86238f5968a08db005717dbddc1.9.6346808f1ed3716#egg=xblock-officemix
 -e git+https://github.com/open-craft/xblock-chat.git@v0.3.0#egg=chat-xblock==0.3.0
--e git+https://github.com/open-craft/xblock-eoc-journal.git@v0.9.3#egg=xblock-eoc-journal==0.9.3
--e git+https://github.com/mckinseyacademy/xblock-scorm.git@v3.0#egg=xblock-scorm==3.0
--e git+https://github.com/mckinseyacademy/xblock-diagnosticfeedback.git@v0.3.0#egg=xblock-diagnostic-feedback==0.3.0
+-e git+https://github.com/open-craft/xblock-eoc-journal.git@v0.9.4#egg=xblock-eoc-journal==0.9.4
+-e git+https://github.com/mckinseyacademy/xblock-scorm.git@v3.2.1#egg=xblock-scorm==3.2.1
+-e git+https://github.com/mckinseyacademy/xblock-diagnosticfeedback.git@v0.4.1#egg=xblock-diagnostic-feedback==0.4.1
 
--e git+https://github.com/open-craft/xblock-group-project-v2.git@0.11.0#egg=xblock-group-project-v2==0.11.0
+-e git+https://github.com/open-craft/xblock-group-project-v2.git@0.12.7#egg=xblock-group-project-v2==0.12.7
 -e git+https://github.com/open-craft/xblock-virtualreality.git@v0.1.5#egg=xblock-virtualreality==0.1.5
 
 -e git+https://github.com/edx/edx-notifications.git@rebase-juniper#egg=edx-notifications==3.0.0

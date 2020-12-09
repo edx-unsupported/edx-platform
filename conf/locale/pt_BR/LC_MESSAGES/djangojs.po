@@ -6986,14 +6986,6 @@ msgid "Update post"
 msgstr "Atualizar publicação"
 
 #: common/static/common/templates/discussion/templates.underscore
-msgid "discussion posted"
-msgstr "discussão postada"
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "question posted"
-msgstr "pergunta postada"
-
-#: common/static/common/templates/discussion/templates.underscore
 #, python-format
 msgid "Show Comment (%(num_comments)s)"
 msgid_plural "Show Comments (%(num_comments)s)"
@@ -7064,11 +7056,6 @@ msgstr "discussão postada"
 #: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "question posted"
 msgstr "pergunta postada"
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-#: common/static/common/templates/discussion/thread-show.underscore
-msgid "Pinned"
-msgstr "Marcado"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "Following"
@@ -7315,10 +7302,6 @@ msgid ""
 "Earn points for your engagement by adding a new post or responding to an "
 "existing post."
 msgstr "Ganhe pontos pelo seu engajamento adicionando uma nova publicação ou respondendo a uma publicação existente."
-
-#: lms/djangoapps/discussion/static/discussion/templates/user-profile.underscore
-msgid "All Posts"
-msgstr "Todas as Publicações"
 
 #: lms/djangoapps/support/static/support/templates/certificates.underscore
 msgid "username or email"
