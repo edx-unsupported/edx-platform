@@ -69,7 +69,7 @@ site_status_msg = get_site_status_msg(course_id)
         <span class="course-name">${display_name}</span></h2>
       % endif
 
-      % if user.is_authenticated():
+      % if user.is_authenticated:
         <ol class="left nav-global list-inline authenticated">
         <%block name="navigation_global_links_authenticated">
           % if settings.FEATURES.get('COURSES_ARE_BROWSABLE') and not show_program_listing:
@@ -168,7 +168,7 @@ site_status_msg = get_site_status_msg(course_id)
         <li class="primary">
           <form action="/i18n/setlang/" method="post" class="settings-language-form" id="language-settings-form">
             <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
-            % if user.is_authenticated():
+            % if user.is_authenticated:
             <input title="preference api" type="hidden" class="url-endpoint" value="${reverse('preferences_api', kwargs={'username': user.username})}" data-user-is-authenticated="true">
             % else:
             <input title="session update url" type="hidden" class="url-endpoint" value="${reverse('session_language')}" data-user-is-authenticated="false">

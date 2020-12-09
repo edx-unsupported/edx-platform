@@ -9,7 +9,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator
 from util.prompt import query_yes_no
 from xmodule.modulestore.django import SignalHandler
 
@@ -30,7 +30,7 @@ class Command(BaseCommand):
         try:
             course_key = CourseKey.from_string(args[0])
         except InvalidKeyError:
-            course_key = SlashSeparatedCourseKey.from_deprecated_string(args[0])
+            course_key = CourseLocator.from_string(args[0])
 
         commit = False
         if len(args) == 2:
@@ -44,11 +44,11 @@ class Command(BaseCommand):
                 SignalHandler.course_deleted.send(sender=None, course_key=course_key)
             else:
 
-                if query_yes_no("Deleting ALL records with references to course {0}. Confirm?".format(course_key), default="no"):
+                if query_yes_no("Deleting ALL records with references to course {}. Confirm?".format(course_key), default="no"):
                     if query_yes_no("Are you sure. This action cannot be undone!", default="no"):
 
                         # Broadcast the deletion event to CMS listeners
-                        print 'Notifying LMS system components...'
+                        print('Notifying LMS system components...')
                         SignalHandler.course_deleted.send(sender=None, course_key=course_key)
 
-                        print 'LMS Course Cleanup Complete!'
+                        print('LMS Course Cleanup Complete!')

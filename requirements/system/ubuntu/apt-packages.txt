@@ -101,7 +101,6 @@ libsemanage-common
 libsemanage1
 libsepol1
 libsmartcols1
-libsqlite3-dev
 libss2
 libssl-dev
 libstdc++6

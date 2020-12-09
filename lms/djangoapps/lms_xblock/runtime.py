@@ -1,22 +1,26 @@
 """
 Module implementing `xblock.runtime.Runtime` functionality for the LMS
 """
+
+
+import six
+import xblock.reference.plugins
 from completion.services import CompletionService
 from django.conf import settings
 from django.urls import reverse
 from edx_django_utils.cache import DEFAULT_REQUEST_CACHE
-import xblock.reference.plugins
 
 from badges.service import BadgingService
 from badges.utils import badges_enabled
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
+from lms.djangoapps.teams.services import TeamsService
 from openedx.core.djangoapps.user_api.course_tag import api as user_course_tag_api
 from openedx.core.lib.url_utils import quote_slashes
-from openedx.core.lib.xblock_utils import xblock_local_resource_url, wrap_xblock_aside
+from openedx.core.lib.xblock_utils import wrap_xblock_aside, xblock_local_resource_url
 from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore.django import ModuleI18nService, modulestore
 from xmodule.partitions.partitions_service import PartitionService
-from xmodule.services import SettingsService
+from xmodule.services import SettingsService, TeamsConfigurationService
 from xmodule.x_module import ModuleSystem
 
 
@@ -24,7 +28,13 @@ def handler_url(block, handler_name, suffix='', query='', thirdparty=False):
     """
     This method matches the signature for `xblock.runtime:Runtime.handler_url()`
 
-    See :method:`xblock.runtime:Runtime.handler_url`
+    :param block: The block to generate the url for
+    :param handler_name: The handler on that block that the url should resolve to
+    :param suffix: Any path suffix that should be added to the handler url
+    :param query: Any query string that should be added to the handler url
+        (which should not include an initial ? or &)
+    :param thirdparty: If true, return a fully-qualified URL instead of relative
+        URL. This is useful for URLs to be used by third-party services.
     """
     view_name = 'xblock_handler'
     if handler_name:
@@ -47,8 +57,8 @@ def handler_url(block, handler_name, suffix='', query='', thirdparty=False):
         view_name = 'xblock_handler_noauth'
 
     url = reverse(view_name, kwargs={
-        'course_id': unicode(block.location.course_key),
-        'usage_id': quote_slashes(unicode(block.scope_ids.usage_id).encode('utf-8')),
+        'course_id': str(block.location.course_key),
+        'usage_id': quote_slashes(str(block.scope_ids.usage_id)),
         'handler': handler_name,
         'suffix': suffix,
     })
@@ -80,7 +90,7 @@ def local_resource_url(block, uri):
     return xblock_local_resource_url(block, uri)
 
 
-class LmsCourse(object):
+class LmsCourse:
     """
     A runtime mixin that provides the course object.
 
@@ -91,11 +101,11 @@ class LmsCourse(object):
     @property
     def course(self):
         # TODO using 'modulestore().get_course(self._course_id)' doesn't work. return None
-        from courseware.courses import get_course
+        from lms.djangoapps.courseware.courses import get_course
         return get_course(self.course_id)
 
 
-class LmsUser(object):
+class LmsUser:
     """
     A runtime mixin that provides the user object.
 
@@ -124,7 +134,7 @@ class LmsPartitionService(PartitionService):
         return course.user_partitions
 
 
-class UserTagsService(object):
+class UserTagsService:
     """
     A runtime class that provides an interface to the user service.  It handles filling in
     the current course id and current user.
@@ -148,7 +158,7 @@ class UserTagsService(object):
             key: the key for the value we want
         """
         if scope != user_course_tag_api.COURSE_SCOPE:
-            raise ValueError("unexpected scope {0}".format(scope))
+            raise ValueError("unexpected scope {}".format(scope))
 
         return user_course_tag_api.get_course_tag(
             self._get_current_user(),
@@ -164,7 +174,7 @@ class UserTagsService(object):
             value: the value to set
         """
         if scope != user_course_tag_api.COURSE_SCOPE:
-            raise ValueError("unexpected scope {0}".format(scope))
+            raise ValueError("unexpected scope {}".format(scope))
 
         return user_course_tag_api.set_course_tag(
             self._get_current_user(),
@@ -183,7 +193,7 @@ class LmsModuleSystem(LmsCourse, LmsUser, ModuleSystem):  # pylint: disable=abst
         services = kwargs.setdefault('services', {})
         user = kwargs.get('user')
         if user and user.is_authenticated:
-            services['completion'] = CompletionService(user=user, course_key=kwargs.get('course_id'))
+            services['completion'] = CompletionService(user=user, context_key=kwargs.get('course_id'))
         services['fs'] = xblock.reference.plugins.FSService()
         services['i18n'] = ModuleI18nService
         services['library_tools'] = LibraryToolsService(store)
@@ -196,7 +206,9 @@ class LmsModuleSystem(LmsCourse, LmsUser, ModuleSystem):  # pylint: disable=abst
         if badges_enabled():
             services['badging'] = BadgingService(course_id=kwargs.get('course_id'), modulestore=store)
         self.request_token = kwargs.pop('request_token', None)
-        super(LmsModuleSystem, self).__init__(**kwargs)
+        services['teams'] = TeamsService()
+        services['teams_configuration'] = TeamsConfigurationService()
+        super().__init__(**kwargs)
 
     def handler_url(self, *args, **kwargs):
         """
@@ -235,8 +247,8 @@ class LmsModuleSystem(LmsCourse, LmsUser, ModuleSystem):  # pylint: disable=abst
 
         runtime_class = 'LmsRuntime'
         extra_data = {
-            'block-id': quote_slashes(unicode(block.scope_ids.usage_id)),
-            'course-id': quote_slashes(unicode(block.course_id)),
+            'block-id': quote_slashes(str(block.scope_ids.usage_id)),
+            'course-id': quote_slashes(str(block.course_id)),
             'url-selector': 'asideBaseUrl',
             'runtime-class': runtime_class,
         }
@@ -249,7 +261,7 @@ class LmsModuleSystem(LmsCourse, LmsUser, ModuleSystem):  # pylint: disable=abst
             view,
             frag,
             context,
-            usage_id_serializer=unicode,
+            usage_id_serializer=str,
             request_token=self.request_token,
             extra_data=extra_data,
         )

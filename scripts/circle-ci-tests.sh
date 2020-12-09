@@ -28,6 +28,9 @@ set -o pipefail
 # There is no need to install the prereqs, as this was already
 # just done via the dependencies override section of circle.yml.
 export NO_PREREQ_INSTALL='true'
+export BOTO_CONFIG='/tmp/nowhere'
+export PYTHONHASHSEED=0
+
 
 EXIT=0
 
@@ -65,14 +68,14 @@ else
             echo "Finding ESLint violations and storing report..."
             paver run_eslint -l $ESLINT_THRESHOLD > eslint.log || { cat eslint.log; EXIT=1; }
 
-            #echo "Finding Stylelint violations and storing report..."
-            #paver run_stylelint -l $STYLELINT_THRESHOLD > stylelint.log || { cat stylelint.log; EXIT=1; }
+            echo "Finding Stylelint violations and storing report..."
+            paver run_stylelint -l $STYLELINT_THRESHOLD > stylelint.log || { cat stylelint.log; EXIT=1; }
 
             # Run quality task. Pass in the 'fail-under' percentage to diff-quality
-            #paver run_quality -p 100 || EXIT=1
+            paver run_quality -p 99 || EXIT=1
 
-            #echo "Running code complexity report (python)."
-            #paver run_complexity > reports/code_complexity.log || echo "Unable to calculate code complexity. Ignoring error."
+            echo "Running code complexity report (python)."
+            paver run_complexity > reports/code_complexity.log || echo "Unable to calculate code complexity. Ignoring error."
 
             exit $EXIT
             ;;

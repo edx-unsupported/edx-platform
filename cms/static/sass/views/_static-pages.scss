@@ -6,8 +6,7 @@
   // page structure
   .content-primary,
   .content-supplementary {
-    @include box-sizing(border-box);
-
+    box-sizing: border-box;
     float: left;
   }
 
@@ -235,8 +234,7 @@
 
     // uses similar styling as assets.scss, unit.scss
     .wrapper-component-action-header {
-      @include box-sizing(border-box);
-
+      box-sizing: border-box;
       position: absolute;
       width: 100%;
       padding: $baseline/4 $baseline/2;
@@ -295,7 +293,8 @@
           vertical-align: bottom;
         }
 
-        &.action-duplicate, &.action-move {
+        &.action-duplicate,
+        &.action-move {
           display: none;
         }
       }
@@ -317,7 +316,7 @@
 
     .course-nav-item-header {
       display: inline-block;
-      width:80%;
+      width: 80%;
 
       .title {
         @extend %t-title4;
@@ -401,7 +400,8 @@
   }
 
   .page-contents {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
+
     @include linear-gradient(top, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.3));
 
     @extend %t-copy-sub1;

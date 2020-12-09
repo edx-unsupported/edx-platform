@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 
-from django.db import migrations, models
+
 import django.db.models.deletion
 from django.conf import settings
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
@@ -31,7 +31,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='creditprovider',
             name='provider_description',
-            field=models.TextField(default=b'', help_text='Description for the credit provider displayed to users.'),
+            field=models.TextField(default=u'', help_text='Description for the credit provider displayed to users.'),
         ),
         migrations.AddField(
             model_name='creditprovider',
@@ -41,16 +41,16 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='creditprovider',
             name='eligibility_email_message',
-            field=models.TextField(default=b'', help_text='Plain text or html content for displaying custom message inside credit eligibility email content which is sent when user has met all credit eligibility requirements.'),
+            field=models.TextField(default=u'', help_text='Plain text or html content for displaying custom message inside credit eligibility email content which is sent when user has met all credit eligibility requirements.'),
         ),
         migrations.AddField(
             model_name='creditprovider',
             name='receipt_email_message',
-            field=models.TextField(default=b'', help_text='Plain text or html content for displaying custom message inside credit receipt email content which is sent *after* paying to get credit for a credit course.'),
+            field=models.TextField(default=u'', help_text='Plain text or html content for displaying custom message inside credit receipt email content which is sent *after* paying to get credit for a credit course.'),
         ),
         migrations.AddField(
             model_name='creditprovider',
             name='thumbnail_url',
-            field=models.URLField(default=b'', help_text='Thumbnail image url of the credit provider.', max_length=255),
+            field=models.URLField(default=u'', help_text='Thumbnail image url of the credit provider.', max_length=255),
         ),
     ]

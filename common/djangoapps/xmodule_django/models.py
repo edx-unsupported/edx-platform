@@ -7,7 +7,6 @@ import warnings
 from django.db import models
 from django.core.exceptions import ValidationError
 from opaque_keys.edx.keys import CourseKey, UsageKey, BlockTypeKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from south.modelsinspector import add_introspection_rules
 
@@ -22,7 +21,7 @@ class NoneToEmptyManager(models.Manager):
         Args:
             field_names: The list of field names to initialize the :class:`NoneToEmptyQuerySet` with.
         """
-        super(NoneToEmptyManager, self).__init__()
+        super().__init__()
 
     def get_query_set(self):
         return NoneToEmptyQuerySet(self.model, using=self._db)
@@ -45,7 +44,7 @@ class NoneToEmptyQuerySet(models.query.QuerySet):
                     key = '{}{}'.format(name, suffix)
                     if key in kwargs and kwargs[key] is None:
                         kwargs[key] = field_object.Empty
-        return super(NoneToEmptyQuerySet, self)._filter_or_exclude(*args, **kwargs)
+        return super()._filter_or_exclude(*args, **kwargs)
 
 
 def _strip_object(key):
@@ -70,7 +69,7 @@ def _strip_value(value, lookup='exact'):
     return stripped_value
 
 
-class OpaqueKeyField(models.CharField):
+class OpaqueKeyField(models.CharField, metaclass=models.SubfieldBase):
     """
     A django field for storing OpaqueKeys.
 
@@ -83,8 +82,6 @@ class OpaqueKeyField(models.CharField):
     """
     description = "An OpaqueKey object, saved to the DB in the form of a string."
 
-    __metaclass__ = models.SubfieldBase
-
     Empty = object()
     KEY_CLASS = None
 
@@ -92,19 +89,19 @@ class OpaqueKeyField(models.CharField):
         if self.KEY_CLASS is None:
             raise ValueError('Must specify KEY_CLASS in OpaqueKeyField subclasses')
 
-        super(OpaqueKeyField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def to_python(self, value):
         if value is self.Empty or value is None:
             return None
 
-        assert isinstance(value, (basestring, self.KEY_CLASS)), \
-            "%s is not an instance of basestring or %s" % (value, self.KEY_CLASS)
+        assert isinstance(value, ((str,), self.KEY_CLASS)), \
+            "{} is not an instance of basestring or {}".format(value, self.KEY_CLASS)
         if value == '':
             # handle empty string for models being created w/o fields populated
             return None
 
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             return self.KEY_CLASS.from_string(value)
         else:
             return value
@@ -113,7 +110,7 @@ class OpaqueKeyField(models.CharField):
         if lookup == 'isnull':
             raise TypeError('Use {0}.Empty rather than None to query for a missing {0}'.format(self.__class__.__name__))
 
-        return super(OpaqueKeyField, self).get_prep_lookup(
+        return super().get_prep_lookup(
             lookup,
             # strip key before comparing
             _strip_value(value, lookup)
@@ -123,8 +120,8 @@ class OpaqueKeyField(models.CharField):
         if value is self.Empty or value is None:
             return ''  # CharFields should use '' as their empty value, rather than None
 
-        assert isinstance(value, self.KEY_CLASS), "%s is not an instance of %s" % (value, self.KEY_CLASS)
-        return unicode(_strip_value(value))
+        assert isinstance(value, self.KEY_CLASS), "{} is not an instance of {}".format(value, self.KEY_CLASS)
+        return str(_strip_value(value))
 
     def validate(self, value, model_instance):
         """Validate Empty values, otherwise defer to the parent"""
@@ -132,14 +129,14 @@ class OpaqueKeyField(models.CharField):
         if not self.blank and value is self.Empty:
             raise ValidationError(self.error_messages['blank'])
         else:
-            return super(OpaqueKeyField, self).validate(value, model_instance)
+            return super().validate(value, model_instance)
 
     def run_validators(self, value):
         """Validate Empty values, otherwise defer to the parent"""
         if value is self.Empty:
             return
 
-        return super(OpaqueKeyField, self).run_validators(value)
+        return super().run_validators(value)
 
 
 class CourseKeyField(OpaqueKeyField):
@@ -164,7 +161,7 @@ class LocationKeyField(UsageKeyField):
     """
     def __init__(self, *args, **kwargs):
         warnings.warn("LocationKeyField is deprecated. Please use UsageKeyField instead.", stacklevel=2)
-        super(LocationKeyField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class BlockTypeKeyField(OpaqueKeyField):

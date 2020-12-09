@@ -1,15 +1,17 @@
 """
 Decorators that can be used to interact with third_party_auth.
 """
+
+
 from functools import wraps
-from urlparse import urlparse, urlunparse
 
 from django.conf import settings
+from django.shortcuts import redirect
 from django.utils.decorators import available_attrs
+from six.moves.urllib.parse import urlencode, urlparse, urlunparse
 
-from third_party_auth.models import SAMLProviderData
-from third_party_auth.models import LTIProviderConfig
-from six.moves.urllib.parse import urlencode, urlparse
+from third_party_auth.models import LTIProviderConfig, SAMLProviderData
+from third_party_auth.provider import Registry
 
 
 def allow_frame_from_whitelisted_url(view_func):  # pylint: disable=invalid-name

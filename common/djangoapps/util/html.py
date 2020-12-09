@@ -2,7 +2,7 @@
 Helper HTML related utility functions
 """
 
-from HTMLParser import HTMLParser
+from html.parser import HTMLParser
 
 
 class MLStripper(HTMLParser):
@@ -14,6 +14,7 @@ class MLStripper(HTMLParser):
         """
         Initializer
         """
+        super().__init__()
         self.reset()
         self.fed = []
 

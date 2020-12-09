@@ -1,35 +1,36 @@
 # Custom requirements to be customized by individual OpenEdX instances
 
 # When updating a hash of an XBlock that uses xblock-utils, please update its version hash in github.txt.
--e git+https://github.com/edx-solutions/xblock-mentoring.git@0.2#egg=xblock-mentoring==0.2
--e git+https://github.com/edx-solutions/xblock-image-explorer.git@v1.2#egg=xblock-image-explorer==1.2
--e git+https://github.com/edx-solutions/xblock-drag-and-drop.git@92ee2055a16899090a073e1df81e35d5293ad767#egg=xblock-drag-and-drop
-# FIXME: temp hash, until (https://github.com/edx-solutions/xblock-drag-and-drop-v2/pull/207 is merged into `master`)
--e git+https://github.com/edx-solutions/xblock-drag-and-drop-v2.git@0a7290362c8e7f75be058cd14a5f726847f4428f#egg=xblock-drag-and-drop-v2==2.2.15
+-e git+https://github.com/edx-solutions/xblock-mentoring.git@rebase-juniper#egg=xblock-mentoring==1.0
+-e git+https://github.com/edx-solutions/xblock-image-explorer.git@juniper-rebase#egg=xblock-image-explorer==2.0
+-e git+https://github.com/edx-solutions/xblock-drag-and-drop.git@rebase-juniper#egg=xblock-drag-and-drop==1.0
+-e git+https://github.com/edx-solutions/xblock-drag-and-drop-v2.git@apros-master#egg=xblock-drag-and-drop-v2==2.5.2
 # This is required for A2E courses that were created with the temporary (xblock-drag-and-drop-v2-new) DnDv2 branch to continue to work.
 # FIXME: bump version to 2.1.6 when https://github.com/edx-solutions/xblock-drag-and-drop-v2/pull/154 merged and tagged
--e git+https://github.com/open-craft/xblock-drag-and-drop-v2.git@82c9dc5e16d10793e8b79e60661e1a78893fce25#egg=xblock-drag-and-drop-v2-new
--e git+https://github.com/edx-solutions/xblock-ooyala.git@v4.0.7#egg=xblock-ooyala==4.0.7
-git+https://github.com/edx-solutions/xblock-group-project.git@0.1.3#egg=xblock-group-project==0.1.3
--e git+https://github.com/edx-solutions/xblock-adventure.git@0.4#egg=xblock-adventure==0.4
+#-e git+https://github.com/open-craft/xblock-drag-and-drop-v2.git@82c9dc5e16d10793e8b79e60661e1a78893fce25#egg=xblock-drag-and-drop-v2-new
+-e git+https://github.com/edx-solutions/xblock-ooyala.git@rebase-juniper#egg=xblock-ooyala==5.0.0
+
+git+https://github.com/edx-solutions/xblock-group-project.git@saqib/MCKIN-26250#egg=xblock-group-project==0.1.4
+-e git+https://github.com/edx-solutions/xblock-adventure.git@rebase-juniper#egg=xblock-adventure==0.3
 -e git+https://github.com/open-craft/xblock-poll.git@v1.10.1#egg=xblock-poll==1.10.1
--e git+https://github.com/open-craft/problem-builder.git@v3.5.7#egg=xblock-problem-builder==3.5.7
--e git+https://github.com/OfficeDev/xblock-officemix.git@86238f5968a08db005717dbddc346808f1ed3716#egg=xblock-officemix
--e git+https://github.com/open-craft/xblock-chat.git@v0.2.8#egg=xblock-chat==0.2.8
--e git+https://github.com/open-craft/xblock-eoc-journal.git@v0.9.4#egg=xblock-eoc-journal==0.9.4
--e git+https://github.com/mckinseyacademy/xblock-scorm.git@v3.2.1#egg=xblock-scorm==3.2.1
--e git+https://github.com/mckinseyacademy/xblock-diagnosticfeedback.git@v0.4.1#egg=xblock-diagnostic-feedback==0.4.1
--e git+https://github.com/open-craft/xblock-group-project-v2.git@0.10.7#egg=xblock-group-project-v2==0.10.7
+-e git+https://github.com/open-craft/problem-builder.git@v4.1.7#egg=xblock-problem-builder==4.1.7
+#-e git+https://github.com/OfficeDev/xblock-officemix.git@86238f5968a08db005717dbddc1.9.6346808f1ed3716#egg=xblock-officemix
+-e git+https://github.com/open-craft/xblock-chat.git@v0.3.0#egg=chat-xblock==0.3.0
+-e git+https://github.com/open-craft/xblock-eoc-journal.git@v0.9.3#egg=xblock-eoc-journal==0.9.3
+-e git+https://github.com/mckinseyacademy/xblock-scorm.git@v3.0#egg=xblock-scorm==3.0
+-e git+https://github.com/mckinseyacademy/xblock-diagnosticfeedback.git@v0.3.0#egg=xblock-diagnostic-feedback==0.3.0
+
+-e git+https://github.com/open-craft/xblock-group-project-v2.git@0.11.0#egg=xblock-group-project-v2==0.11.0
 -e git+https://github.com/open-craft/xblock-virtualreality.git@v0.1.5#egg=xblock-virtualreality==0.1.5
--e git+https://github.com/edx/edx-notifications.git@2.0.0#egg=edx-notifications==2.0.0
 
-git+https://github.com/edx-solutions/gradebook-edx-platform-extensions.git@2.0.2#egg=gradebook-edx-platform-extensions==2.0.2
-git+https://github.com/edx-solutions/mobileapps-edx-platform-extensions.git@v2.0.0#egg=mobileapps-edx-platform-extensions==2.0.0
-git+https://github.com/edx-solutions/discussion-edx-platform-extensions.git@v2.0.1#egg=discussion-edx-platform-extensions==2.0.1
-git+https://github.com/edx-solutions/organizations-edx-platform-extensions.git@v2.0.7#egg=organizations-edx-platform-extensions==2.0.7
-git+https://github.com/edx-solutions/course-edx-platform-extensions.git@v3.0.0#egg=course-edx-platform-extensions==3.0.0
-git+https://github.com/edx-solutions/projects-edx-platform-extensions.git@v3.0.4#egg=projects-edx-platform-extensions==3.0.4
--e git+https://github.com/edx-solutions/api-integration.git@3b19d4e63c2ff683e7680347fe9f1989330b8be7#egg=api-integration
+-e git+https://github.com/edx/edx-notifications.git@rebase-juniper#egg=edx-notifications==3.0.0
+git+https://github.com/edx-solutions/gradebook-edx-platform-extensions.git@rebase-juniper#egg=gradebook-edx-platform-extensions==3.0.0
+git+https://github.com/edx-solutions/mobileapps-edx-platform-extensions.git@rebase-juniper#egg=mobileapps-edx-platform-extensions==3.0.1
+git+https://github.com/edx-solutions/discussion-edx-platform-extensions.git@rebase-juniper#egg=discussion-edx-platform-extensions==3.0.1
+git+https://github.com/edx-solutions/organizations-edx-platform-extensions.git@rebase-juniper#egg=organizations-edx-platform-extensions==3.0.1
+git+https://github.com/edx-solutions/course-edx-platform-extensions.git@rebase-juniper#egg=course-edx-platform-extensions==4.0.0
+git+https://github.com/edx-solutions/projects-edx-platform-extensions.git@rebase-juniper#egg=projects-edx-platform-extensions==4.0.0
+git+https://github.com/edx-solutions/api-integration.git@rebase-juniper#egg=api-integration==5.0.2
 
-git+https://github.com/mckinseyacademy/openedx-user-manager-api@v1.2.0#egg=openedx-user-manager-api==1.2.0
-openedx-completion-aggregator==2.2.4
+git+https://github.com/mckinseyacademy/openedx-user-manager-api@v2.0.1#egg=openedx-user-manager-api==2.0.1
+openedx-completion-aggregator==3.0.0

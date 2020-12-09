@@ -26,18 +26,18 @@ def _generate_course_structure(course_key):
         while blocks_stack:
             curr_block = blocks_stack.pop()
             children = curr_block.get_children() if curr_block.has_children else []
-            key = unicode(curr_block.scope_ids.usage_id)
+            key = str(curr_block.scope_ids.usage_id)
             block = {
                 "usage_key": key,
                 "block_type": curr_block.category,
                 "display_name": curr_block.display_name,
-                "children": [unicode(child.scope_ids.usage_id) for child in children]
+                "children": [str(child.scope_ids.usage_id) for child in children]
             }
 
             if (curr_block.category == 'discussion' and
                     hasattr(curr_block, 'discussion_id') and
                     curr_block.discussion_id):
-                discussions[curr_block.discussion_id] = unicode(curr_block.scope_ids.usage_id)
+                discussions[curr_block.discussion_id] = str(curr_block.scope_ids.usage_id)
 
             # Retrieve these attributes separately so that we can fail gracefully
             # if the block doesn't have the attribute.
@@ -55,7 +55,7 @@ def _generate_course_structure(course_key):
             blocks_stack.extend(children)
         return {
             'structure': {
-                "root": unicode(course.scope_ids.usage_id),
+                "root": str(course.scope_ids.usage_id),
                 "blocks": blocks_dict
             },
             'discussion_id_map': discussions
@@ -71,8 +71,8 @@ def update_course_structure(course_key):
     from .models import CourseStructure
 
     # Ideally we'd like to accept a CourseLocator; however, CourseLocator is not JSON-serializable (by default) so
-    # Celery's delayed tasks fail to start. For this reason, callers should pass the course key as a Unicode string.
-    if not isinstance(course_key, basestring):
+    # Celery's delayed tasks fail to start. For this reason, callers should pass the course key as a string.
+    if not isinstance(course_key, str):
         raise ValueError('course_key must be a string. {} is not acceptable.'.format(type(course_key)))
 
     course_key = CourseKey.from_string(course_key)

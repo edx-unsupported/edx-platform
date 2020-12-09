@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 
-from django.db import migrations, models
-import django.utils.timezone
-from django.conf import settings
-import model_utils.fields
-from lms.djangoapps.certificates.models import template_assets_path
 import datetime
+
+import django.utils.timezone
+import model_utils.fields
+from django.conf import settings
+from django.db import migrations, models
 from django.utils.timezone import utc
+
+from lms.djangoapps.certificates.models import template_assets_path
 from opaque_keys.edx.django.models import CourseKeyField
 
 

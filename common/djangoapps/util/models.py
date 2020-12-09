@@ -1,25 +1,30 @@
 """Models for the util app. """
-import cStringIO
+
+import base64
 import gzip
 import logging
+from io import BytesIO
 
+import six
 from config_models.models import ConfigurationModel
 from django.db import models
 from django.utils.text import compress_string
-
 from opaque_keys.edx.django.models import CreatorMixin
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 
 class RateLimitConfiguration(ConfigurationModel):
-    """Configuration flag to enable/disable rate limiting.
+    """
+    Configuration flag to enable/disable rate limiting.
 
     Applies to Django Rest Framework views.
 
     This is useful for disabling rate limiting for performance tests.
     When enabled, it will disable rate limiting on any view decorated
     with the `can_disable_rate_limit` class decorator.
+
+    .. no_pii:
     """
     class Meta(ConfigurationModel.Meta):
         app_label = "util"
@@ -31,11 +36,12 @@ def decompress_string(value):
     """
 
     try:
-        val = value.encode('utf').decode('base64')
-        zbuf = cStringIO.StringIO(val)
+        val = base64.b64decode(value.encode('utf8'))
+        zbuf = BytesIO(val)
         zfile = gzip.GzipFile(fileobj=zbuf)
         ret = zfile.read()
         zfile.close()
+        ret = ret.decode('utf8')
     except Exception as e:
         logger.error('String decompression failed. There may be corrupted data in the database: %s', e)
         ret = value
@@ -43,21 +49,27 @@ def decompress_string(value):
 
 
 class CompressedTextField(CreatorMixin, models.TextField):
-    """ TextField that transparently compresses data when saving to the database, and decompresses the data
-    when retrieving it from the database. """
+    """
+    TextField that transparently compresses data when saving to the database, and decompresses the data
+    when retrieving it from the database.
+    """
 
     def get_prep_value(self, value):
-        """ Compress the text data. """
+        """
+        Compress the text data.
+        """
         if value is not None:
-            if isinstance(value, unicode):
+            if isinstance(value, six.text_type):
                 value = value.encode('utf8')
             value = compress_string(value)
-            value = value.encode('base64').decode('utf8')
+            value = base64.b64encode(value).decode('utf8')
         return value
 
     def to_python(self, value):
-        """ Decompresses the value from the database. """
-        if isinstance(value, unicode):
+        """
+        Decompresses the value from the database.
+        """
+        if isinstance(value, six.text_type):
             value = decompress_string(value)
 
         return value

@@ -3,12 +3,11 @@ Tests of the SubsectionGrade classes.
 """
 from ..models import PersistentSubsectionGrade
 from ..subsection_grade import CreateSubsectionGrade, ReadSubsectionGrade
-from .utils import mock_get_score
 from .base import GradeTestBase
+from .utils import mock_get_score
 
 
 class SubsectionGradeTest(GradeTestBase):
-    shard = 4
 
     def test_create_and_read(self):
         with mock_get_score(1, 2):

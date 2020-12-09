@@ -21,7 +21,8 @@ class TestDeleteProfileImages(TestCase):
     Test delete_profile_images task
     """
     @ddt.data(
-        (['user_a', 'user_b', 'user_c'], {'user_a': None, 'user_b': Exception('test'), 'user_c': None})
+        (['user_a', 'user_b', 'user_c'], [None, None, None]),
+        (['user_a', 'user_b', 'user_c'], [Exception('test'), None, None])
     )
     @ddt.unpack
     @override_settings(CELERY_ALWAYS_EAGER=True)
@@ -50,5 +51,5 @@ class TestDeleteProfileImages(TestCase):
 
         self.assertSetEqual(set(expected_names), set(deleted_names))
 
-        if side_effects and [exc for exc in side_effects.values() if isinstance(exc, Exception)]:
+        if side_effects and [exc for exc in side_effects if isinstance(exc, Exception)]:
             mock_logger.exception.assert_called()

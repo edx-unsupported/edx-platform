@@ -2,7 +2,7 @@
 Module rendering
 """
 
-from __future__ import absolute_import
+
 import hashlib
 import json
 import logging
@@ -11,29 +11,35 @@ import pytz
 from collections import OrderedDict
 from functools import partial
 from datetime import datetime
-from django.utils.timezone import utc
-from completion.models import BlockCompletion
+
+import six
 from completion import waffle as completion_waffle
+from completion.models import BlockCompletion
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
+from django.db import transaction
+from django.http import Http404, HttpResponse, HttpResponseForbidden
 from django.middleware.csrf import CsrfViewMiddleware
 from django.template.context_processors import csrf
 from django.urls import reverse
-from django.http import Http404, HttpResponse, HttpResponseForbidden
 from django.utils.text import slugify
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.decorators.csrf import csrf_exempt
 from edx_django_utils.cache import RequestCache
 from edx_django_utils.monitoring import set_custom_metrics_for_course_key, set_monitoring_transaction_name
+from edx_proctoring.api import get_attempt_status_summary
 from edx_proctoring.services import ProctoringService
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
+from edx_when.field_data import DateLookupFieldData
+from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from requests.auth import HTTPBasicAuth
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import APIException
 from six import text_type
+from web_fragments.fragment import Fragment
 from xblock.core import XBlock
 from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xblock.exceptions import NoSuchHandlerError, NoSuchViewError
@@ -42,20 +48,20 @@ from xblock.runtime import KvsFieldData
 
 import static_replace
 from capa.xqueue_interface import XQueueInterface
-from courseware.access import get_user_role, has_access
-from courseware.access_response import IncorrectPartitionGroupError
-from courseware.entrance_exams import user_can_skip_entrance_exam, user_has_passed_entrance_exam
-from courseware.masquerade import (
+from lms.djangoapps.courseware.access import get_user_role, has_access
+from lms.djangoapps.courseware.entrance_exams import user_can_skip_entrance_exam, user_has_passed_entrance_exam
+from lms.djangoapps.courseware.masquerade import (
     MasqueradingKeyValueStore,
     filter_displayed_blocks,
     is_masquerading_as_specific_student,
     setup_masquerade
 )
-from courseware.model_data import DjangoKeyValueStore, FieldDataCache
+from lms.djangoapps.courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from edxmako.shortcuts import render_to_string
-from eventtracking import tracker
 from lms.djangoapps.courseware.field_overrides import OverrideFieldData
-from lms.djangoapps.grades.signals.signals import SCORE_PUBLISHED
+from lms.djangoapps.courseware.services import UserStateService
+from lms.djangoapps.grades.api import GradesUtilService
+from lms.djangoapps.grades.api import signals as grades_signals
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem
@@ -64,30 +70,30 @@ from openedx.core.djangoapps.bookmarks.services import BookmarksService
 from openedx.core.djangoapps.crawlers.models import CrawlersConfig
 from openedx.core.djangoapps.credit.services import CreditService
 from openedx.core.djangoapps.util.user_utils import SystemUser
-from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.djangolib.markup import HTML
+from openedx.core.lib.api.authentication import BearerAuthenticationAllowInactiveUser
 from openedx.core.lib.api.view_utils import view_auth_classes
 from openedx.core.lib.gating.services import GatingService
 from openedx.core.lib.license import wrap_with_license
 from openedx.core.lib.url_utils import quote_slashes, unquote_slashes
-from openedx.core.lib.xblock_utils import request_token as xblock_request_token
 from openedx.core.lib.xblock_utils import (
     add_staff_markup,
+    get_aside_from_xblock,
+    hash_resource,
+    is_xblock_aside,
     replace_course_urls,
     replace_jump_to_id_urls,
-    replace_static_urls,
-    wrap_xblock,
-    is_xblock_aside,
-    get_aside_from_xblock,
+    replace_static_urls
 )
+from openedx.core.lib.xblock_utils import request_token as xblock_request_token
+from openedx.core.lib.xblock_utils import wrap_xblock
 from openedx.features.course_duration_limits.access import course_expiration_wrapper
+from openedx.features.discounts.utils import offer_banner_wrapper
 from student.models import anonymous_id_for_user, user_by_anonymous_id
 from student.roles import CourseBetaTesterRole
 from track import contexts
 from util import milestones_helpers
 from util.json_request import JsonResponse
-from web_fragments.fragment import Fragment
-from xmodule.util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 from xblock_django.user_service import DjangoXBlockUserService
 from xmodule.contentstore.django import contentstore
 from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
@@ -96,8 +102,8 @@ from xmodule.lti_module import LTIModule
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.services import NotificationsService, CoursewareParentInfoService
+from xmodule.util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 from xmodule.x_module import XModuleDescriptor
-
 
 log = logging.getLogger(__name__)
 
@@ -166,7 +172,6 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
 
     field_data_cache must include data from the course module and 2 levels of its descendants
     '''
-
     with modulestore().bulk_operations(course.id):
         course_module = get_module_for_descriptor(
             user, request, course, field_data_cache, course.id, course=course
@@ -195,7 +200,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
             display_id = slugify(chapter.display_name_with_default_escaped)
             local_hide_from_toc = False
             if required_content:
-                if unicode(chapter.location) not in required_content:
+                if six.text_type(chapter.location) not in required_content:
                     local_hide_from_toc = True
 
             # Skip the current chapter if a hide flag is tripped
@@ -260,36 +265,20 @@ def _add_timed_exam_info(user, course, section, section_context):
         settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False)
     )
     if section_is_time_limited:
-        # We need to import this here otherwise Lettuce test
-        # harness fails. When running in 'harvest' mode, the
-        # test service appears to get into trouble with
-        # circular references (not sure which as edx_proctoring.api
-        # doesn't import anything from edx-platform). Odd thing
-        # is that running: manage.py lms runserver --settings=acceptance
-        # works just fine, it's really a combination of Lettuce and the
-        # 'harvest' management command
-        #
-        # One idea is that there is some coupling between
-        # lettuce and the 'terrain' Djangoapps projects in /common
-        # This would need more investigation
-        from edx_proctoring.api import get_attempt_status_summary
-
-        #
         # call into edx_proctoring subsystem
         # to get relevant proctoring information regarding this
         # level of the courseware
         #
         # This will return None, if (user, course_id, content_id)
         # is not applicable
-        #
         timed_exam_attempt_context = None
         try:
             timed_exam_attempt_context = get_attempt_status_summary(
                 user.id,
-                unicode(course.id),
-                unicode(section.location)
+                six.text_type(course.id),
+                six.text_type(section.location)
             )
-        except Exception, ex:  # pylint: disable=broad-except
+        except Exception as ex:  # pylint: disable=broad-except
             # safety net in case something blows up in edx_proctoring
             # as this is just informational descriptions, it is better
             # to log and continue (which is safe) than to have it be an
@@ -308,7 +297,7 @@ def _add_timed_exam_info(user, course, section, section_context):
 def get_module(user, request, usage_key, field_data_cache,
                position=None, log_if_not_found=True, wrap_xmodule_display=True,
                grade_bucket_type=None, depth=0,
-               static_asset_path='', course=None):
+               static_asset_path='', course=None, will_recheck_access=False):
     """
     Get an instance of the xmodule class identified by location,
     setting the state based on an existing StudentModule, or creating one if none
@@ -331,6 +320,9 @@ def get_module(user, request, usage_key, field_data_cache,
                                 by get_course_info_section, because info section modules
                                 do not have a course as the parent module, and thus do not
                                 inherit this lms key value.
+      - will_recheck_access   : If True, the caller commits to re-checking access on each child XBlock
+                                before rendering the content in order to display access error messages
+                                to the user.
 
     Returns: xmodule instance, or None if the user does not have access to the
     module.  If there's an error, will try to return an instance of ErrorModule
@@ -343,7 +335,7 @@ def get_module(user, request, usage_key, field_data_cache,
                                          wrap_xmodule_display=wrap_xmodule_display,
                                          grade_bucket_type=grade_bucket_type,
                                          static_asset_path=static_asset_path,
-                                         course=course)
+                                         course=course, will_recheck_access=will_recheck_access)
     except ItemNotFoundError:
         if log_if_not_found:
             log.debug("Error in get_module: ItemNotFoundError")
@@ -410,7 +402,7 @@ def get_xqueue_callback_url_prefix(request):
 def get_module_for_descriptor(user, request, descriptor, field_data_cache, course_key,
                               position=None, wrap_xmodule_display=True, grade_bucket_type=None,
                               static_asset_path='', disable_staff_debug_info=False,
-                              course=None):
+                              course=None, will_recheck_access=False):
     """
     Implements get_module, extracting out the request-specific functionality.
 
@@ -442,7 +434,8 @@ def get_module_for_descriptor(user, request, descriptor, field_data_cache, cours
         user_location=user_location,
         request_token=xblock_request_token(request),
         disable_staff_debug_info=disable_staff_debug_info,
-        course=course
+        course=course,
+        will_recheck_access=will_recheck_access,
     )
 
 
@@ -461,7 +454,8 @@ def get_module_system_for_user(
         static_asset_path='',
         user_location=None,
         disable_staff_debug_info=False,
-        course=None
+        course=None,
+        will_recheck_access=False,
 ):
     """
     Helper function that returns a module system and student_data bound to a user and a descriptor.
@@ -532,7 +526,7 @@ def get_module_system_for_user(
             user_location=user_location,
             request_token=request_token,
             course=course,
-            will_recheck_access=True,
+            will_recheck_access=will_recheck_access,
         )
 
     def get_event_handler(event_type):
@@ -586,7 +580,6 @@ def get_module_system_for_user(
 
         BlockCompletion.objects.submit_completion(
             user=user,
-            course_key=course_id,
             block_key=block.scope_ids.usage_id,
             completion=event['completion'],
         )
@@ -603,16 +596,17 @@ def get_module_system_for_user(
             if course.end is not None and now > course.end:
                 return
 
-        SCORE_PUBLISHED.send(
-            sender=None,
-            block=block,
-            user=user,
-            raw_earned=event['value'],
-            raw_possible=event['max_value'],
-            only_if_higher=event.get('only_if_higher'),
-            score_deleted=event.get('score_deleted'),
-            grader_response=event.get('grader_response')
-        )
+        if not user.is_anonymous:
+            grades_signals.SCORE_PUBLISHED.send(
+                sender=None,
+                block=block,
+                user=user,
+                raw_earned=event['value'],
+                raw_possible=event['max_value'],
+                only_if_higher=event.get('only_if_higher'),
+                score_deleted=event.get('score_deleted'),
+                grader_response=event.get('grader_response')
+            )
 
     def handle_deprecated_progress_event(block, event):
         """
@@ -648,7 +642,6 @@ def get_module_system_for_user(
             if not getattr(block, 'has_custom_completion', False):
                 BlockCompletion.objects.submit_completion(
                     user=user,
-                    course_key=course_id,
                     block_key=block.scope_ids.usage_id,
                     completion=1.0,
                 )
@@ -693,13 +686,15 @@ def get_module_system_for_user(
             static_asset_path=static_asset_path,
             user_location=user_location,
             request_token=request_token,
-            course=course
+            course=course,
+            will_recheck_access=will_recheck_access,
         )
 
         module.descriptor.bind_for_student(
             inner_system,
             real_user.id,
             [
+                partial(DateLookupFieldData, course_id=course_id, user=user),
                 partial(OverrideFieldData.wrap, real_user, course),
                 partial(LmsFieldData, student_data=inner_student_data),
             ],
@@ -763,6 +758,7 @@ def get_module_system_for_user(
 
     block_wrappers.append(partial(display_access_messages, user))
     block_wrappers.append(partial(course_expiration_wrapper, user))
+    block_wrappers.append(partial(offer_banner_wrapper, user))
 
     if settings.FEATURES.get('DISPLAY_DEBUG_INFO_TO_STAFF'):
         if is_masquerading_as_specific_student(user, course_id):
@@ -790,12 +786,13 @@ def get_module_system_for_user(
     is_pure_xblock = isinstance(descriptor, XBlock) and not isinstance(descriptor, XModuleDescriptor)
     module_class = getattr(descriptor, 'module_class', None)
     is_lti_module = not is_pure_xblock and issubclass(module_class, LTIModule)
-    if is_pure_xblock or is_lti_module:
+    if (is_pure_xblock and not getattr(descriptor, 'requires_per_student_anonymous_id', False)) or is_lti_module:
         anonymous_student_id = anonymous_id_for_user(user, course_id)
     else:
         anonymous_student_id = anonymous_id_for_user(user, None)
 
-    field_data = LmsFieldData(descriptor._field_data, student_data)  # pylint: disable=protected-access
+    field_data = DateLookupFieldData(descriptor._field_data, course_id, user)  # pylint: disable=protected-access
+    field_data = LmsFieldData(field_data, student_data)
 
     user_is_staff = bool(has_access(user, u'staff', descriptor.location, course_id))
 
@@ -809,6 +806,8 @@ def get_module_system_for_user(
         'credit': CreditService(),
         'bookmarks': BookmarksService(user=user),
         'gating': GatingService(),
+        'grade_utils': GradesUtilService(course_id=course_id),
+        'user_state': UserStateService(),
         'courseware_parent_info': CoursewareParentInfoService(),
     }
 
@@ -870,7 +869,7 @@ def get_module_system_for_user(
         try:
             position = int(position)
         except (ValueError, TypeError):
-            log.exception('Non-integer %r passed as position.', position)
+            log.exception(u'Non-integer %r passed as position.', position)
             position = None
 
     system.set('position', position)
@@ -919,13 +918,15 @@ def get_module_for_descriptor_internal(user, descriptor, student_data, course_id
         user_location=user_location,
         request_token=request_token,
         disable_staff_debug_info=disable_staff_debug_info,
-        course=course
+        course=course,
+        will_recheck_access=will_recheck_access,
     )
 
     descriptor.bind_for_student(
         system,
         user.id,
         [
+            partial(DateLookupFieldData, course_id=course_id, user=user),
             partial(OverrideFieldData.wrap, user, course),
             partial(LmsFieldData, student_data=student_data),
         ],
@@ -947,7 +948,6 @@ def get_module_for_descriptor_internal(user, descriptor, student_data, course_id
             not access
             and will_recheck_access
             and (access.user_message or access.user_fragment)
-            and isinstance(access, IncorrectPartitionGroupError)
         )
         if access or caller_will_handle_access_error:
             return descriptor
@@ -955,7 +955,7 @@ def get_module_for_descriptor_internal(user, descriptor, student_data, course_id
     return descriptor
 
 
-def load_single_xblock(request, user_id, course_id, usage_key_string, course=None):
+def load_single_xblock(request, user_id, course_id, usage_key_string, course=None, will_recheck_access=False):
     """
     Load a single XBlock identified by usage_key_string.
     """
@@ -969,9 +969,17 @@ def load_single_xblock(request, user_id, course_id, usage_key_string, course=Non
         modulestore().get_item(usage_key),
         depth=0,
     )
-    instance = get_module(user, request, usage_key, field_data_cache, grade_bucket_type='xqueue', course=course)
+    instance = get_module(
+        user,
+        request,
+        usage_key,
+        field_data_cache,
+        grade_bucket_type='xqueue',
+        course=course,
+        will_recheck_access=will_recheck_access
+    )
     if instance is None:
-        msg = "No module {0} for user {1}--access denied?".format(usage_key_string, user)
+        msg = u"No module {0} for user {1}--access denied?".format(usage_key_string, user)
         log.debug(msg)
         raise Http404
     return instance
@@ -1022,6 +1030,7 @@ def xqueue_callback(request, course_id, userid, mod_id, dispatch):
 
 @csrf_exempt
 @xframe_options_exempt
+@transaction.non_atomic_requests
 def handle_xblock_callback_noauth(request, course_id, usage_id, handler, suffix=None):
     """
     Entry point for unauthenticated XBlock handlers.
@@ -1036,6 +1045,7 @@ def handle_xblock_callback_noauth(request, course_id, usage_id, handler, suffix=
 
 @csrf_exempt
 @xframe_options_exempt
+@transaction.non_atomic_requests
 def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
     """
     Generic view for extensions. This is where AJAX calls go.
@@ -1061,7 +1071,7 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
     # to avoid introducing backwards-incompatible changes.
     # You can see https://github.com/edx/XBlock/pull/383 for more details.
     else:
-        authentication_classes = (JwtAuthentication, OAuth2AuthenticationAllowInactiveUser)
+        authentication_classes = (JwtAuthentication, BearerAuthenticationAllowInactiveUser)
         authenticators = [auth() for auth in authentication_classes]
 
         for authenticator in authenticators:
@@ -1069,7 +1079,7 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
                 user_auth_tuple = authenticator.authenticate(request)
             except APIException:
                 log.exception(
-                    "XBlock handler %r failed to authenticate with %s", handler, authenticator.__class__.__name__
+                    u"XBlock handler %r failed to authenticate with %s", handler, authenticator.__class__.__name__
                 )
             else:
                 if user_auth_tuple is not None:
@@ -1079,20 +1089,20 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
     # NOTE (CCB): Allow anonymous GET calls (e.g. for transcripts). Modifying this view is simpler than updating
     # the XBlocks to use `handle_xblock_callback_noauth`, which is practically identical to this view.
     if request.method != 'GET' and not (request.user and request.user.is_authenticated):
-        return HttpResponseForbidden()
+        return HttpResponseForbidden('Unauthenticated')
 
     request.user.known = request.user.is_authenticated
 
     try:
         course_key = CourseKey.from_string(course_id)
     except InvalidKeyError:
-        raise Http404('{} is not a valid course key'.format(course_id))
+        raise Http404(u'{} is not a valid course key'.format(course_id))
 
     with modulestore().bulk_operations(course_key):
         try:
             course = modulestore().get_course(course_key)
         except ItemNotFoundError:
-            raise Http404('{} does not exist in the modulestore'.format(course_id))
+            raise Http404(u'{} does not exist in the modulestore'.format(course_id))
 
         return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course=course)
 
@@ -1115,8 +1125,8 @@ def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_inf
         descriptor = modulestore().get_item(usage_key)
         descriptor_orig_usage_key, descriptor_orig_version = modulestore().get_block_original_usage(usage_key)
     except ItemNotFoundError:
-        log.warn(
-            "Invalid location for course id %s: %s",
+        log.warning(
+            u"Invalid location for course id %s: %s",
             usage_key.course_key,
             usage_key
         )
@@ -1126,14 +1136,14 @@ def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_inf
         'module': {
             # xss-lint: disable=python-deprecated-display-name
             'display_name': descriptor.display_name_with_default_escaped,
-            'usage_key': unicode(descriptor.location),
+            'usage_key': six.text_type(descriptor.location),
         }
     }
 
     # For blocks that are inherited from a content library, we add some additional metadata:
     if descriptor_orig_usage_key is not None:
-        tracking_context['module']['original_usage_key'] = unicode(descriptor_orig_usage_key)
-        tracking_context['module']['original_usage_version'] = unicode(descriptor_orig_version)
+        tracking_context['module']['original_usage_key'] = six.text_type(descriptor_orig_usage_key)
+        tracking_context['module']['original_usage_version'] = six.text_type(descriptor_orig_version)
 
     unused_masquerade, user = setup_masquerade(request, course_id, has_access(user, 'staff', descriptor, course_id))
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
@@ -1154,7 +1164,7 @@ def get_module_by_usage_id(request, course_id, usage_id, disable_staff_debug_inf
     if instance is None:
         # Either permissions just changed, or someone is trying to be clever
         # and load something they shouldn't have access to.
-        log.debug("No module %s for user %s -- access denied?", usage_key, user)
+        log.debug(u"No module %s for user %s -- access denied?", usage_key, user)
         raise Http404
 
     return (instance, tracking_context)
@@ -1198,7 +1208,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
         else:
             block_usage_key = usage_key
         instance, tracking_context = get_module_by_usage_id(
-            request, course_id, unicode(block_usage_key), course=course
+            request, course_id, six.text_type(block_usage_key), course=course
         )
 
         # Name the transaction so that we can view XBlock handlers separately in
@@ -1228,7 +1238,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
                     resp = append_data_to_webob_response(resp, ee_data)
 
         except NoSuchHandlerError as err:
-            log.exception("XBlock %s attempted to access missing handler %r", instance, handler)
+            log.exception(u"XBlock %s attempted to access missing handler %r", instance, handler)
             return JsonResponse({'success': "Handler not found"}, status=404)
 
         # If we can't find the module, respond with a 404
@@ -1269,16 +1279,6 @@ def _get_course_and_invoke_handler(request, course_id, usage_id, handler, suffix
     return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course=course)
 
 
-def hash_resource(resource):
-    """
-    Hash a :class:`web_fragments.fragment.FragmentResource
-    """
-    md5 = hashlib.md5()
-    for data in resource:
-        md5.update(repr(data))
-    return md5.hexdigest()
-
-
 @api_view(['GET'])
 @view_auth_classes(is_authenticated=True)
 def xblock_view(request, course_id, usage_id, view_name):
@@ -1291,8 +1291,8 @@ def xblock_view(request, course_id, usage_id, view_name):
             the second is the resource description
     """
     if not settings.FEATURES.get('ENABLE_XBLOCK_VIEW_ENDPOINT', False):
-        log.warn("Attempt to use deactivated XBlock view endpoint -"
-                 " see FEATURES['ENABLE_XBLOCK_VIEW_ENDPOINT']")
+        log.warning("Attempt to use deactivated XBlock view endpoint -"
+                    " see FEATURES['ENABLE_XBLOCK_VIEW_ENDPOINT']")
         raise Http404
 
     try:
@@ -1307,18 +1307,18 @@ def xblock_view(request, course_id, usage_id, view_name):
         try:
             fragment = instance.render(view_name, context=request.GET)
         except NoSuchViewError:
-            log.exception("Attempt to render missing view on %s: %s", instance, view_name)
+            log.exception(u"Attempt to render missing view on %s: %s", instance, view_name)
             raise Http404
 
         hashed_resources = OrderedDict()
         for resource in fragment.resources:
             hashed_resources[hash_resource(resource)] = resource
 
-        csrf_token = csrf(request)['csrf_token']
+        csrf_token = six.text_type(csrf(request)['csrf_token'])
         response = JsonResponse({
             'html': fragment.content,
-            'resources': hashed_resources.items(),
-            'csrf_token': unicode(csrf_token),
+            'resources': list(hashed_resources.items()),
+            'csrf_token': csrf_token,
         })
         request.META['CSRF_COOKIE'] = csrf_token
         return response
@@ -1337,14 +1337,14 @@ def _check_files_limits(files):
 
         # Check number of files submitted
         if len(inputfiles) > settings.MAX_FILEUPLOADS_PER_INPUT:
-            msg = 'Submission aborted! Maximum %d files may be submitted at once' % \
+            msg = u'Submission aborted! Maximum %d files may be submitted at once' % \
                   settings.MAX_FILEUPLOADS_PER_INPUT
             return msg
 
         # Check file sizes
         for inputfile in inputfiles:
             if inputfile.size > settings.STUDENT_FILEUPLOAD_MAX_SIZE:  # Bytes
-                msg = 'Submission aborted! Your file "%s" is too large (max size: %d MB)' % \
+                msg = u'Submission aborted! Your file "%s" is too large (max size: %d MB)' % \
                       (inputfile.name, settings.STUDENT_FILEUPLOAD_MAX_SIZE / (1000 ** 2))
                 return msg
 
@@ -1364,7 +1364,8 @@ def append_data_to_webob_response(response, data):
 
     """
     if getattr(response, 'content_type', None) == 'application/json':
-        response_data = json.loads(response.body)
+        json_input = response.body.decode('utf-8') if isinstance(response.body, bytes) else response.body
+        response_data = json.loads(json_input)
         response_data.update(data)
-        response.body = json.dumps(response_data)
+        response.body = json.dumps(response_data).encode('utf-8')
     return response

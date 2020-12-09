@@ -126,7 +126,7 @@ class Command(BaseCommand):
         """
 
         if not settings.FEATURES.get('ENABLE_NOTIFICATIONS', False):
-            print 'ENABLE_NOTIFICATIONS not set to "true". Stopping...'
+            print('ENABLE_NOTIFICATIONS not set to "true". Stopping...')
             return
 
         usage = "usage: %prog [--daily] [--weekly] [--ns=NAMESPACE]"

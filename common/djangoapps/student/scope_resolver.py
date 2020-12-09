@@ -10,7 +10,7 @@ from django.contrib.auth.models import User
 
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator
 
 log = logging.getLogger(__name__)
 
@@ -25,7 +25,7 @@ def _get_course_key_from_string(course_id):
         try:
             course_key = CourseKey.from_string(course_id)
         except InvalidKeyError:
-            course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+            course_key = CourseLocator.from_string(course_id)
     else:
         course_key = course_id
 

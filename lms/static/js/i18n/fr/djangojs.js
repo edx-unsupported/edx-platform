@@ -48,6 +48,7 @@
     "\n      After you submit your exam, your responses are graded and your proctoring session is reviewed.\n      You might be eligible to earn academic credit for this course if you complete all required exams\n      as well as achieve a final grade that meets credit requirements for the course.\n    ": "\n      Apr\u00e8s avoir envoy\u00e9 votre examen, vos r\u00e9ponses seront \u00e9valu\u00e9es et votre session surveill\u00e9e sera \u00e9valu\u00e9e.\n      Vous pouvez \u00eatre \u00e9ligible \u00e0 des cr\u00e9dits acad\u00e9miques ou un certificat pour ce cours\n      si votre note est suffisante et votre session valid\u00e9e.\n    ",
     "\n      Are you sure that you want to submit your timed exam?\n    ": "\n      \u00cates-vous s\u00fbr de vouloir soumettre votre examen \u00e0 temps limit\u00e9?\n    ",
     "\n      Are you sure you want to end your proctored exam?\n    ": "\n      \u00cates-vous s\u00fbre de vouloir terminer votre examen surveill\u00e9?\n    ",
+    "\n      Because the due date has passed, you are no longer able to take this exam.\n    ": "\nVous ne pouvez plus passer cet examen car, l\u2019\u00e9ch\u00e9ance est pass\u00e9e.",
     "\n      Error with proctored exam\n    ": "\nErreur lors de l'examen surveill\u00e9",
     "\n      Follow these instructions\n    ": "\nSuivez ces instructions",
     "\n      Get familiar with proctoring for real exams later in the course. This practice exam has no impact\n      on your grade in the course.\n    ": "\n      Entrainez-vous \u00e0 passer un examen surveill\u00e9. Cet examen surveill\u00e9 d'entrainement n'est pas not\u00e9\n      et sans impact sur votre note finale.\n    ",
@@ -57,6 +58,7 @@
     "\n      If you have questions about the status of your proctored exam results, contact %(platform_name)s Support.\n    ": "\n      Si vous avez des questions \u00e0 propos du statut de votre examen surveill\u00e9, contactez le support %(platform_name)s.\n    ",
     "\n      Practice exams do not affect your grade or your credit eligibility.\n      You have completed this practice exam and can continue with your course work.\n    ": "\n      Les examens d'entrainement n'affectent pas votre note.\n      Vous avez termin\u00e9 cet examen d'entrainement, vous pouvez continuer \u00e0 parcourir le cours.\n    ",
     "\n      The due date for this exam has passed\n    ": "\n      La date limite pour cet examen est pass\u00e9e\n    ",
+    "\n      There was a problem with your practice proctoring session\n    ": "\nIl y a eu un probl\u00e8me avec l'essai de votre session de surveillance",
     "\n      This exam is proctored\n    ": "\nCet examen est surveill\u00e9",
     "\n      To be eligible for course credit or for a MicroMasters credential, you must pass the proctoring review for this exam.\n    ": "\nPour \u00eatre \u00e9ligible aux cr\u00e9dits acad\u00e9miques, vous devez passer cet examen avec surveillance.",
     "\n      To view your exam questions and responses, select <strong>View my exam</strong>. The exam's review status is shown in the left navigation pane.\n    ": "\n      Pour voir votre examen et vos r\u00e9ponses, cliquez sur <strong>Voir mon examen</strong>. Le statut de la revue de l'examen est disponible dans le menu de gauche.\n    ",
@@ -218,7 +220,6 @@
     "Advanced": "Avanc\u00e9",
     "After the subsection\\'s due date has passed, learners can no longer access its content. The subsection remains included in grade calculations.": "Apr\u00e8s que la date limite de la sous-section soit pass\u00e9e, les apprenants ne peuvent plus acc\u00e9der \u00e0 son contenu. La sous-section reste incluse dans les calculs de note.",
     "After you select ": "Apr\u00e8s avoir choisi",
-    "After you upload new files all your previously uploaded files will be overwritten. Continue?": "Apr\u00e8s avoir charger les nouveaux fichiers tous les pr\u00e9c\u00e9dents fichiers seront supprim\u00e9s. Continuer?",
     "Align center": "Aligner au centre",
     "Align left": "Aligner \u00e0 gauche",
     "Align right": "Aligner \u00e0 droite",
@@ -681,7 +682,6 @@
     "Feedback available for selection.": "Feedback disponible pour la s\u00e9lection.",
     "File": "Fichier",
     "File Name": "Nom du fichier",
-    "File size must be 10MB or less.": "La taille du fichier doit \u00eatre de 10Mb ou moins.",
     "File type is not allowed.": "Type de fichier non support\u00e9",
     "File types can not be empty.": "Les types de fichier ne peuvent \u00eatre vides.",
     "File upload succeeded": "Chargement du fichier r\u00e9ussi",
@@ -1786,7 +1786,7 @@
     "You have not created any certificates yet.": "Vous n'avez pas encore cr\u00e9e de certificat.",
     "You have not created any content groups yet.": "Vous n'avez pas encore cr\u00e9\u00e9 de groupes de contenu.",
     "You have not created any group configurations yet.": "Vous n'avez pas encore cr\u00e9\u00e9 de configuration des groupes.",
-    "You have selected an action, and you haven't made any changes on individual fields. You're probably looking for the Go button rather than the Save button.": "Vous avez s\u00e9lectionn\u00e9 une action, et vous n'avez fait aucune modification sur des champs. Vous cherchez probablement le bouton Envoyer et non le bouton Sauvegarder.",
+    "You have selected an action, and you haven't made any changes on individual fields. You're probably looking for the Go button rather than the Save button.": "Vous avez s\u00e9lectionn\u00e9 une action, et vous n'avez fait aucune modification sur des champs. Vous cherchez probablement le bouton Envoyer et non le bouton Enregistrer.",
     "You have selected an action, but you haven't saved your changes to individual fields yet. Please click OK to save. You'll need to re-run the action.": "Vous avez s\u00e9lectionn\u00e9 une action, mais vous n'avez pas encore sauvegard\u00e9 certains champs modifi\u00e9s. Cliquez sur OK pour sauver. Vous devrez r\u00e9appliquer l'action.",
     "You have successfully signed into %(currentProvider)s, but your %(currentProvider)s account does not have a linked %(platformName)s account. To link your accounts, sign in now using your %(platformName)s password.": "Vous \u00eates connect\u00e9 \u00e0 %(currentProvider)s avec succ\u00e8s,mais votre compte %(currentProvider)s n'est pas reli\u00e9 \u00e0 votre compte %(platformName)s. Pour lier vos comptes, connectez-vous en utilisant votre mot de passe %(platformName)s.",
     "You have unsaved changes are you sure you want to navigate away?": "Vous avez des modifications non enregistr\u00e9es, \u00eates-vous s\u00fbr de vouloir quitter cette page ?",
@@ -2018,7 +2018,7 @@
       if (typeof(value) == 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
-        return value[django.pluralidx(count)];
+        return value.constructor === Array ? value[django.pluralidx(count)] : value;
       }
     };
 
@@ -2076,9 +2076,9 @@
       "%Y-%m-%d"
     ],
     "DECIMAL_SEPARATOR": ",",
-    "FIRST_DAY_OF_WEEK": "1",
+    "FIRST_DAY_OF_WEEK": 1,
     "MONTH_DAY_FORMAT": "j F",
-    "NUMBER_GROUPING": "3",
+    "NUMBER_GROUPING": 3,
     "SHORT_DATETIME_FORMAT": "j N Y H:i",
     "SHORT_DATE_FORMAT": "j N Y",
     "THOUSAND_SEPARATOR": "\u00a0",

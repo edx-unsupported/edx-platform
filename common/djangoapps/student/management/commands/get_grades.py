@@ -3,13 +3,13 @@ Management command to generate a list of grades for
 all students that are enrolled in a course.
 """
 from util.request import RequestMock
-from courseware import grades, courses
+from lms.djangoapps.courseware import grades, courses
 from certificates.models import GeneratedCertificate
 from django.core.management.base import BaseCommand, CommandError
 import os
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator
 from django.contrib.auth.models import User
 from optparse import make_option
 import datetime
@@ -17,6 +17,9 @@ import csv
 
 
 class Command(BaseCommand):
+    """
+    Management command to generate a list of grades for all students that are enrolled in a course.
+    """
 
     help = """
     Generate a list of grades for all students
@@ -51,7 +54,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if os.path.exists(options['output']):
-            raise CommandError("File {0} already exists".format(
+            raise CommandError("File {} already exists".format(
                 options['output']))
 
         STATUS_INTERVAL = 100
@@ -63,9 +66,9 @@ class Command(BaseCommand):
             # if it's not a new-style course key, parse it from an old-style
             # course key
             except InvalidKeyError:
-                course_key = SlashSeparatedCourseKey.from_deprecated_string(options['course'])
+                course_key = CourseLocator.from_string(options['course'])
 
-        print "Fetching enrolled students for {0}".format(course_key)
+        print("Fetching enrolled students for {}".format(course_key))
         enrolled_students = User.objects.filter(
             courseenrollment__course_id=course_key
         )
@@ -73,20 +76,20 @@ class Command(BaseCommand):
         request = factory.get('/')
 
         total = enrolled_students.count()
-        print "Total enrolled: {0}".format(total)
+        print("Total enrolled: {}".format(total))
         course = courses.get_course_by_id(course_key)
         total = enrolled_students.count()
         start = datetime.datetime.now()
         rows = []
         header = None
-        print "Fetching certificate data"
+        print("Fetching certificate data")
         cert_grades = {
             cert.user.username: cert.grade
             for cert in list(
                 GeneratedCertificate.objects.filter(course_id=course_key).prefetch_related('user')
             )
         }
-        print "Grading students"
+        print("Grading students")
         for count, student in enumerate(enrolled_students):
             count += 1
             if count % STATUS_INTERVAL == 0:
@@ -97,18 +100,20 @@ class Command(BaseCommand):
                 timeleft = diff * (total - count) / STATUS_INTERVAL
                 hours, remainder = divmod(timeleft.seconds, 3600)
                 minutes, seconds = divmod(remainder, 60)
-                print "{0}/{1} completed ~{2:02}:{3:02}m remaining".format(
-                    count, total, hours, minutes)
+                print("{}/{} completed ~{:02}:{:02}m remaining".format(
+                    count, total, hours, minutes))
                 start = datetime.datetime.now()
             request.user = student
             grade = grades.grade(student, request, course)
             if not header:
-                header = [section['label'] for section in grade[u'section_breakdown']]
+                header = [section['label'] for section in grade['section_breakdown']]
                 rows.append(["email", "username", "certificate-grade", "grade"] + header)
-            percents = {section['label']: section['percent'] for section in grade[u'section_breakdown']}
+            percents = {section['label']: section['percent'] for section in grade['section_breakdown']}
             row_percents = [percents[label] for label in header]
             if student.username in cert_grades:
-                rows.append([student.email, student.username, cert_grades[student.username], grade['percent']] + row_percents)
+                rows.append(
+                    [student.email, student.username, cert_grades[student.username], grade['percent']] + row_percents
+                )
             else:
                 rows.append([student.email, student.username, "N/A", grade['percent']] + row_percents)
         with open(options['output'], 'wb') as f:

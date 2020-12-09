@@ -21,7 +21,7 @@ class Command(BaseCommand):
         store = modulestore()
         for course in store.get_courses():
             if course.cohort_config:
-                print "Updating affected course: %s" % unicode(course.location)
+                print("Updating affected course: {}".format(str(course.location)))
                 if 'inline_discussions_cohorting_default' in course.cohort_config:
                     course.cohort_config['always_cohort_inline_discussions'] = course.cohort_config[
                         'inline_discussions_cohorting_default'
@@ -31,4 +31,4 @@ class Command(BaseCommand):
                 if inlines or course_discussions:
                     course.cohort_config['cohorted_discussions'] = inlines + course_discussions
                 store.update_item(course, None)
-                print "%s updated." % unicode(course.location)
+                print("{} updated.".format(str(course.location)))

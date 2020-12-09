@@ -43,7 +43,6 @@ class _BaseTestCase(CompletionWaffleTestMixin, SharedModuleStoreTestCase):
     def submit_completion_with_user(self, user, item, completion):
         bc = BlockCompletion.objects.submit_completion(
             user=user,
-            course_key=self.course_key,
             block_key=item.location,
             completion=completion,
         )
@@ -114,7 +113,6 @@ class ConfigurationTestCase(_BaseTestCase):
         with override_settings(COMPLETION_AGGREGATOR_ASYNC_AGGREGATION=async_agg_setting):
             BlockCompletion.objects.submit_completion(
                 user=self.user,
-                course_key=self.course_key,
                 block_key=self.item.location,
                 completion=1.0
             )
@@ -314,7 +312,7 @@ class LibraryTestCase(_BaseTestCase):
                     parent=cls.vertical,
                     parent_location=cls.vertical.location,
                     max_count=2,
-                    source_library_id=unicode(cls.library.location.library_key),
+                    source_library_id=str(cls.library.location.library_key),
                     modulestore=cls.store,
                 )
                 # copy children from library to content block (LibaryContentDescriptor.tools.update_children?)
