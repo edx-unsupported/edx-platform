@@ -204,7 +204,7 @@ class ReportStore(object):
                     'bucket': config['BUCKET'],
                     'location': config['ROOT_PATH'],
                     'custom_domain': config.get("CUSTOM_DOMAIN", None),
-                    'querystring_expire': 300,
+                    'querystring_expire': 1200,
                     'gzip': True,
                 },
             )
