@@ -24601,7 +24601,7 @@ msgid ""
 "File type '%(detected_type)s' is not allowed. Allowed types are: "
 "'%(allowed_types)s'."
 msgstr ""
-"文件类型“%(detected_type)s”不受支持。支持的类型为：“%(allowed_types)s”。"
+"不支持文件类型“%(detected_type)s”。支持的类型为：“%(allowed_types)s”。"
 
 #: lms/lib/utils.py:13
 #, python-format
