@@ -15,6 +15,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail.message import EmailMessage
 from django.db import transaction
 from django.utils.translation import ugettext as _
+from gradebook.tasks import update_user_gradebook
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -174,6 +175,11 @@ def _migrate_progress(course, source, target):
     except Exception:
         log.exception("Unexpected error while migrating user progress.")
         return OUTCOME_FAILED_MIGRATION
+
+    log.info('Updating gradebook for %s user.', source.email)
+    update_user_gradebook(course, source.id)
+    log.info('Updating gradebook for %s user.', target.email)
+    update_user_gradebook(course, target.id)
 
     log.info(
         'User progress in "%s" course successfully migrated from "%s" to "%s"', course_key, source.email, target.email
