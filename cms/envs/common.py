@@ -1221,7 +1221,6 @@ CELERY_IMPORTS = (
     'cms.djangoapps.contentstore.tasks',
     'openedx.core.djangoapps.bookmarks.tasks',
     'openedx.core.djangoapps.ccxcon.tasks',
-    # TODO : juniper rebase - verify if we need the following line or not
     # this is a custom change added during ironwood rebase to fix unit tests
     'openedx.core.djangoapps.content.course_structures.tasks',
 )

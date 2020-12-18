@@ -91,7 +91,6 @@ class HtmlBlock(
         Return a fragment that contains the html for the student view
         """
         fragment = Fragment(self.get_html())
-        # TODO: juniper rebase - Please remove the below line if not requried.
         ## this line is a cutom change made during ironwood rebase
         fragment.add_javascript_url(settings.STATIC_URL + 'bundles/commons.js')
         add_webpack_to_fragment(fragment, 'HtmlBlockPreview')
