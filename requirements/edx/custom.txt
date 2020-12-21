@@ -20,7 +20,7 @@ git+https://github.com/edx-solutions/xblock-group-project.git@rebase-juniper#egg
 -e git+https://github.com/mckinseyacademy/xblock-scorm.git@v3.2.1#egg=xblock-scorm==3.2.1
 -e git+https://github.com/mckinseyacademy/xblock-diagnosticfeedback.git@v0.4.1#egg=xblock-diagnostic-feedback==0.4.1
 
--e git+https://github.com/open-craft/xblock-group-project-v2.git@0.12.7#egg=xblock-group-project-v2==0.12.7
+-e git+https://github.com/open-craft/xblock-group-project-v2.git@0.12.10#egg=xblock-group-project-v2==0.12.10
 -e git+https://github.com/open-craft/xblock-virtualreality.git@v0.1.5#egg=xblock-virtualreality==0.1.5
 
 -e git+https://github.com/edx/edx-notifications.git@rebase-juniper#egg=edx-notifications==3.0.0
