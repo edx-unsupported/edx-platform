@@ -13,7 +13,7 @@
 git+https://github.com/edx-solutions/xblock-group-project.git@rebase-juniper#egg=xblock-group-project==1.0.0
 -e git+https://github.com/edx-solutions/xblock-adventure.git@rebase-juniper#egg=xblock-adventure==0.3
 -e git+https://github.com/open-craft/xblock-poll.git@v1.10.1#egg=xblock-poll==1.10.1
--e git+https://github.com/open-craft/problem-builder.git@v4.1.7#egg=xblock-problem-builder==4.1.7
+-e git+https://github.com/open-craft/problem-builder.git@v4.1.8#egg=xblock-problem-builder==4.1.8
 #-e git+https://github.com/OfficeDev/xblock-officemix.git@86238f5968a08db005717dbddc1.9.6346808f1ed3716#egg=xblock-officemix
 -e git+https://github.com/open-craft/xblock-chat.git@v0.3.0#egg=chat-xblock==0.3.0
 -e git+https://github.com/open-craft/xblock-eoc-journal.git@v0.9.4#egg=xblock-eoc-journal==0.9.4
