@@ -7,6 +7,7 @@ from io import BytesIO
 
 from celery.task import task
 from completion.models import BlockCompletion
+from completion_aggregator.models import Aggregator
 from courseware.courses import get_course
 from courseware.models import StudentModule
 from django.conf import settings
@@ -171,6 +172,9 @@ def _migrate_progress(course, source, target):
         for state in student_states:
             state.student = target
             state.save()
+
+        log.info('Removing stale aggregators for source user.')
+        Aggregator.objects.filter(user=source, course_key=course_key).delete()
 
     except Exception:
         log.exception("Unexpected error while migrating user progress.")
