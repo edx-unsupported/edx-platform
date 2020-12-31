@@ -279,6 +279,7 @@ class StaticContentServer(MiddlewareMixin):
 
             try:
                 session_id = encryption_key.decrypt(bytes(access_token, 'utf-8'), settings.ASSETS_TOKEN_TTL)
+                session_id = session_id.decode() if type(session_id) is bytes else session_id
             except (InvalidToken, TypeError):
                 return False
             else:
