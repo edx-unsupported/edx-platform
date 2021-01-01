@@ -2296,6 +2296,9 @@ INSTALLED_APPS = [
     # be retried
     'celery_utils',
 
+    # management of user-triggered async tasks (course import/export, etc.)
+    'user_tasks',
+
     # Ability to detect and special-case crawler behavior
     'openedx.core.djangoapps.crawlers',
 
