@@ -121,9 +121,7 @@ def _migrate_progress(course, source, target):
         return OUTCOME_SOURCE_NOT_FOUND
 
     try:
-        assert not BlockCompletion.user_course_completion_queryset(user=target, course_key=course_key).exists()
-        assert not AnonymousUserId.objects.filter(user=source, course_id=course_key).exists()
-        assert not StudentModule.objects.filter(student=source, course_id=course_key).exists()
+        enrollment = CourseEnrollment.objects.select_for_update().get(user=source, course=course_key)
     except ObjectDoesNotExist:
         log.warning(
             'Migration failed. Source user with email "%s" not enrolled in "%s" course', source.email, course_key
@@ -136,9 +134,13 @@ def _migrate_progress(course, source, target):
         log.warning('Migration failed. Target user with such email not found: %s', target)
         return OUTCOME_TARGET_NOT_FOUND
 
-    if CourseEnrollment.objects.filter(user=target, course=course_key).exists():
+    try:
+        assert not BlockCompletion.user_course_completion_queryset(user=target, course_key=course_key).exists()
+        assert not AnonymousUserId.objects.filter(user=source, course_id=course_key).exists()
+        assert not StudentModule.objects.filter(student=source, course_id=course_key).exists()
+    except AssertionError:
         log.warning(
-            'Migration failed. Target user with email "%s" already enrolled in "%s" course', target.email, course_key
+            'Migration failed. Target user with email "%s" already enrolled in "%s" course and progress is present.', target.email, course_key
         )
         return OUTCOME_TARGET_ALREADY_ENROLLED
 
