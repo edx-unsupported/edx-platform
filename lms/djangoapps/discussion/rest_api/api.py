@@ -1048,7 +1048,6 @@ def get_response_comments(request, comment_id, page, page_size, requested_fields
         A paginated result containing a list of comments
 
     """
-    import pdb;pdb.set_trace()
     try:
         cc_comment = Comment(id=comment_id).retrieve()
         cc_thread, context = _get_thread_and_context(
