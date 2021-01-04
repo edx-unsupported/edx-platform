@@ -159,8 +159,16 @@ def _migrate_progress(course, source, target):
     # Actually migrate completions and progress
     try:
         # Modify enrollment
-        enrollment.user = target
-        enrollment.save()
+        try:
+            target_enrollment = CourseEnrollment.objects.select_for_update().get(user=source, course=course_key)
+        except ObjectDoesNotExist:
+            enrollment.user = target
+        else:
+            enrollment.is_active = False
+            target_enrollment.is_active = True
+            target_enrollment.save()
+        finally:
+            enrollment.save()
 
         # Migrate completions for user
         for completion in completions:
