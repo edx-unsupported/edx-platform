@@ -13,6 +13,27 @@ UPDATE_STATUS_FAILED = 'failed'
 UPDATE_STATUS_SKIPPED = 'skipped'
 
 
+def get_report_info(csv_name, course_id, timestamp, config_name='GRADES_DOWNLOAD'):
+    """
+    Upload data as a CSV using ReportStore.
+
+    Arguments:
+        csv_name: Name of the resulting CSV
+        course_id: ID of the course
+
+    Returns:
+        report_stroe: ReportStore - Instance of report store
+        report_name: string - Name of the generated report
+    """
+    report_store = ReportStore.from_config(config_name)
+    report_name = u"{course_prefix}_{csv_name}_{timestamp_str}.csv".format(
+        course_prefix=course_filename_prefix_generator(course_id),
+        csv_name=csv_name,
+        timestamp_str=timestamp.strftime("%Y-%m-%d-%H%M")
+    )
+    return report_store, report_name
+
+
 def upload_csv_to_report_store(rows, csv_name, course_id, timestamp, config_name='GRADES_DOWNLOAD'):
     """
     Upload data as a CSV using ReportStore.
