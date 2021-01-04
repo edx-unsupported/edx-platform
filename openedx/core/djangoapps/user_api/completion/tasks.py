@@ -136,8 +136,9 @@ def _migrate_progress(course, source, target):
 
     try:
         assert not BlockCompletion.user_course_completion_queryset(user=target, course_key=course_key).exists()
-        assert not AnonymousUserId.objects.filter(user=source, course_id=course_key).exists()
         assert not StudentModule.objects.filter(student=source, course_id=course_key).exists()
+        anonymous_ids = AnonymousUserId.objects.filter(user=target, course_id=course_key).values('anonymous_user_id')
+        assert not StudentItem.filter(course_id=course_key, student_id__in=anonymous_ids).exists()
     except AssertionError:
         log.warning(
             'Migration failed. Target user with email "%s" already enrolled in "%s" course and progress is present.', target.email, course_key
