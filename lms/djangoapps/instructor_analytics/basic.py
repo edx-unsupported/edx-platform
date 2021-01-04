@@ -441,7 +441,7 @@ def list_problem_responses(course_key, problem_location, limit_responses=None, b
     if limit_responses:
         smdat = smdat[:limit_responses]
     if batch_no:
-        smdat = smdat[(batch_no-1)*batch_size:batch_no*batch_size]
+        smdat = smdat[(batch_no - 1) * batch_size:batch_no * batch_size]
 
     return [
         {'username': response.student.username, 'state': response.state}
