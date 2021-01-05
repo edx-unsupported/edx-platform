@@ -512,11 +512,13 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
             student = self.create_student('student{}'.format(ctr))
             self.submit_student_answer(student.username, u'Problem1', ['Option 1'])
 
-        student_data, _ = ProblemResponses._build_student_data(
+        student_data = []
+        for student_data_batch, _, _ in ProblemResponses._build_student_data(
             user_id=self.instructor.id,
             course_key=self.course.id,
             usage_key_str_list=[str(self.course.location)],
-        )
+        ):
+            student_data += student_data_batch
 
         self.assertEquals(len(student_data), 4)
 
@@ -532,11 +534,14 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         problem = self.define_option_problem(u'Problem1')
         self.submit_student_answer(self.student.username, u'Problem1', ['Option 1'])
         with self._remove_capa_report_generator():
-            student_data, _ = ProblemResponses._build_student_data(
+            student_data = []
+            for student_data_batch, _, _ in ProblemResponses._build_student_data(
                 user_id=self.instructor.id,
                 course_key=self.course.id,
                 usage_key_str_list=[str(problem.location)],
-            )
+            ):
+                student_data += student_data_batch
+
         self.assertEquals(len(student_data), 1)
         self.assertDictContainsSubset({
             'username': 'student',
@@ -545,7 +550,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
             'title': 'Problem1',
         }, student_data[0])
         self.assertIn('state', student_data[0])
-        mock_list_problem_responses.assert_called_with(self.course.id, ANY, ANY)
+        mock_list_problem_responses.assert_called_with(self.course.id, ANY, ANY, ANY, ANY)
 
     @patch('xmodule.capa_module.CapaDescriptor.generate_report_data', create=True)
     def test_build_student_data_for_block_with_mock_generate_report_data(self, mock_generate_report_data):
@@ -561,11 +566,14 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
             ('student', state1),
             ('student', state2),
         ])
-        student_data, _ = ProblemResponses._build_student_data(
+        student_data = []
+        for student_data_batch, _, _ in ProblemResponses._build_student_data(
             user_id=self.instructor.id,
             course_key=self.course.id,
             usage_key_str_list=[str(self.course.location)],
-        )
+        ):
+            student_data += student_data_batch
+
         self.assertEquals(len(student_data), 2)
         self.assertDictContainsSubset({
             'username': 'student',
@@ -592,11 +600,14 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         """
         self.define_option_problem(u'Problem1')
         self.submit_student_answer(self.student.username, u'Problem1', ['Option 1'])
-        student_data, _ = ProblemResponses._build_student_data(
+        student_data = []
+        for student_data_batch, _, _ in ProblemResponses._build_student_data(
             user_id=self.instructor.id,
             course_key=self.course.id,
             usage_key_str_list=[str(self.course.location)],
-        )
+        ):
+            student_data += student_data_batch
+
         self.assertEquals(len(student_data), 1)
         self.assertDictContainsSubset({
             'username': 'student',
@@ -628,8 +639,8 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
             course_key=self.course.id,
             usage_key_str_list=[str(problem.location)],
         )
-        mock_generate_report_data.assert_called_with(ANY, ANY)
-        mock_list_problem_responses.assert_called_with(self.course.id, ANY, ANY)
+        mock_generate_report_data.assert_called()
+        mock_list_problem_responses.assert_called()
 
     def test_success(self):
         task_input = {
@@ -639,14 +650,15 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         with patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task'):
             with patch('lms.djangoapps.instructor_task.tasks_helper.grades'
                        '.ProblemResponses._build_student_data') as mock_build_student_data:
-                mock_build_student_data.return_value = (
+                mock_build_student_data.return_value = iter([(
                     [
                         {'username': 'user0', 'state': u'state0'},
                         {'username': 'user1', 'state': u'state1'},
                         {'username': 'user2', 'state': u'state2'},
                     ],
-                    ['username', 'state']
-                )
+                    ['username', 'state'],
+                    1
+                )])
                 result = ProblemResponses.generate(
                     None, None, self.course.id, task_input, 'calculated'
                 )
