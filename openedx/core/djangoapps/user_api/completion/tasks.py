@@ -1,7 +1,8 @@
 """Module containing a task for user progress migration"""
 
-import csv
+
 import logging
+import unicodecsv
 
 from io import BytesIO
 
@@ -9,7 +10,7 @@ from celery.task import task
 from completion.models import BlockCompletion
 from completion_aggregator.models import Aggregator
 from courseware.courses import get_course
-from courseware.models import StudentModule
+from lms.djangoapps.courseware.models import StudentModule
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
@@ -64,7 +65,8 @@ def _create_results_csv(results):
 
     csv_file = BytesIO()
 
-    writer = csv.DictWriter(csv_file, fieldnames)
+    writer = unicodecsv.DictWriter(csv_file, fieldnames, encoding="utf-8")
+    # writer = csv.DictWriter(csv_file, fieldnames)
     writer.writeheader()
     writer.writerows(results)
 
@@ -141,8 +143,8 @@ def _migrate_progress(course, source, target):
         return OUTCOME_TARGET_ALREADY_ENROLLED
 
     # Fetch completions for source user
-    completions = BlockCompletion.user_course_completion_queryset(
-        user=source, course_key=course_key
+    completions = BlockCompletion.user_learning_context_completion_queryset(
+        user=source, context_key=course_key
     ).select_for_update()
 
     # Fetch edx-submissions data for source user

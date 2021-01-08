@@ -1,5 +1,5 @@
-import csv
 import logging
+import unicodecsv
 
 from rest_framework.authentication import SessionAuthentication
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
@@ -66,7 +66,7 @@ class MigrateProgressView(APIView):
         csv_file = request.FILES['file']
         recepient_address = request.POST.get('recepient_address')
 
-        reader = csv.DictReader(csv_file)
+        reader = unicodecsv.DictReader(csv_file, encoding="utf-8")
 
         if not {'course', 'source_email', 'dest_email'}.issubset(set(reader.fieldnames)):
             log.warning('Received invalid csv.')

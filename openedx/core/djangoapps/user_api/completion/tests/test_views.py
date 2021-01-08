@@ -1,7 +1,7 @@
 import mock
 
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from rest_framework.test import APIClient, APITestCase
 
 from student.tests.factories import UserFactory
@@ -21,7 +21,7 @@ class ProgressMigrateAPITestCase(APITestCase):
 
     def test_invalid_csv(self):
         invalid_csv = b'course,source_email,wrong_column,outcome\r\n' \
-            'course-v1:a+b+c,source@example.com,target@example.com,\r\n'
+            b'course-v1:a+b+c,source@example.com,target@example.com,\r\n'
 
         csv_file = SimpleUploadedFile("migrate.csv", invalid_csv, content_type="text/csv")
 
@@ -34,7 +34,7 @@ class ProgressMigrateAPITestCase(APITestCase):
     @mock.patch('openedx.core.djangoapps.user_api.completion.views.migrate_progress.delay')
     def test_migrate_scheduling(self, migrate_progress):
         csv = b'course,source_email,dest_email,outcome\r\n' \
-            'course-v1:a+b+c,source@example.com,target@example.com,\r\n'
+            b'course-v1:a+b+c,source@example.com,target@example.com,\r\n'
 
         csv_file = SimpleUploadedFile("migrate.csv", csv, content_type="text/csv")
 
