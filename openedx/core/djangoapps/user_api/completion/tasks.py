@@ -66,7 +66,6 @@ def _create_results_csv(results):
     csv_file = BytesIO()
 
     writer = unicodecsv.DictWriter(csv_file, fieldnames, encoding="utf-8")
-    # writer = csv.DictWriter(csv_file, fieldnames)
     writer.writeheader()
     writer.writerows(results)
 

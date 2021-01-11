@@ -5,10 +5,11 @@ import json
 from completion import waffle as completion_waffle
 from completion.models import BlockCompletion
 from lms.djangoapps.courseware.models import StudentModule
-from courseware.tests.factories import StudentModuleFactory
+from lms.djangoapps.courseware.tests.factories import StudentModuleFactory
 
 from django.contrib.auth.models import User
 from django.core import mail
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
 from openedx.core.djangoapps.user_api.completion.tasks import (
@@ -141,6 +142,7 @@ class ProgressMigrationTestCase(ModuleStoreTestCase):
             OUTCOME_TARGET_ALREADY_ENROLLED
         )
 
+    @skip_unless_lms
     def test_migrated(self):
         source = self._create_user(enrolled=self.course)
         target = self._create_user()
