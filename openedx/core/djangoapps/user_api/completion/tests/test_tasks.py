@@ -35,6 +35,7 @@ from mock import call, patch
 import uuid
 
 
+@skip_unless_lms
 class ProgressMigrationTestCase(ModuleStoreTestCase):
     """
     Parent test case for progress migration tests.
@@ -144,7 +145,6 @@ class ProgressMigrationTestCase(ModuleStoreTestCase):
             OUTCOME_TARGET_ALREADY_ENROLLED
         )
 
-    @skip_unless_lms
     def test_migrated(self):
         source = self._create_user(enrolled=self.course)
         target = self._create_user()
@@ -178,6 +178,7 @@ class ProgressMigrationTestCase(ModuleStoreTestCase):
                 OUTCOME_FAILED_MIGRATION
             )
 
+    @skip_unless_lms
     def test_migrate_progress(self):
         """
         Integration test, that checks that:
