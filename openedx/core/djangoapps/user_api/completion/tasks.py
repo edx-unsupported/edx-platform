@@ -136,7 +136,9 @@ def _migrate_progress(course, source, target):
         return OUTCOME_TARGET_NOT_FOUND
 
     try:
-        assert not BlockCompletion.user_course_completion_queryset(user=target, course_key=course_key).exists()
+        assert not BlockCompletion.user_learning_context_completion_queryset(
+            user=target, context_key=course_key
+        ).exists()
         anonymous_ids = AnonymousUserId.objects.filter(user=target, course_id=course_key).values('anonymous_user_id')
         assert not StudentItem.objects.filter(course_id=course_key, student_id__in=anonymous_ids).exists()
     except AssertionError:
