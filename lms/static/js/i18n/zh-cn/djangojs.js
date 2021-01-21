@@ -4,14 +4,21 @@
 
   var django = globals.django || (globals.django = {});
 
-  
-  django.pluralidx = function(count) { return (count == 1) ? 0 : 1; };
-  
+
+   django.pluralidx = function(n) {
+    var v=0;
+    if (typeof(v) == 'boolean') {
+      return v ? 1 : 0;
+    } else {
+      return v;
+    }
+  };
+
 
   /* gettext library */
 
   django.catalog = django.catalog || {};
-  
+
   var newcatalog = {
     "\n\nThis email is to let you know that the status of your proctoring session review for %(exam_name)s in\n<a href=\"%(course_url)s\">%(course_name)s </a> is %(status)s. If you have any questions about proctoring,\ncontact %(platform)s support at %(contact_email)s.\n\n": "\n\n\u6b64\u5c01\u90ae\u4ef6\u63d0\u793a\u60a8\u5728\u76d1\u8003\u6a21\u5f0f\u4e0b\u6240\u8fdb\u884c\u7684\u8bfe\u7a0b<a href=\"%(course_url)s\">%(course_name)s</a>\u7684%(exam_name)s\u8003\u8bd5\u5ba1\u6838\u72b6\u6001\u4e3a%(status)s\u3002\u5982\u679c\u60a8\u5bf9\u76d1\u8003\u6a21\u5f0f\u6709\u4efb\u4f55\u7591\u95ee\uff0c\u8bf7\u8054\u7cfb%(platform)s\u652f\u6301\u56e2\u961f%(contact_email)s \u3002\n",
     "\n                    Make sure you are on a computer with a webcam, and that you have valid photo identification\n                    such as a driver's license or passport, before you continue.\n                ": "\n                    \u8bf7\u786e\u4fdd\u60a8\u7684\u7535\u8111\u5e26\u6709\u7f51\u7edc\u6444\u50cf\u5934\uff0c\u5e76\u6709\u6709\u6548\u7684\u5e26\u7167\u7247\u8eab\u4efd\u8bc1\u660e\uff0c\n                    \u4f8b\u5982\u9a7e\u9a76\u8bc1\u6216\u62a4\u7167\u3002\n                ",
@@ -2482,7 +2489,7 @@
   for (var key in newcatalog) {
     django.catalog[key] = newcatalog[key];
   }
-  
+
 
   if (!django.jsi18n_initialized) {
     django.gettext = function(msgid) {
