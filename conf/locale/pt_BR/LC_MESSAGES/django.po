@@ -25880,3 +25880,19 @@ msgid ""
 "distinct password(s) before reusing a previous password."
 msgstr "Você está reutilizando uma senha que usou recentemente. Você deve ter {0} "
 "senha(s) distinta(s) antes de reutilizar uma senha anterior"
+
+#: lms/lib/utils.py:8
+#, python-format
+msgid ""
+"File type '%(detected_type)s' is not allowed. Allowed types are: "
+"'%(allowed_types)s'."
+msgstr ""
+"O tipo de arquivo '%(detected_type)s' não é permitido. Os tipos permitidos são: '%(allowed_types)s'."
+
+#: lms/lib/utils.py:13
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+"A extensão de arquivo '%(extension)s' não é permitida. As extensões permitidas são: '%(allowed_extensions)s'."

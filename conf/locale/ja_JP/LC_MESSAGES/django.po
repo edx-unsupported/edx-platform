@@ -24349,3 +24349,19 @@ msgid ""
 "distinct password(s) before reusing a previous password."
 msgstr "最近まで使用していたパスワードを再使用しようとしています。過去に使用したことのあるパスワードは、"
 "異なるパスワードを {0} 回使用した後でないと再使用できません"
+
+#: lms/lib/utils.py:8
+#, python-format
+msgid ""
+"File type '%(detected_type)s' is not allowed. Allowed types are: "
+"'%(allowed_types)s'."
+msgstr ""
+"ファイルタイプ '%(detected_type)s' は使用できません。使用できるタイプは '%(allowed_types)s' です。"
+
+#: lms/lib/utils.py:13
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+"ファイル拡張子 '%(extension)s' は使用できません。使用できる拡張子は '%(allowed_extensions)s' です。"

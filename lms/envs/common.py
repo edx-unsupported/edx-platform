@@ -2091,6 +2091,9 @@ INSTALLED_APPS = [
     # edX Video Pipeline integration
     'openedx.core.djangoapps.video_pipeline',
 
+    # CMS apps
+    'cms.djangoapps.course_creators',
+
     # Our courseware
     'courseware',
     'student.apps.StudentConfig',
@@ -2292,6 +2295,9 @@ INSTALLED_APPS = [
     # Customized celery tasks, including persisting failed tasks so they can
     # be retried
     'celery_utils',
+
+    # management of user-triggered async tasks (course import/export, etc.)
+    'user_tasks',
 
     # Ability to detect and special-case crawler behavior
     'openedx.core.djangoapps.crawlers',

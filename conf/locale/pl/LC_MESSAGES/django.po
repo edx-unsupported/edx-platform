@@ -673,3 +673,19 @@ msgstr "treść nie może być pusta"
 #, python-brace-format
 msgid "User '{username}' already exists"
 msgstr "Użytkownik o nazwie '{username}' już istnieje"
+
+#: lms/lib/utils.py:8
+#, python-format
+msgid ""
+"File type '%(detected_type)s' is not allowed. Allowed types are: "
+"'%(allowed_types)s'."
+msgstr ""
+"Typ pliku '%(detected_type)s' nie jest dozwolony. Dozwolone typy plików to: '%(allowed_types)s'."
+
+#: lms/lib/utils.py:13
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+"Rozszerzenie '%(extension)s' nie jest dozwolone. Dozwolone rozszerzenia to: '%(allowed_extensions)s'."

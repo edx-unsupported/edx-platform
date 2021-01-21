@@ -204,7 +204,7 @@ class ReportStore(object):
                     'bucket': config['BUCKET'],
                     'location': config['ROOT_PATH'],
                     'custom_domain': config.get("CUSTOM_DOMAIN", None),
-                    'querystring_expire': 300,
+                    'querystring_expire': 1200,
                     'gzip': True,
                 },
             )
@@ -274,7 +274,11 @@ class DjangoStorageReportStore(ReportStore):
         # Adding unicode signature (BOM) for MS Excel 2013 compatibility
         output_buffer.write(codecs.BOM_UTF8)
         csvwriter = csv.writer(output_buffer)
-        csvwriter.writerows(self._get_utf8_encoded_rows(rows))
+        batch_size = 3000
+        while rows:
+            batch = rows[:batch_size]
+            rows = rows[batch_size:]
+            csvwriter.writerows(self._get_utf8_encoded_rows(batch))
         output_buffer.seek(0)
         self.store(course_id, filename, output_buffer)
 

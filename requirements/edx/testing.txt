@@ -38,6 +38,7 @@ git+https://github.com/edx/RecommenderXBlock.git@1.4.0#egg=recommender-xblock==1
 git+https://github.com/edx-solutions/xblock-drag-and-drop-v2@v2.1.6#egg=xblock-drag-and-drop-v2==2.1.6
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@138e6fa0bf3a2013e904a085b9fed77dab7f3f21#egg=xblock-google-drive
 git+https://github.com/open-craft/xblock-poll@add89e14558c30f3c8dc7431e5cd6536fff6d941#egg=xblock-poll==1.5.1
+-e git+https://github.com/msaqib52/xblock-utils.git@a05d63cf5e07d0920a2dbd66032dcf579e501d4d#egg=xblock-utils==1.2.3
 -e common/lib/xmodule
 amqp==1.4.9
 analytics-python==1.2.9
@@ -334,7 +335,6 @@ webob==1.8.5
 werkzeug==0.14.1          # via flask
 wrapt==1.10.5
 xblock-review==1.1.5
-xblock-utils==1.2.2
 xblock==1.2.2
 xmltodict==0.11.0         # via moto
 zendesk==1.1.1

@@ -25950,3 +25950,17 @@ msgid ""
 "distinct password(s) before reusing a previous password."
 msgstr "إنك تعيد استخدام كلمة مرور استخدمتها مؤخرًا. يجب"
 " أن يكون لديك {0} كلمة (كلمات) مرور مختلفة قبل إعادة استخدام كلمة مرور سابقة"
+
+#: lms/lib/utils.py:8
+#, python-format
+msgid ""
+"File type '%(detected_type)s' is not allowed. Allowed types are: "
+"'%(allowed_types)s'."
+msgstr "نوع الملف '%(detected_type)s' غير مسموح به. الأنواع المسموح بها هي: '%(allowed_types)s'."
+
+#: lms/lib/utils.py:13
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr "امتداد الملف '%(extension)s' غير مسموح به. الامتدادات المسموح بها هي: '%(allowed_extensions)s'."

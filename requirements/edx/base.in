@@ -154,5 +154,6 @@ user-util                           # Functionality for retiring users (GDPR com
 web-fragments                       # Provides the ability to render fragments of web pages
 XBlock                              # Courseware component architecture
 xblock-review                       # XBlock which displays problems from earlier in the course for ungraded retries
-xblock-utils                        # Provides utilities used by the Discussion XBlock
+# Using this forked version of xblock-utils because of a fix related to i18n in master but master do not support python 2
+-e git+https://github.com/msaqib52/xblock-utils.git@a05d63cf5e07d0920a2dbd66032dcf579e501d4d#egg=xblock-utils==1.2.3
 zendesk                             # Python API for the Zendesk customer support system

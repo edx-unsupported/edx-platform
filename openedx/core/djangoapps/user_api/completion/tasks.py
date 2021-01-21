@@ -7,6 +7,7 @@ from io import BytesIO
 
 from celery.task import task
 from completion.models import BlockCompletion
+from completion_aggregator.models import Aggregator
 from courseware.courses import get_course
 from courseware.models import StudentModule
 from django.conf import settings
@@ -15,6 +16,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail.message import EmailMessage
 from django.db import transaction
 from django.utils.translation import ugettext as _
+from gradebook.tasks import update_user_gradebook
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -132,9 +134,13 @@ def _migrate_progress(course, source, target):
         log.warning('Migration failed. Target user with such email not found: %s', target)
         return OUTCOME_TARGET_NOT_FOUND
 
-    if CourseEnrollment.objects.filter(user=target, course=course_key).exists():
+    try:
+        assert not BlockCompletion.user_course_completion_queryset(user=target, course_key=course_key).exists()
+        anonymous_ids = AnonymousUserId.objects.filter(user=target, course_id=course_key).values('anonymous_user_id')
+        assert not StudentItem.objects.filter(course_id=course_key, student_id__in=anonymous_ids).exists()
+    except AssertionError:
         log.warning(
-            'Migration failed. Target user with email "%s" already enrolled in "%s" course', target.email, course_key
+            'Migration failed. Target user with email "%s" already enrolled in "%s" course and progress is present.', target.email, course_key
         )
         return OUTCOME_TARGET_ALREADY_ENROLLED
 
@@ -153,8 +159,16 @@ def _migrate_progress(course, source, target):
     # Actually migrate completions and progress
     try:
         # Modify enrollment
-        enrollment.user = target
-        enrollment.save()
+        try:
+            target_enrollment = CourseEnrollment.objects.select_for_update().get(user=target, course=course_key)
+        except ObjectDoesNotExist:
+            enrollment.user = target
+        else:
+            enrollment.is_active = False
+            target_enrollment.is_active = True
+            target_enrollment.save()
+        finally:
+            enrollment.save()
 
         # Migrate completions for user
         for completion in completions:
@@ -171,9 +185,17 @@ def _migrate_progress(course, source, target):
             state.student = target
             state.save()
 
+        log.info('Removing stale aggregators for source user.')
+        Aggregator.objects.filter(user=source, course_key=course_key).delete()
+
     except Exception:
         log.exception("Unexpected error while migrating user progress.")
         return OUTCOME_FAILED_MIGRATION
+
+    log.info('Updating gradebook for %s user.', source.email)
+    update_user_gradebook(course, source.id)
+    log.info('Updating gradebook for %s user.', target.email)
+    update_user_gradebook(course, target.id)
 
     log.info(
         'User progress in "%s" course successfully migrated from "%s" to "%s"', course_key, source.email, target.email

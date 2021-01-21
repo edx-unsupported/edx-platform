@@ -26494,3 +26494,21 @@ msgid ""
 "distinct password(s) before reusing a previous password."
 msgstr "Vous réutilisez un mot de passe que vous avez déjà utilisé par le passé. Vous devez avoir "
 "{0} mots de passe différents avant de réutiliser un mot de passe déjà utilisé par le passé."
+
+#: lms/lib/utils.py:8
+#, python-format
+msgid ""
+"File type '%(detected_type)s' is not allowed. Allowed types are: "
+"'%(allowed_types)s'."
+msgstr ""
+"Les fichiers de type '%(detected_type)s' ne sont pas pris en charge. "
+"Les types de fichiers pris en charge sont les suivants : %(allowed_types)s'."
+
+#: lms/lib/utils.py:13
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+"Les extensions de fichiers '%(extension)s' ne sont pas prises en charge. "
+"Les extensions pris en charge sont : '%(allowed_extensions)s'."

@@ -23961,3 +23961,21 @@ msgstr "해당 강의에 등록되지 않은 수강자"
 #: users/views.py:1762
 msgid "read field is missing"
 msgstr "읽기 필드 누락"
+
+#: lms/lib/utils.py:8
+#, python-format
+msgid ""
+"File type '%(detected_type)s' is not allowed. Allowed types are: "
+"'%(allowed_types)s'."
+msgstr ""
+"파일 유형 '%(detected_type)s'은(는) 허용되지 않습니다. "
+"허용되는 유형은 '%(allowed_types)s'입니다."
+
+#: lms/lib/utils.py:13
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+"파일 확장자 '%(extension)s'은(는) 허용되지 않습니다. "
+"허용되는 확장자는 '%(allowed_extensions)s'입니다."
