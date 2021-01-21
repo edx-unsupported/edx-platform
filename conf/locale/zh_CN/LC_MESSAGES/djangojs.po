@@ -7085,7 +7085,7 @@ msgstr "帖子类型"
 msgid ""
 "Questions raise issues that need answers. Discussions share ideas and start "
 "conversations. (Required)"
-msgstr "“问题”指需要回答的问题。“讨论”指分享想法并开始交流。(必填项)"
+msgstr "使用“问题”可提出需要解答的问题。使用“讨论”可分享想法并开始对话。(必填项)"
 
 #: common/static/common/templates/discussion/thread-type.underscore
 msgid "Question"

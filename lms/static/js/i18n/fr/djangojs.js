@@ -1257,7 +1257,7 @@
     "Publishing Status": "\u00c9tat de la publication",
     "Question": "Question",
     "Questions raise issues that need answers. Discussions share ideas and start conversations.": "Les questions portent sur des probl\u00e8mes qui n\u00e9cessitent des r\u00e9ponses. Les discussions permettent de partager des id\u00e9es et de d\u00e9marrer des conversations",
-    "Questions raise issues that need answers. Discussions share ideas and start conversations. (Required)": "Les questions sont adapt\u00e9es pour les sujets qui n\u00e9cessitent une r\u00e9ponse. Les discussions permettent de partager des id\u00e9es et de commencer des conversations. (Obligatoire)",
+    "Questions raise issues that need answers. Discussions share ideas and start conversations. (Required)": "Les questions portent sur des probl\u00e8mes qui n\u00e9cessitent des r\u00e9ponses. Les discussions permettent de partager des id\u00e9es et de d\u00e9marrer des conversations. (Obligatoire)",
     "Queued": "Mis en file d'attente",
     "REMAINING COURSES": "RESTANT",
     "Read More": "En lire plus.",

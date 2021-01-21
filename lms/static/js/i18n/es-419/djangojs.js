@@ -1464,7 +1464,7 @@
     "Publishing Status": "Estado de publicaci\u00f3n",
     "Question": "Pregunta",
     "Questions raise issues that need answers. Discussions share ideas and start conversations.": "Las preguntas plantean problemas que exigen una respuesta. Los debates fomentan el intercambio de ideas y generan conversaciones.",
-    "Questions raise issues that need answers. Discussions share ideas and start conversations. (Required)": "Utiliza Pregunta para plantear temas que necesitan respuestas. Utiliza Discusi\u00f3n para compartir tus ideas y comenzar conversaciones. (Obligatorio)",
+    "Questions raise issues that need answers. Discussions share ideas and start conversations. (Required)": "Las preguntas plantean problemas que exigen una respuesta. Los debates fomentan el intercambio de ideas y generan conversaciones. (Obligatorio)",
     "Queued": "En cola",
     "REMAINING COURSES": "CURSOS RESTANTES",
     "Read More": "Leer mas",

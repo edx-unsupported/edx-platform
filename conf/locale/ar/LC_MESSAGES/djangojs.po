@@ -7220,7 +7220,7 @@ msgstr "نوع المنشور"
 msgid ""
 "Questions raise issues that need answers. Discussions share ideas and start "
 "conversations. (Required)"
-msgstr "ثير الأسئلة المشكلات التي تحتاج إلى إجابات.المناقشات تبادل الأفكار وبدء المحادثات. (مطلوب)"
+msgstr "تثير الأسئلة مشكلات تحتاج إلى إجابات. وتشارك المناقشات أفكارًا وتفتتح المحادثات. (مطلوب)"
 
 #: common/static/common/templates/discussion/thread-type.underscore
 msgid "Question"

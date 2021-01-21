@@ -7561,9 +7561,8 @@ msgid ""
 "Questions raise issues that need answers. Discussions share ideas and start "
 "conversations. (Required)"
 msgstr ""
-"Les questions sont adaptées pour les sujets qui nécessitent une réponse. Les"
-" discussions permettent de partager des idées et de commencer des "
-"conversations. (Obligatoire)"
+"Les questions portent sur des problèmes qui nécessitent des réponses. Les discussions "
+"permettent de partager des idées et de démarrer des conversations. (Obligatoire)"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Question"

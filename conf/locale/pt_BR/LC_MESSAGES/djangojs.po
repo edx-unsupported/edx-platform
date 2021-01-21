@@ -7206,7 +7206,9 @@ msgstr "Tipo de postagem"
 msgid ""
 "Questions raise issues that need answers. Discussions share ideas and start "
 "conversations. (Required)"
-msgstr "Perguntas levantam questões que precisam de respostas. As discussões compartilham ideias e iniciam conversas. (Obrigatório)"
+msgstr ""
+"As perguntas levantam questões que precisam de respostas. As discussões "
+"compartilham ideias e iniciam conversas. (Obrigatório)"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Question"

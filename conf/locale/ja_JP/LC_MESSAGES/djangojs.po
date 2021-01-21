@@ -3148,7 +3148,7 @@ msgstr ""
 #: lms/static/js/customwmd.js
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Your question or idea (required)"
-msgstr ""
+msgstr "質問やアイディア(必須)"
 
 #: lms/static/js/dashboard/donation.js
 msgid "Please enter a valid donation amount."
@@ -6937,7 +6937,7 @@ msgstr "投稿タイプ"
 msgid ""
 "Questions raise issues that need answers. Discussions share ideas and start "
 "conversations. (Required)"
-msgstr "'質問'は解答を必要とする議題に用います。'ディスカッション'は考えを共有したり、会話するためのものです。(必須)"
+msgstr "質問: 回答が必要な問題を提起します。ディスカッション: 対話を開始し、アイデアを共有します。(必須)"
 
 #: common/static/common/templates/discussion/thread-type.underscore
 msgid "Question"

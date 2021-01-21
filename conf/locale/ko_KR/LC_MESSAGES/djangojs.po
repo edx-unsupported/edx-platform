@@ -10729,7 +10729,7 @@ msgstr "게시글 유형"
 msgid ""
 "Questions raise issues that need answers. Discussions share ideas and start "
 "conversations. (Required)"
-msgstr "질문을 통해 답변을 필요로 하는 문제를 제기할 수 있으며, 토론을 통해 의견을 공유하고 대화를 시작할 수 있습니다(필수)."
+msgstr "질문을 통해 답변을 필요로 하는 문제를 제기할 수 있으며, 토론을 통해 의견을 공유하고 대화를 시작할 수 있습니다.(필수)"
 
 #: common/static/common/templates/discussion/thread-type.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-type.underscore

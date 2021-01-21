@@ -735,7 +735,7 @@
     "Publishing Status": "Situa\u00e7\u00e3o de Publica\u00e7\u00e3o",
     "Question": "Pergunta",
     "Questions raise issues that need answers. Discussions share ideas and start conversations.": "As perguntas levantam quest\u00f5es que precisam de respostas. As discuss\u00f5es compartilham ideias e iniciam conversas",
-    "Questions raise issues that need answers. Discussions share ideas and start conversations. (Required)": "Perguntas levantam quest\u00f5es que precisam de respostas. As discuss\u00f5es compartilham ideias e iniciam conversas. (Obrigat\u00f3rio)",
+    "Questions raise issues that need answers. Discussions share ideas and start conversations. (Required)": "As perguntas levantam quest\u00f5es que precisam de respostas. As discuss\u00f5es compartilham ideias e iniciam conversas. (Obrigat\u00f3rio)",
     "Queued": "Em lista de espera.",
     "Reason": "Raz\u00e3o",
     "Reason field should not be left blank.": "O campo de motivo n\u00e3o deve ser deixado em branco.",

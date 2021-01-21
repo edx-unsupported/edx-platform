@@ -7241,8 +7241,8 @@ msgstr "Typ postu"
 msgid ""
 "Questions raise issues that need answers. Discussions share ideas and start "
 "conversations. (Required)"
-msgstr "Pytania podnoszą kwestie wymagające odpowiedzi. Dyskusje służą do dzielenie "
-"się opiniami i rozpoczęcia konwersacji. (Wymagane)"
+msgstr "Za pomocą Pytania możesz podnieść kwestie wymagające odpowiedzi. Za pomocą "
+"Dyskusji możesz podzielić się spostrzeżeniami i rozpocząć rozmowę. (Wymagane)"
 
 #: common/static/common/templates/discussion/templates.underscore
 msgid "Question"

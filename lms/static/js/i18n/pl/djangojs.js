@@ -1010,7 +1010,7 @@
     "Publishing Status": "Status opublikowania",
     "Question": "Pytanie",
     "Questions raise issues that need answers. Discussions share ideas and start conversations.": "Za pomoc\u0105 Pytania mo\u017cesz podnie\u015b\u0107 kwestie wymagaj\u0105ce odpowiedzi. Za pomoc\u0105 Dyskusji mo\u017cesz podzieli\u0107 si\u0119 spostrze\u017ceniami i rozpocz\u0105\u0107 rozmow\u0119.",
-    "Questions raise issues that need answers. Discussions share ideas and start conversations. (Required)": "Pytania podnosz\u0105 kwestie wymagaj\u0105ce odpowiedzi. Dyskusje s\u0142u\u017c\u0105 do dzielenie si\u0119 opiniami i rozpocz\u0119cia konwersacji. (Wymagane)",
+    "Questions raise issues that need answers. Discussions share ideas and start conversations. (Required)": "Za pomoc\u0105 Pytania mo\u017cesz podnie\u015b\u0107 kwestie wymagaj\u0105ce odpowiedzi. Za pomoc\u0105 Dyskusji mo\u017cesz podzieli\u0107 si\u0119 spostrze\u017ceniami i rozpocz\u0105\u0107 rozmow\u0119. (Wymagane)",
     "Queued": "Zakolejkowane",
     "REMAINING COURSES": "KURSY POZOSTA\u0141E",
     "Read More": "Dowiedz si\u0119 wi\u0119cej",
