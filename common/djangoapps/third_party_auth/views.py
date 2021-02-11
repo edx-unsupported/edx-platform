@@ -106,14 +106,21 @@ def post_to_custom_auth_form(request):
     if not pipeline_data:
         raise Http404
     # Verify the format of pipeline_data:
+    try:
+        data = pipeline_data['data'].decode('utf-8')
+        hmac = pipeline_data['hmac'].decode('utf-8')
+    except AttributeError:
+        data = pipeline_data['data']
+        hmac = pipeline_data['hmac']
+
     data = {
         'post_url': pipeline_data['post_url'],
         # data: The provider info and user's name, email, etc. as base64 encoded JSON
         # It's base64 encoded because it's signed cryptographically and we don't want whitespace
         # or ordering issues affecting the hash/signature.
-        'data': pipeline_data['data'],
+        'data': data,
         # The cryptographic hash of user_data:
-        'hmac': pipeline_data['hmac'],
+        'hmac': hmac,
     }
     return render(request, 'third_party_auth/post_custom_auth_entry.html', data)
 
