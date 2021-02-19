@@ -32,4 +32,4 @@ git+https://github.com/edx-solutions/projects-edx-platform-extensions.git@v3.0.5
 -e git+https://github.com/edx-solutions/api-integration.git@4193d38dc7aa3bcab885241fc32e25dbb0e47cf0#egg=api-integration
 
 git+https://github.com/mckinseyacademy/openedx-user-manager-api@v1.2.0#egg=openedx-user-manager-api==1.2.0
-openedx-completion-aggregator==2.2.4
+openedx-completion-aggregator==3.0.2
