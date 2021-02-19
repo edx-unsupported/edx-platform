@@ -33,4 +33,4 @@ git+https://github.com/edx-solutions/projects-edx-platform-extensions.git@rebase
 git+https://github.com/edx-solutions/api-integration.git@rebase-juniper#egg=api-integration==5.0.4
 
 git+https://github.com/mckinseyacademy/openedx-user-manager-api@v2.0.1#egg=openedx-user-manager-api==2.0.1
-openedx-completion-aggregator==3.0.1
+openedx-completion-aggregator==3.0.2
