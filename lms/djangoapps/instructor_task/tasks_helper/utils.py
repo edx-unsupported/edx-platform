@@ -15,7 +15,7 @@ UPDATE_STATUS_SKIPPED = 'skipped'
 
 def get_report_info(csv_name, course_id, timestamp, config_name='GRADES_DOWNLOAD'):
     """
-    Upload data as a CSV using ReportStore.
+    Returns ReportStore and Report Name.
 
     Arguments:
         csv_name: Name of the resulting CSV
@@ -51,12 +51,7 @@ def upload_csv_to_report_store(rows, csv_name, course_id, timestamp, config_name
     Returns:
         report_name: string - Name of the generated report
     """
-    report_store = ReportStore.from_config(config_name)
-    report_name = u"{course_prefix}_{csv_name}_{timestamp_str}.csv".format(
-        course_prefix=course_filename_prefix_generator(course_id),
-        csv_name=csv_name,
-        timestamp_str=timestamp.strftime("%Y-%m-%d-%H%M")
-    )
+    report_store, report_name = get_report_info(csv_name, course_id, timestamp, config_name)
 
     report_store.store_rows(course_id, report_name, rows)
     tracker_emit(csv_name)
