@@ -21,7 +21,7 @@ from eventtracking import tracker
 
 from lms.djangoapps.courseware import courses
 from openedx.core.lib.cache_utils import request_cached
-from student.models import get_user_by_username_or_email
+from student.models import get_user_by_username_or_email, CourseAccessRole
 
 from .models import (
     CohortMembership,
@@ -264,7 +264,7 @@ def get_cohort(user, course_key, assign=True, use_cached=False):
             assignment.delete()
             break
         else:
-            course_user_group = get_random_cohort(course_key)
+            course_user_group = get_new_cohort(user, course_key)
         add_user_to_cohort(course_user_group, user)
         return course_user_group
     except ValueError:
@@ -279,6 +279,17 @@ def get_cohort(user, course_key, assign=True, use_cached=False):
             course_key, user.id, six.text_type(integrity_error)
         )
         return get_cohort(user, course_key, assign, use_cached)
+
+
+def get_new_cohort(user, course_key):
+    if CourseAccessRole.objects.filter(user=user, course_id=course_key, role='staff'):
+        try:
+            cohort = get_cohort_by_name(course_key, CourseUserGroup.default_cohort_name)
+        except CourseUserGroup.DoesNotExist:
+            cohort = add_cohort(course_key, CourseUserGroup.default_cohort_name, CourseCohort.RANDOM)
+    else:
+        cohort = get_random_cohort(course_key)
+    return cohort
 
 
 def get_random_cohort(course_key):
