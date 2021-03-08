@@ -134,9 +134,13 @@ def _migrate_progress(course, source, target):
         log.warning('Migration failed. Target user with such email not found: %s', target)
         return OUTCOME_TARGET_NOT_FOUND
 
-    if CourseEnrollment.objects.filter(user=target, course=course_key).exists():
+    try:
+        assert not BlockCompletion.user_course_completion_queryset(user=target, course_key=course_key).exists()
+        anonymous_ids = AnonymousUserId.objects.filter(user=target, course_id=course_key).values('anonymous_user_id')
+        assert not StudentItem.objects.filter(course_id=course_key, student_id__in=anonymous_ids).exists()
+    except AssertionError:
         log.warning(
-            'Migration failed. Target user with email "%s" already enrolled in "%s" course', target.email, course_key
+            'Migration failed. Target user with email "%s" already enrolled in "%s" course and progress is present.', target.email, course_key
         )
         return OUTCOME_TARGET_ALREADY_ENROLLED
 
@@ -155,8 +159,16 @@ def _migrate_progress(course, source, target):
     # Actually migrate completions and progress
     try:
         # Modify enrollment
-        enrollment.user = target
-        enrollment.save()
+        try:
+            target_enrollment = CourseEnrollment.objects.select_for_update().get(user=target, course=course_key)
+        except ObjectDoesNotExist:
+            enrollment.user = target
+        else:
+            enrollment.is_active = False
+            target_enrollment.is_active = True
+            target_enrollment.save()
+        finally:
+            enrollment.save()
 
         # Migrate completions for user
         for completion in completions:
