@@ -674,6 +674,8 @@ class ProblemResponses(object):
         batch_size = 10000
         batch_no = 1
 
+        TASK_LOG.info(u'No. Usage Keys: %s', len(usage_keys))
+
         while True:
             student_data = []
             with store.bulk_operations(course_key):
@@ -691,6 +693,7 @@ class ProblemResponses(object):
                         if filter_types is not None and block_key.block_type not in filter_types:
                             continue
 
+                        TASK_LOG.info(u'Block Key: %s', block_key)
                         block = store.get_item(block_key)
                         generated_report_data = defaultdict(list)
 
@@ -768,6 +771,7 @@ class ProblemResponses(object):
             filter_types = problem_types_filter.split(',')
 
         output_buffer = None
+        TASK_LOG.info(u'inside generate...')
 
         # Compute result table and format it
         for student_data, student_data_keys, batch_no in cls._build_student_data(
@@ -782,6 +786,7 @@ class ProblemResponses(object):
                     data.setdefault(key, '')
 
             header, rows = format_dictlist(student_data, student_data_keys)
+            TASK_LOG.info(u'Rows: %s, Batch_no: %s', len(rows), batch_no)
 
             task_progress.attempted = task_progress.succeeded = len(rows)
 

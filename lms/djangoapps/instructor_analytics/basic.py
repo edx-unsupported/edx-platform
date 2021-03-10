@@ -5,6 +5,7 @@ Serve miscellaneous course and student data
 """
 import datetime
 import json
+import logging
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -30,6 +31,8 @@ from shoppingcart.models import (
     RegistrationCodeRedemption
 )
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
+
+logger = logging.getLogger(__name__)
 
 STUDENT_FEATURES = ('id', 'username', 'first_name', 'last_name', 'is_staff', 'email')
 PROFILE_FEATURES = ('name', 'language', 'location', 'year_of_birth', 'gender',
@@ -442,6 +445,8 @@ def list_problem_responses(course_key, problem_location, limit_responses=None, b
         smdat = smdat[:limit_responses]
     if batch_no:
         smdat = smdat[(batch_no - 1) * batch_size:batch_no * batch_size]
+
+    logger.info(smdat.count())
 
     return [
         {'username': response.student.username, 'state': response.state}
