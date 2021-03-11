@@ -48,7 +48,7 @@ jobs:
            rm -rf ~/virtualenvs/
            virtualenv --python=`which python3.5` --no-wheel --no-setuptools ~/virtualenvs/venv-3.5.2
            source ~/virtualenvs/venv-3.5.2/bin/activate
-           cd && curl https://bootstrap.pypa.io/3.4/get-pip.py -o get-pip.py
+           cd && curl https://bootstrap.pypa.io/pip/3.4/get-pip.py -o get-pip.py
            python get-pip.py pip==20.0.2 wheel==0.35.1 setuptools==50.3.0
 
      - run:

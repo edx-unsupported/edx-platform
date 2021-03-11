@@ -2,6 +2,9 @@ This is the core repository of the Open edX software. It includes the LMS
 (student-facing, delivering courseware), and Studio (course authoring)
 components.
 
+Notice: This repo will be archived in April 2021.
+#######
+
 Installation
 ------------
 
