@@ -249,7 +249,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
     # id_generator is ignored, because each ImportSystem is already local to
     # a course, and has it's own id_generator already in place
     def add_node_as_child(self, block, node, id_generator):
-        child_block = self.process_xml(etree.tostring(node))
+        child_block = self.process_xml(etree.tostring(node, encoding='unicode'))
         block.children.append(child_block.scope_ids.usage_id)
 
 
