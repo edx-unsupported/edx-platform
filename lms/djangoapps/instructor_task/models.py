@@ -272,9 +272,9 @@ class DjangoStorageReportStore(ReportStore):
             getattr(settings, config_name).get('STORAGE_KWARGS'),
         )
 
-    def add_rows(self, course_id, filename, rows, output_buffer=None):
+    def add_rows(self, rows, output_buffer=None):
         """
-        Given a course_id, filename, and rows (each row is an iterable of
+        Given an output buffer and rows (each row is an iterable of
         strings), add rows to output buffer in csv format and return it.
         """
         if not output_buffer:

@@ -1023,7 +1023,7 @@ class ProblemResponses(object):
             csv_name = 'student_state_from_{}'.format(problem_location)
 
             report_store, report_name = get_report_info(csv_name, course_id, start_date)
-            output_buffer = report_store.add_rows(course_id, report_name, rows, output_buffer)
+            output_buffer = report_store.add_rows(rows, output_buffer)
 
         output_buffer.seek(0)
         report_store.store(course_id, report_name, output_buffer)

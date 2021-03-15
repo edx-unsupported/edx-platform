@@ -552,7 +552,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
             ):
                 student_data += student_data_batch
 
-        self.assertEquals(len(student_data), 1)
+        self.assertEqual(len(student_data), 1)
         self.assertDictContainsSubset({
             'username': 'student',
             'location': 'test_course > Section > Subsection > Problem1',
@@ -584,7 +584,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         ):
             student_data += student_data_batch
 
-        self.assertEquals(len(student_data), 2)
+        self.assertEqual(len(student_data), 2)
         self.assertDictContainsSubset({
             'username': 'student',
             'location': 'test_course > Section > Subsection > Problem1',
@@ -618,7 +618,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         ):
             student_data += student_data_batch
 
-        self.assertEquals(len(student_data), 1)
+        self.assertEqual(len(student_data), 1)
         self.assertDictContainsSubset({
             'username': 'student',
             'location': 'test_course > Section > Subsection > Problem1',
@@ -644,11 +644,11 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
         """
         problem = self.define_option_problem(u'Problem1')
         mock_generate_report_data.side_effect = NotImplementedError
-        ProblemResponses._build_student_data(
+        list(ProblemResponses._build_student_data(
             user_id=self.instructor.id,
             course_key=self.course.id,
             usage_key_str_list=[str(problem.location)],
-        )
+        ))
         mock_generate_report_data.assert_called()
         mock_list_problem_responses.assert_called()
 
