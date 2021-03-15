@@ -264,7 +264,8 @@ def get_cohort(user, course_key, assign=True, use_cached=False):
             assignment.delete()
             break
         else:
-            course_user_group = get_new_cohort(user, course_key)
+            is_user_staff = CourseAccessRole.objects.filter(user=user, course_id=course_key, role='staff').exists()
+            course_user_group = get_default_cohort(course_key) if is_user_staff else get_random_cohort(course_key)
         add_user_to_cohort(course_user_group, user)
         return course_user_group
     except ValueError:
@@ -281,14 +282,11 @@ def get_cohort(user, course_key, assign=True, use_cached=False):
         return get_cohort(user, course_key, assign, use_cached)
 
 
-def get_new_cohort(user, course_key):
-    if CourseAccessRole.objects.filter(user=user, course_id=course_key, role='staff'):
-        try:
-            cohort = get_cohort_by_name(course_key, CourseUserGroup.default_cohort_name)
-        except CourseUserGroup.DoesNotExist:
-            cohort = add_cohort(course_key, CourseUserGroup.default_cohort_name, CourseCohort.RANDOM)
-    else:
-        cohort = get_random_cohort(course_key)
+def get_default_cohort(course_key):
+    try:
+        cohort = get_cohort_by_name(course_key, CourseUserGroup.default_cohort_name)
+    except CourseUserGroup.DoesNotExist:
+        cohort = add_cohort(course_key, CourseUserGroup.default_cohort_name, CourseCohort.MANUAL)
     return cohort
 
 
