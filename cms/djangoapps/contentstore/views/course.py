@@ -56,7 +56,7 @@ from contentstore.utils import (
 from contentstore.views.entrance_exam import create_entrance_exam, delete_entrance_exam, update_entrance_exam
 from course_action_state.managers import CourseActionStateItemNotFoundError
 from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
-from course_creators.views import add_user_with_status_unrequested, get_course_creator_status
+from cms.djangoapps.course_creators.views import add_user_with_status_unrequested, get_course_creator_status
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response
 from edx_notifications.data import NotificationMessage
