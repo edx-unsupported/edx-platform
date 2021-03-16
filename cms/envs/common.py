@@ -1356,7 +1356,7 @@ INSTALLED_APPS = [
     'contentstore.apps.ContentstoreConfig',
 
     'openedx.core.djangoapps.contentserver',
-    'course_creators',
+    'cms.djangoapps.course_creators',
     'student.apps.StudentConfig',  # misleading name due to sharing with lms
     'openedx.core.djangoapps.course_groups',  # not used in cms (yet), but tests run
     'xblock_config.apps.XBlockConfig',

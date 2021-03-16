@@ -15,7 +15,7 @@ from contentstore.utils import reverse_library_url, reverse_url, reverse_usage_u
 from contentstore.views.item import _duplicate_item
 from contentstore.views.preview import _load_preview_module
 from contentstore.views.tests.test_library import LIBRARY_REST_URL
-from course_creators.views import add_user_with_status_granted
+from cms.djangoapps.course_creators.views import add_user_with_status_granted
 from student import auth
 from student.auth import has_studio_read_access, has_studio_write_access
 from student.roles import (
