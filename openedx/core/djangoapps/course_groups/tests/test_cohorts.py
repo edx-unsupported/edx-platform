@@ -240,7 +240,7 @@ class TestCohorts(ModuleStoreTestCase):
         self.assertIsNone(cohorts.get_cohort(user, course.id), "No cohort created yet")
 
         cohort = CohortFactory(course_id=course.id, name="TestCohort", users=[user])
-        role = CourseAccessRole(user=staff_user, role="staff", course_id = course.id, org=course.org)
+        role = CourseAccessRole(user=staff_user, role="staff", course_id=course.id, org=course.org)
         role.save()
 
         self.assertIsNone(
