@@ -15,7 +15,7 @@ from opaque_keys.edx.locator import CourseLocator
 from six import text_type
 from six.moves import range
 
-from student.models import CourseEnrollment
+from student.models import CourseEnrollment, CourseAccessRole
 from student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_MODULESTORE, ModuleStoreTestCase
@@ -235,10 +235,13 @@ class TestCohorts(ModuleStoreTestCase):
 
         user = UserFactory(username="test", email="a@b.com")
         other_user = UserFactory(username="test2", email="a2@b.com")
+        staff_user = UserFactory(username="test3", email="a3@b.com")
 
         self.assertIsNone(cohorts.get_cohort(user, course.id), "No cohort created yet")
 
         cohort = CohortFactory(course_id=course.id, name="TestCohort", users=[user])
+        role = CourseAccessRole(user=staff_user, role="staff", course_id=course.id, org=course.org)
+        role.save()
 
         self.assertIsNone(
             cohorts.get_cohort(user, course.id),
@@ -258,6 +261,12 @@ class TestCohorts(ModuleStoreTestCase):
             cohorts.get_cohort(other_user, course.id).id,
             cohorts.get_cohort_by_name(course.id, cohorts.DEFAULT_COHORT_NAME).id,
             "other_user should be assigned to the default cohort"
+        )
+
+        self.assertEqual(
+            cohorts.get_cohort(staff_user, course.id).id,
+            cohorts.get_cohort_by_name(course.id, CourseUserGroup.default_cohort_name).id,
+            "staff_user should be assigned to default cohort"
         )
 
     def test_get_cohort_preassigned_user(self):

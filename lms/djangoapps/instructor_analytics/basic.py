@@ -433,7 +433,7 @@ def coupon_codes_features(features, coupons_list, course_id):
     return [extract_coupon(coupon, features) for coupon in coupons_list]
 
 
-def list_problem_responses(course_key, problem_location, limit_responses=None):
+def list_problem_responses(course_key, problem_location, limit_responses=None, batch_no=None, batch_size=None):
     """
     Return responses to a given problem as a dict.
 
@@ -464,8 +464,11 @@ def list_problem_responses(course_key, problem_location, limit_responses=None):
         module_state_key=problem_key
     )
     smdat = smdat.order_by('student')
-    if limit_responses is not None:
+
+    if limit_responses:
         smdat = smdat[:limit_responses]
+    if batch_no:
+        smdat = smdat[(batch_no - 1) * batch_size:batch_no * batch_size]
 
     return [
         {'username': response.student.username, 'state': get_response_state(response)}
