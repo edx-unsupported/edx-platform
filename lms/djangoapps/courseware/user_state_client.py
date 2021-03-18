@@ -395,11 +395,11 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
 
             yield XBlockUserState(username, block_key, state, history_entry.created, scope)
 
-    def iter_all_for_block(self, block_key, scope=Scope.user_state):
+    def iter_all_for_block(self, block_key, batch_no=None, batch_size=None, scope=Scope.user_state):
         """
         Return an iterator over the data stored in the block (e.g. a problem block).
 
-        You get no ordering guarantees.If you're using this method, you should be running in an
+        Results are ordered by student id. If you're using this method, you should be running in an
         async task.
 
         Arguments:
@@ -413,7 +413,10 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         if scope != Scope.user_state:
             raise ValueError("Only Scope.user_state is supported")
 
-        results = StudentModule.objects.order_by('id').filter(module_state_key=block_key)
+        results = StudentModule.objects.filter(module_state_key=block_key).order_by('student')
+        if batch_no:
+            results = results[(batch_no - 1) * batch_size:batch_no * batch_size]
+
         p = Paginator(results, settings.USER_STATE_BATCH_SIZE)
 
         for page_number in p.page_range:

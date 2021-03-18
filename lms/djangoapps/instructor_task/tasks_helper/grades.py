@@ -923,7 +923,7 @@ class ProblemResponses(object):
                         # human-readable formatting for user state.
                         if hasattr(block, 'generate_report_data'):
                             try:
-                                user_state_iterator = user_state_client.iter_all_for_block(block_key)
+                                user_state_iterator = user_state_client.iter_all_for_block(block_key, batch_no, batch_size)
                                 for username, state in block.generate_report_data(user_state_iterator, max_count):
                                     generated_report_data[username].append(state)
                             except NotImplementedError:
@@ -993,6 +993,7 @@ class ProblemResponses(object):
             filter_types = problem_types_filter.split(',')
 
         output_buffer = None
+        total_rows = 0
 
         # Compute result table and format it
         for student_data, student_data_keys, batch_no in cls._build_student_data(
@@ -1008,7 +1009,8 @@ class ProblemResponses(object):
 
             header, rows = format_dictlist(student_data, student_data_keys)
 
-            task_progress.attempted = task_progress.succeeded = len(rows)
+            total_rows += len(rows)
+            task_progress.attempted = task_progress.succeeded = total_rows
 
             if batch_no == 1:
                 rows.insert(0, header)
