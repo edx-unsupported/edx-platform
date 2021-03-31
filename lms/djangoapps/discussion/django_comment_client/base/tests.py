@@ -648,8 +648,6 @@ class ViewsTestCase(
             )
         self.assertEqual(response.status_code, 200)
 
-    # TODO : juniper rebase - check if we can remove this skip
-    @skip("Saving these changes after signal is handled by Celery task. It needs to be tested differently")
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_NOTIFICATIONS": True})
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_SOCIAL_ENGAGEMENT": True})
     def test_create_cohorted_thread(self, mock_request):
@@ -710,7 +708,7 @@ class ViewsTestCase(
 
         leaderboard_position = StudentSocialEngagementScore.get_user_leaderboard_position(
             self.course.id,
-            self.student.id
+            user_id=self.student.id
         )
 
         # should be 0 points
@@ -731,7 +729,7 @@ class ViewsTestCase(
         # in order to test social engagement scoring, we have
         # to mock out the social stats cs_comment_service
         # API
-        with patch('social_engagement.engagement._get_user_social_stats') as mock_func:
+        with patch('social_engagement.engagement._get_course_social_stats') as mock_func:
             mock_func.return_value = {
                 'num_threads': 1,
                 'num_comments': 0,
@@ -750,7 +748,7 @@ class ViewsTestCase(
             # based on default scoring rules
             leaderboard_position = StudentSocialEngagementScore.get_user_leaderboard_position(
                 self.course.id,
-                self.student.id
+                user_id=self.student.id
             )
 
             # should be 10 points
@@ -826,7 +824,7 @@ class ViewsTestCase(
             "comments_count": 0,
         })
 
-        with patch('social_engagement.engagement._get_user_social_stats') as mock_func:
+        with patch('social_engagement.engagement._get_course_social_stats') as mock_func:
             mock_func.return_value = {
                 'num_threads': 2,
                 'num_comments': 0,
@@ -846,7 +844,7 @@ class ViewsTestCase(
             # created two threads
             leaderboard_position = StudentSocialEngagementScore.get_user_leaderboard_position(
                 self.course.id,
-                self.student.id
+                user_id=self.student.id
             )
 
             # should be 10 points

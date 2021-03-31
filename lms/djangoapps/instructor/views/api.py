@@ -1004,8 +1004,6 @@ def list_course_role_members(request, course_id):
     return JsonResponse(response_payload)
 
 
-# TODO: juniper upgrade - adjust this method decorator in custom class based view
-# @require_course_permission(permissions.CAN_RESEARCH)
 class ProblemResponseReport(DeveloperErrorViewMixin, APIView):
     """
     **Use Cases**
@@ -2436,8 +2434,6 @@ def list_email_content(request, course_id):
     return JsonResponse(response_payload)
 
 
-# TODO: juniper upgrade - adjust this method decorator in custom class based view
-# @require_course_permission(permissions.SHOW_TASKS)
 class InstructorTasks(DeveloperErrorViewMixin, APIView):
     """
     **Use Cases**
@@ -2555,8 +2551,6 @@ def list_entrance_exam_instructor_tasks(request, course_id):
     return JsonResponse(response_payload)
 
 
-# TODO: juniper upgrade - adjust this method decorator in custom class based view
-# @require_course_permission(permissions.CAN_RESEARCH)
 class ReportDownloadsList(DeveloperErrorViewMixin, APIView):
     """
     **Use Cases**
