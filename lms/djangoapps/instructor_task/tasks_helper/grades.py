@@ -958,9 +958,6 @@ class ProblemResponses(object):
                             if max_count <= 0:
                                 break
 
-            if not student_data:
-                break
-
             # Keep the keys in a useful order, starting with username, title and location,
             # then the columns returned by the xblock report generator in sorted order and
             # finally end with the more machine friendly block_key and state.
@@ -971,6 +968,9 @@ class ProblemResponses(object):
             )
 
             yield student_data, student_data_keys_list, batch_no
+
+            if not student_data:
+                break
             batch_no += 1
 
     @classmethod
