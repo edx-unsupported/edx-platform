@@ -217,7 +217,7 @@ class ReportStore(object):
                     'bucket': config['BUCKET'],
                     'location': config['ROOT_PATH'],
                     'custom_domain': config.get("CUSTOM_DOMAIN", None),
-                    'querystring_expire': 1200,
+                    'querystring_expire': 5400,
                     'gzip': True,
                 },
             )
@@ -271,6 +271,21 @@ class DjangoStorageReportStore(ReportStore):
             getattr(settings, config_name).get('STORAGE_CLASS'),
             getattr(settings, config_name).get('STORAGE_KWARGS'),
         )
+
+    def add_rows(self, rows, output_buffer=None):
+        """
+        Given an output buffer and rows (each row is an iterable of
+        strings), add rows to output buffer in csv format and return it.
+        """
+        if not output_buffer:
+            output_buffer = ContentFile('')
+            # Adding unicode signature (BOM) for MS Excel 2013 compatibility
+            if six.PY2:
+                output_buffer.write(codecs.BOM_UTF8)
+
+        csvwriter = csv.writer(output_buffer)
+        csvwriter.writerows(self._get_utf8_encoded_rows(rows))
+        return output_buffer
 
     def store(self, course_id, filename, buff):
         """

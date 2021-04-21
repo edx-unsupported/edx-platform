@@ -17,7 +17,7 @@ from contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase, pars
 from contentstore.utils import reverse_course_url, reverse_library_url
 from contentstore.views.component import get_component_templates
 from contentstore.views.library import get_library_creator_status
-from course_creators.views import add_user_with_status_granted as grant_course_creator_status
+from cms.djangoapps.course_creators.views import add_user_with_status_granted as grant_course_creator_status
 from student.roles import LibraryUserRole
 from xmodule.modulestore.tests.factories import LibraryFactory
 

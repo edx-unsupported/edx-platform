@@ -105,7 +105,7 @@ mako==1.0.2                         # Primary template language used for server-
 Markdown                            # Convert text markup to HTML; used in capa problems, forums, and course wikis
 mongoengine==0.10.0                 # Object-document mapper for MongoDB, used in the LMS dashboard
 mysqlclient                         # Driver for the default production relational database
-newrelic                            # New Relic agent for performance monitoring
+newrelic==5.12.1.141                # New Relic agent for performance monitoring
 nodeenv                             # Utility for managing Node.js environments; we use this for deployments and testing
 oauthlib                            # OAuth specification support for authenticating via LTI or other Open edX services
 openedx-calc                        # Library supporting mathematical calculations for Open edX
@@ -113,7 +113,7 @@ pa11ycrawler                        # Python crawler (using Scrapy) that uses Pa
 pdfminer.six                        # Used in shoppingcart for extracting/parsing pdf text
 piexif                              # Exif image metadata manipulation, used in the profile_images app
 Pillow                              # Image manipulation library; used for course assets, profile images, invoice PDFs, etc.
-py2neo<4.0.0                        # Used to communicate with Neo4j, which is used internally for modulestore inspection
+
 PyContracts
 pycountry
 pycryptodomex

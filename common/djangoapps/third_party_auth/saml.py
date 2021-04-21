@@ -209,10 +209,16 @@ class EdXSAMLIdentityProvider(SAMLIdentityProvider):
         """
         details = super(EdXSAMLIdentityProvider, self).get_user_details(attributes)
         extra_field_definitions = self.conf.get('extra_field_definitions', [])
-        details.update({
-            field['name']: attributes[field['urn']][0] if field['urn'] in attributes else None
-            for field in extra_field_definitions
-        })
+        extra_fields = {}
+        for field in extra_field_definitions:
+            value = attributes[field['urn']] if field['urn'] in attributes else None
+            if isinstance(value, list):
+                if value:
+                    value = value[0]
+                else:
+                    value = None
+            extra_fields[field['name']] = value
+        details.update(extra_fields)
         return details
 
     def get_attr(self, attributes, conf_key, default_attribute):
