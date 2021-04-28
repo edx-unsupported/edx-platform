@@ -56,7 +56,7 @@ django-pyfs
 django-ratelimit-backend
 django-require
 django-sekizai
-django-ses
+django-ses>=2.0.0                   # Pinned to use AWS Signature V4 as older versions are deprecated
 django-simple-history
 django-splash
 django-statici18n

@@ -90,7 +90,7 @@ django-pyfs==2.1          # via -r requirements/edx/testing.txt
 django-ratelimit-backend==2.0  # via -r requirements/edx/testing.txt
 django-require==1.0.11    # via -r requirements/edx/testing.txt
 django-sekizai==1.1.0     # via -r requirements/edx/testing.txt, django-wiki
-django-ses==0.8.14        # via -r requirements/edx/testing.txt
+django-ses==2.0.0         # via -r requirements/edx/testing.txt
 django-simple-history==2.10.0  # via -r requirements/edx/testing.txt, edx-enterprise, edx-organizations, ora2
 django-splash==0.2.9      # via -r requirements/edx/testing.txt
 django-statici18n==1.9.0  # via -r requirements/edx/testing.txt
