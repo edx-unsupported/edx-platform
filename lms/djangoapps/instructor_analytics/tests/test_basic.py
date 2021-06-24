@@ -122,13 +122,15 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
                 patched_manager.filter.return_value = mock_results
 
                 mock_problem_location = ''
-                problem_responses = list_problem_responses(self.course_key, problem_location=mock_problem_location)
+                problem_responses = list(
+                    list_problem_responses(self.course_key, problem_location=mock_problem_location)
+                )
 
                 # Check if list_problem_responses called UsageKey.from_string to look up problem key:
                 patched_from_string.assert_called_once_with(mock_problem_location)
                 # Check if list_problem_responses called StudentModule.objects.filter to obtain relevant records:
                 patched_manager.filter.assert_called_once_with(
-                    course_id=self.course_key, module_state_key=mock_problem_key
+                    module_state_key=mock_problem_key
                 )
 
                 # Check if list_problem_responses returned expected results:

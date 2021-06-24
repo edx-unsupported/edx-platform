@@ -560,7 +560,7 @@ class TestProblemResponsesReport(TestReportMixin, InstructorTaskModuleTestCase):
             'title': 'Problem1',
         }, student_data[0])
         self.assertIn('state', student_data[0])
-        mock_list_problem_responses.assert_called_with(self.course.id, ANY, ANY, ANY, ANY)
+        mock_list_problem_responses.assert_called_with(self.course.id, ANY, ANY)
 
     @patch('xmodule.capa_module.ProblemBlock.generate_report_data', create=True)
     def test_build_student_data_for_block_with_mock_generate_report_data(self, mock_generate_report_data):

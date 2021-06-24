@@ -14,6 +14,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers.json import DjangoJSONEncoder
+from django.core.paginator import Paginator
 from django.db.models import Count, Q
 from django.urls import reverse
 from edx_proctoring.api import get_exam_violation_report
@@ -433,7 +434,7 @@ def coupon_codes_features(features, coupons_list, course_id):
     return [extract_coupon(coupon, features) for coupon in coupons_list]
 
 
-def list_problem_responses(course_key, problem_location, limit_responses=None, batch_no=None, batch_size=None):
+def list_problem_responses(course_key, problem_location, limit_responses=None):
     """
     Return responses to a given problem as a dict.
 
@@ -460,20 +461,19 @@ def list_problem_responses(course_key, problem_location, limit_responses=None, b
         return []
 
     smdat = StudentModule.objects.filter(
-        course_id=course_key,
         module_state_key=problem_key
-    )
-    smdat = smdat.order_by('student')
+    ).select_related('student').order_by('student')
 
     if limit_responses:
         smdat = smdat[:limit_responses]
-    if batch_no:
-        smdat = smdat[(batch_no - 1) * batch_size:batch_no * batch_size]
 
-    return [
-        {'username': response.student.username, 'state': get_response_state(response)}
-        for response in smdat
-    ]
+    p = Paginator(smdat, settings.USER_STATE_BATCH_SIZE)
+
+    for page_number in p.page_range:
+        page = p.page(page_number)
+
+        for response in page.object_list:
+            yield {'username': response.student.username, 'state': get_response_state(response)}
 
 
 def get_response_state(response):
