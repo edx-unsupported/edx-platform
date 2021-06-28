@@ -1020,7 +1020,7 @@ class ProblemResponses(object):
             output_buffer = report_store.add_rows(rows, output_buffer)
 
         output_buffer.seek(0)
-        report_store.store(course_id, report_name, output_buffer)
+        report_store.store(course_id, report_name, output_buffer, True)
         tracker_emit(report_name)
         current_step = {'step': 'CSV uploaded', 'report_name': report_name}
 

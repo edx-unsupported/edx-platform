@@ -278,16 +278,20 @@ class DjangoStorageReportStore(ReportStore):
         strings), add rows to output buffer in csv format and return it.
         """
         if not output_buffer:
-            output_buffer = ContentFile('')
+            output_buffer = ContentFile(b'')
             # Adding unicode signature (BOM) for MS Excel 2013 compatibility
             if six.PY2:
                 output_buffer.write(codecs.BOM_UTF8)
 
-        csvwriter = csv.writer(output_buffer)
+        buff = ContentFile('')
+        csvwriter = csv.writer(buff)
         csvwriter.writerows(self._get_utf8_encoded_rows(rows))
+        buff.seek(0)
+
+        output_buffer.write(buff.read().encode('utf-8'))
         return output_buffer
 
-    def store(self, course_id, filename, buff):
+    def store(self, course_id, filename, buff, batched=False):
         """
         Store the contents of `buff` in a directory determined by hashing
         `course_id`, and name the file `filename`. `buff` can be any file-like
@@ -296,7 +300,7 @@ class DjangoStorageReportStore(ReportStore):
         path = self.path_to(course_id, filename)
         # See https://github.com/boto/boto/issues/2868
         # Boto doesn't play nice with unicod in python3
-        if not six.PY2:
+        if not six.PY2 and not batched:
             buff = ContentFile(buff.read().encode('utf-8'))
 
         self.storage.save(path, buff)
