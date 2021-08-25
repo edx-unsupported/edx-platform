@@ -121,7 +121,7 @@
         <div class="field-help" id="field_help_title">
             <%- gettext("Add a clear and descriptive title to encourage participation. (Required)") %>
         </div>
-        <input id='edit-discussion-forum-title' aria-describedby="field_help_title" type="text" class="edit-post-title field-input" name="title" placeholder="Title" value="<%- title %>">
+        <input id='edit-discussion-forum-title' aria-describedby="field_help_title" type="text" class="edit-post-title field-input" name="title" placeholder="<%- gettext("Title") %>" value="<%- title %>">
     </label>
 </div>
 <div class="form-row post-field">
@@ -476,7 +476,7 @@
                 <%- gettext("Add a clear and descriptive title to encourage participation. (Required)") %>
             </div>
             <div>
-                <input id='discussion-forum-title' aria-describedby="field_help_title" type="text" class="js-post-title field-input" name="title" placeholder="Title">
+                <input id='discussion-forum-title' aria-describedby="field_help_title" type="text" class="js-post-title field-input" name="title" placeholder="<%- gettext("Title") %>">
             </div>
         </label>
     </div>
