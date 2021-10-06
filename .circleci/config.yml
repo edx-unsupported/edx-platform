@@ -54,13 +54,9 @@ jobs:
      - run:
          name: Installing Node v12.18.4 and Node packages
          command: |
-           sudo apt-get update || echo "This is expected to fail."
-           sudo apt-get install -y ca-certificates
-           sudo rm -f /etc/ssl/certs/2e5ac55d.0
-           sudo rm -f /etc/ssl/certs/12d55845.0
-           sudo rm -f /etc/ssl/certs/DST_Root_CA_X3.pem
-           sed -i '/mozilla\/DST_Root_CA_X3.crt/d' /etc/ca-certificates.conf
-           update-ca-certificates --fresh
+           sudo apt-get install openssl ca-certificates
+           sudo rm -f /usr/share/ca-certificates/mozilla/DST_Root_CA_X3.crt
+           sudo update-ca-certificates
            curl -fsSL https://deb.nodesource.com/setup_12.x | sudo -E bash -
            sudo apt-get install -y nodejs
            sudo npm install -g n
