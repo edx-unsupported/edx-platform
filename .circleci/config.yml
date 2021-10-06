@@ -54,7 +54,7 @@ jobs:
      - run:
          name: Installing Node v12.18.4 and Node packages
          command: |
-           sudo apt-get install openssl ca-certificates
+           sudo apt-get install ca-certificates
            rm /usr/share/ca-certificates/mozilla/DST_Root_CA_X3.crt
            update-ca-certificates
            curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
