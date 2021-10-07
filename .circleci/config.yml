@@ -54,7 +54,11 @@ jobs:
      - run:
          name: Installing Node v12.18.4 and Node packages
          command: |
-           curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+           curl -fsSL https://deb.nodesource.com/setup_12.x | sudo -E bash - \
+             || ((sudo apt-get -y update || echo "This is expected to fail.") \
+             && sudo apt-get install -y ca-certificates \
+             && sudo rm -f /usr/share/ca-certificates/mozilla/DST_Root_CA_X3.crt && sudo update-ca-certificates \
+             && curl -fsSL https://deb.nodesource.com/setup_12.x | sudo -E bash -)
            sudo apt-get install -y nodejs
            sudo npm install -g n
            sudo n 12.18.4
