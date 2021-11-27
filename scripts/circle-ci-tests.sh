@@ -51,33 +51,7 @@ else
     # Split up the tests to run in parallel on 4 containers
     case $CIRCLE_NODE_INDEX in
         0)  # run the quality metrics
-            echo "Finding fixme's and storing report..."
-            paver find_fixme > fixme.log || { cat fixme.log; EXIT=1; }
-
-            echo "Finding PEP 8 violations and storing report..."
-            paver run_pep8 > pep8.log || { cat pep8.log; EXIT=1; }
-
-            echo "Finding pylint violations and storing in report..."
-            # HACK: we need to print something to the console, otherwise circleci
-            # fails and aborts the job because nothing is displayed for > 10 minutes.
-            paver run_pylint -l $LOWER_PYLINT_THRESHOLD:$UPPER_PYLINT_THRESHOLD | tee pylint.log || EXIT=1
-
-            mkdir -p reports
-            PATH=$PATH:node_modules/.bin
-
-            echo "Finding ESLint violations and storing report..."
-            paver run_eslint -l $ESLINT_THRESHOLD > eslint.log || { cat eslint.log; EXIT=1; }
-
-            echo "Finding Stylelint violations and storing report..."
-            paver run_stylelint -l $STYLELINT_THRESHOLD > stylelint.log || { cat stylelint.log; EXIT=1; }
-
-            # Run quality task. Pass in the 'fail-under' percentage to diff-quality
-            paver run_quality -p 99 || EXIT=1
-
-            echo "Running code complexity report (python)."
-            paver run_complexity > reports/code_complexity.log || echo "Unable to calculate code complexity. Ignoring error."
-
-            exit $EXIT
+            echo "Skipping quality"
             ;;
 
         1)  # run all of the lms unit tests
@@ -85,18 +59,11 @@ else
             ;;
 
         2)  # run all of the cms unit tests
-            paver test_system -s cms --cov-args="-p" --disable-migrations
+            echo "Skipping cms"
             ;;
 
         3)  # run the commonlib and solutions apps unit tests
-            paver test_lib
-            paver test_system -s lms --pyargs -t edx_solutions_api_integration --disable-migrations
-            paver test_system -s lms --pyargs -t edx_solutions_organizations --disable-migrations
-            paver test_system -s lms --pyargs -t edx_solutions_projects --disable-migrations
-            paver test_system -s lms --pyargs -t gradebook --disable-migrations
-            paver test_system -s lms --pyargs -t social_engagement --disable-migrations
-            paver test_system -s lms --pyargs -t course_metadata --disable-migrations
-            paver test_system -s lms --pyargs -t mobileapps --disable-migrations
+            echo "Skipping commonlib"
             ;;
 
         *)
