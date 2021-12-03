@@ -132,6 +132,7 @@ jobs:
      - run:
          name: Running Tests
          command: |
+           export PYTHONUNBUFFERED=1
            source ~/virtualenvs/venv-3.5.2/bin/activate
            ./scripts/all-tests.sh
          no_output_timeout: 120m
