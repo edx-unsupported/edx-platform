@@ -48,7 +48,7 @@ if [ "$CIRCLE_NODE_TOTAL" == "1" ] ; then
 
     exit $EXIT
 else
-    # Split up the tests to run in parallel on 4 containers
+    # Split up the tests to run in parallel on 8 containers
     case $CIRCLE_NODE_INDEX in
         0)  # run the quality metrics
             echo "Finding fixme's and storing report..."
@@ -82,7 +82,7 @@ else
 
         1)  # run all of the lms unit tests
             #paver test_system -s lms --cov-args="-p" --disable-migrations
-            paver test_system -s lms --pyargs -t discussion --disable-migrations
+            paver test_system -s lms --pyargs -t discussion --cov-args="-p" --disable-migrations
             ;;
 
         2)  # run all of the cms unit tests
@@ -100,6 +100,24 @@ else
             paver test_system -s lms --pyargs -t mobileapps --disable-migrations
             ;;
 
+        4)  # run all of the lms unit tests
+            paver test_system -s lms --pyargs -t course_api --cov-args="-p" --disable-migrations
+            paver test_system -s lms --pyargs -t grades --cov-args="-p" --disable-migrations
+            paver test_system -s lms --pyargs -t instructor --cov-args="-p" --disable-migrations
+            ;;
+        5)  # run all of the lms unit tests
+            paver test_system -s lms --pyargs -t course_blocks --cov-args="-p" --disable-migrations
+            paver test_system -s lms --pyargs -t learner_dashboard --cov-args="-p" --disable-migrations
+            ;;
+        6)  # run all of the lms unit tests
+            #paver test_system -s lms --cov-args="-p" --disable-migrations
+            paver test_system -s lms --pyargs -t mobile_api --cov-args="-p" --disable-migrations
+            paver test_system -s lms --pyargs -t instructor --cov-args="-p" --disable-migrations
+            ;;
+        7)  # run all of the lms unit tests
+            paver test_system -s lms --pyargs -t dashboard --cov-args="-p" --disable-migrations
+            paver test_system -s lms --pyargs -t courseware --cov-args="-p" --disable-migrations
+            ;;
         *)
             echo "No tests were executed in this container."
             echo "Please adjust scripts/circle-ci-tests.sh to match your parallelism."
