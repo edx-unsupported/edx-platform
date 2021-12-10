@@ -48,7 +48,7 @@ if [ "$CIRCLE_NODE_TOTAL" == "1" ] ; then
 
     exit $EXIT
 else
-    # Split up the tests to run in parallel on 4 containers
+    # Split up the tests to run in parallel on 22 containers
     case $CIRCLE_NODE_INDEX in
         0)  # run the quality metrics
             echo "Finding fixme's and storing report..."
@@ -80,8 +80,9 @@ else
             exit $EXIT
             ;;
 
-        1)  # run all of the lms unit tests
-            paver test_system -s lms --cov-args="-p" --disable-migrations
+        1)  # run selected of the lms unit tests
+            #paver test_system -s lms --cov-args="-p" --disable-migrations
+            paver test_system -s lms --pyargs -t discussion --cov-args="-p" --disable-migrations
             ;;
 
         2)  # run all of the cms unit tests
@@ -98,6 +99,55 @@ else
             paver test_system -s lms --pyargs -t course_metadata --disable-migrations
             paver test_system -s lms --pyargs -t mobileapps --disable-migrations
             ;;
+
+        4)  # run selected of the lms unit tests
+            paver test_system -s lms --pyargs -t course_api --cov-args="-p" --disable-migrations
+            paver test_system -s lms --pyargs -t grades --cov-args="-p" --disable-migrations
+            paver test_system -s lms --pyargs -t instructor --cov-args="-p" --disable-migrations
+            paver test_system -s lms --pyargs -t staticbook --cov-args="-p" --disable-migrations
+            ;;
+
+        5)  # run selected of the lms unit tests
+            paver test_system -s lms --pyargs -t course_blocks --cov-args="-p" --disable-migrations
+            paver test_system -s lms --pyargs -t learner_dashboard --cov-args="-p" --disable-migrations
+            paver test_system -s lms --pyargs -t support --cov-args="-p" --disable-migrations
+            paver test_system -s lms --pyargs -t survey --cov-args="-p" --disable-migrations
+            paver test_system -s lms --pyargs -t teams --cov-args="-p" --disable-migrations
+            ;;
+
+        6)  # run selected of the lms unit tests
+            #paver test_system -s lms --cov-args="-p" --disable-migrations
+            paver test_system -s lms --pyargs -t mobile_api --cov-args="-p" --disable-migrations
+            paver test_system -s lms --pyargs -t instructor_analytics --cov-args="-p" --disable-migrations
+            paver test_system -s lms --pyargs -t tests --cov-args="-p" --disable-migrations
+            paver test_system -s lms --pyargs -t verify_student --cov-args="-p" --disable-migrations
+            ;;
+
+        7)  # run selected of the lms unit tests
+            paver test_system -s lms --pyargs -t dashboard --cov-args="-p" --disable-migrations
+            paver test_system -s lms --pyargs -t courseware --cov-args="-p" --disable-migrations
+            ;;
+
+        8)  # run selected of the lms unit tests
+            paver test_system -s lms --pyargs -t badges --cov-args="-p" --disable-migrations
+            paver test_system -s lms --pyargs -t branding --cov-args="-p" --disable-migrations
+            ;;
+
+        9)  # run selected of the lms unit tests
+            paver test_system -s lms --pyargs -t bulk_email --cov-args="-p" --disable-migrations
+            paver test_system -s lms --pyargs -t bulk_enroll --cov-args="-p" --disable-migrations
+            ;;
+
+        10)  # run selected of the lms unit tests
+            paver test_system -s lms --pyargs -t ccx --cov-args="-p" --disable-migrations
+            paver test_system -s lms --pyargs -t certificates --cov-args="-p" --disable-migrations
+            ;;
+
+        11)  # run selected of the lms unit tests
+            paver test_system -s lms --pyargs -t commerce --cov-args="-p" --disable-migrations
+            paver test_system -s lms --pyargs -t course_goals --cov-args="-p" --disable-migrations
+            ;;
+
 
         *)
             echo "No tests were executed in this container."
