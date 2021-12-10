@@ -6,7 +6,7 @@ jobs:
       enabled: true
       image: ubuntu-1604:201903-01
    resource_class: large
-   parallelism: 22
+   parallelism: 12
 
    steps:
      - checkout
