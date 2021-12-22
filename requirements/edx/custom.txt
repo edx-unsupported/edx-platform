@@ -16,6 +16,7 @@ git+https://github.com/mckinseyacademy/xblock-group-project.git@1.0.0#egg=xblock
 -e git+https://github.com/mckinseyacademy/xblock-chat.git@v0.3.0#egg=chat-xblock==0.3.0
 -e git+https://github.com/mckinseyacademy/xblock-eoc-journal.git@v0.10.1#egg=xblock-eoc-journal==0.10.1
 -e git+https://github.com/mckinseyacademy/xblock-scorm.git@v3.2.2#egg=xblock-scorm==3.2.2
+# is this Repo working
 -e git+https://github.com/mckinseyacademy/xblock-diagnosticfeedback.git@v0.4.1#egg=xblock-diagnostic-feedback==0.4.1
 
 -e git+https://github.com/mckinseyacademy/xblock-group-project-v2.git@0.12.14#egg=xblock-group-project-v2==0.12.14
