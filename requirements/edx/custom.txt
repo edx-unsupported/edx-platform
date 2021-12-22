@@ -33,5 +33,5 @@ git+https://github.com/mckinseyacademy/course-edx-platform-extensions.git@v4.0.0
 git+https://github.com/mckinseyacademy/projects-edx-platform-extensions.git@v4.0.0#egg=projects-edx-platform-extensions==4.0.0
 git+https://github.com/mckinseyacademy/api-integration.git@v5.0.5#egg=api-integration==5.0.5
 
--e git+https://${PAT_GITHUB}@github.com/mckinseyacademy/openedx-user-manager-api@v2.0.1#egg=openedx-user-manager-api==2.0.1
+git+https://${PAT_GITHUB}@github.com/mckinseyacademy/openedx-user-manager-api@v2.0.1#egg=openedx-user-manager-api==2.0.1
 openedx-completion-aggregator==3.0.3
