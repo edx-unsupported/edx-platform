@@ -230,14 +230,14 @@ class ReportStore(object):
             )
         return DjangoStorageReportStore.from_config(config_name)
 
-    def _get_utf8_encoded_rows(self, rows, encode_for_utf8=False):
+    def _get_utf8_encoded_rows(self, rows):
         """
         Given a list of `rows` containing unicode strings, return a
         new list of rows with those strings encoded as utf-8 for CSV
         compatibility.
         """
         for row in rows:
-            if six.PY2 or encode_for_utf8:
+            if six.PY2:
                 yield [six.text_type(item).encode('utf-8') for item in row]
             else:
                 yield [six.text_type(item) for item in row]
@@ -300,12 +300,18 @@ class DjangoStorageReportStore(ReportStore):
         path = self.path_to(course_id, filename)
         # See https://github.com/boto/boto/issues/2868
         # Boto doesn't play nice with unicod in python3
-        if not six.PY2 and not batched:
-            buff = ContentFile(buff.read().encode('utf-8'))
+        if batched:
+            output_buffer = ContentFile(b'')
+            # for large file buff.read() throws memory error so we have to use chunks
+            for chunk in buff.chunks():
+                output_buffer.write(chunk.encode('utf-8'))
+            self.storage.save(path, output_buffer)
+        else:
+            if not six.PY2:
+                buff = ContentFile(buff.read().encode('utf-8'))
+            self.storage.save(path, buff)
 
-        self.storage.save(path, buff)
-
-    def store_rows(self, course_id, filename, rows, encode_for_utf8=False, batched=False):
+    def store_rows(self, course_id, filename, rows, batched=False):
         """
         Given a course_id, filename, and rows (each row is an iterable of
         strings), write the rows to the storage backend in csv format.
@@ -315,9 +321,9 @@ class DjangoStorageReportStore(ReportStore):
         if six.PY2:
             output_buffer.write(codecs.BOM_UTF8)
         csvwriter = csv.writer(output_buffer)
-        csvwriter.writerows(self._get_utf8_encoded_rows(rows, encode_for_utf8))
+        csvwriter.writerows(self._get_utf8_encoded_rows(rows))
         output_buffer.seek(0)
-        self.store(course_id, filename, output_buffer, batched)
+        self.store(course_id, filename, output_buffer, batched=batched)
 
     def links_for(self, course_id):
         """
