@@ -230,14 +230,14 @@ class ReportStore(object):
             )
         return DjangoStorageReportStore.from_config(config_name)
 
-    def _get_utf8_encoded_rows(self, rows, encode_for_utf8=False):
+    def _get_utf8_encoded_rows(self, rows):
         """
         Given a list of `rows` containing unicode strings, return a
         new list of rows with those strings encoded as utf-8 for CSV
         compatibility.
         """
         for row in rows:
-            if six.PY2 or encode_for_utf8:
+            if six.PY2:
                 yield [six.text_type(item).encode('utf-8') for item in row]
             else:
                 yield [six.text_type(item) for item in row]
@@ -305,7 +305,7 @@ class DjangoStorageReportStore(ReportStore):
 
         self.storage.save(path, buff)
 
-    def store_rows(self, course_id, filename, rows, encode_for_utf8=False, batched=False):
+    def store_rows(self, course_id, filename, rows):
         """
         Given a course_id, filename, and rows (each row is an iterable of
         strings), write the rows to the storage backend in csv format.
@@ -315,9 +315,9 @@ class DjangoStorageReportStore(ReportStore):
         if six.PY2:
             output_buffer.write(codecs.BOM_UTF8)
         csvwriter = csv.writer(output_buffer)
-        csvwriter.writerows(self._get_utf8_encoded_rows(rows, encode_for_utf8))
+        csvwriter.writerows(self._get_utf8_encoded_rows(rows))
         output_buffer.seek(0)
-        self.store(course_id, filename, output_buffer, batched)
+        self.store(course_id, filename, output_buffer)
 
     def links_for(self, course_id):
         """
