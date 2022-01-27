@@ -272,7 +272,7 @@ class DjangoStorageReportStore(ReportStore):
             getattr(settings, config_name).get('STORAGE_KWARGS'),
         )
 
-    def add_rows(self, rows, output_buffer=None):
+    def add_rows(self, rows, output_buffer=None, batched=False):
         """
         Given an output buffer and rows (each row is an iterable of
         strings), add rows to output buffer in csv format and return it.
@@ -287,8 +287,11 @@ class DjangoStorageReportStore(ReportStore):
         csvwriter = csv.writer(buff)
         csvwriter.writerows(self._get_utf8_encoded_rows(rows))
         buff.seek(0)
-
-        output_buffer.write(buff.read().encode('utf-8'))
+        if batched:
+            for chunk in buff.chunks(chunk_size=size):
+                output_buffer.write(chunk.encode('utf-8'))
+        else:
+            output_buffer.write(buff.read().encode('utf-8'))
         return output_buffer
 
     def store(self, course_id, filename, buff, batched=False):
@@ -300,18 +303,12 @@ class DjangoStorageReportStore(ReportStore):
         path = self.path_to(course_id, filename)
         # See https://github.com/boto/boto/issues/2868
         # Boto doesn't play nice with unicod in python3
-        if batched:
-            output_buffer = ContentFile(b'')
-            # for large file buff.read() throws memory error so we have to use chunks
-            for chunk in buff.chunks():
-                output_buffer.write(chunk.encode('utf-8'))
-            self.storage.save(path, output_buffer)
-        else:
-            if not six.PY2:
-                buff = ContentFile(buff.read().encode('utf-8'))
-            self.storage.save(path, buff)
+        if not six.PY2 and not batched:
+            buff = ContentFile(buff.read().encode('utf-8'))
 
-    def store_rows(self, course_id, filename, rows, batched=False):
+        self.storage.save(path, buff)
+
+    def store_rows(self, course_id, filename, rows):
         """
         Given a course_id, filename, and rows (each row is an iterable of
         strings), write the rows to the storage backend in csv format.
@@ -323,7 +320,7 @@ class DjangoStorageReportStore(ReportStore):
         csvwriter = csv.writer(output_buffer)
         csvwriter.writerows(self._get_utf8_encoded_rows(rows))
         output_buffer.seek(0)
-        self.store(course_id, filename, output_buffer, batched=batched)
+        self.store(course_id, filename, output_buffer)
 
     def links_for(self, course_id):
         """
